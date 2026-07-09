@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { supabase } from '../lib/supabase';
 import { eq } from 'drizzle-orm';
 import { db } from '@project-atlas/database';
+import { ActivityService } from '../lib/activity';
 
 // Document schema for validation
 const documentSchema = z.object({
@@ -33,6 +34,7 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
     const { filename, mimetype, file } = multipart;
     const companyId = (req as any).companyId;
     const claimId = (req.body as any).claimId;
+    const userInfo = ActivityService.getUserInfo(req);
 
     // Generate unique file path
     const fileExtension = filename.split('.').pop();
@@ -64,6 +66,19 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
       sizeBytes: (file as any).length,
     }).returning();
 
+    // Log activity
+    await ActivityService.logUpload({
+      companyId,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      entityType: 'document',
+      entityId: (document as any).id,
+      entityName: filename,
+      description: `Uploaded document: ${filename}`,
+      newValues: { fileName: filename, mimetype, sizeBytes: (file as any).length },
+      ipAddress: userInfo.ipAddress,
+    });
+
     reply.code(201).send(document);
   });
 
@@ -77,6 +92,7 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
 
     const { filename, mimetype, file } = multipart;
     const companyId = (req as any).companyId;
+    const userInfo = ActivityService.getUserInfo(req);
 
     // Generate unique file path
     const fileExtension = filename.split('.').pop();
@@ -108,6 +124,19 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
       sizeBytes: (file as any).length,
     }).returning();
 
+    // Log activity
+    await ActivityService.logUpload({
+      companyId,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      entityType: 'document',
+      entityId: (document as any).id,
+      entityName: filename,
+      description: `Uploaded document for claim ${claimId}: ${filename}`,
+      newValues: { fileName: filename, mimetype, sizeBytes: (file as any).length, claimId },
+      ipAddress: userInfo.ipAddress,
+    });
+
     reply.code(201).send(document);
   });
 
@@ -131,6 +160,7 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.delete('/:id', async (req, reply) => {
     const { id } = req.params as any;
     const companyId = (req as any).companyId;
+    const userInfo = ActivityService.getUserInfo(req);
 
     // Get document first to verify ownership and get URL
     const [document] = await db
@@ -145,6 +175,19 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
     if ((document as any).companyId !== companyId) {
       return reply.code(403).send({ error: 'Access denied' });
     }
+
+    // Log activity before delete
+    await ActivityService.logDelete({
+      companyId,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      entityType: 'document',
+      entityId: id,
+      entityName: (document as any).fileName,
+      description: `Deleted document: ${(document as any).fileName}`,
+      previousValues: { fileName: (document as any).fileName, url: (document as any).url },
+      ipAddress: userInfo.ipAddress,
+    });
 
     // Delete from Supabase storage
     const url = (document as any).url;
@@ -163,6 +206,7 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/:id/download', async (req, reply) => {
     const { id } = req.params as any;
     const companyId = (req as any).companyId;
+    const userInfo = ActivityService.getUserInfo(req);
 
     // Get document to verify ownership
     const [document] = await db
@@ -177,6 +221,18 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
     if ((document as any).companyId !== companyId) {
       return reply.code(403).send({ error: 'Access denied' });
     }
+
+    // Log activity
+    await ActivityService.logDownload({
+      companyId,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      entityType: 'document',
+      entityId: id,
+      entityName: (document as any).fileName,
+      description: `Downloaded document: ${(document as any).fileName}`,
+      ipAddress: userInfo.ipAddress,
+    });
 
     // Redirect to the public URL
     reply.redirect((document as any).url);

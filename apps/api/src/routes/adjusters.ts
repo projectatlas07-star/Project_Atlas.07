@@ -5,7 +5,7 @@ import { adjusters } from '@project-atlas/database';
 import { z } from 'zod';
 import { db } from '@project-atlas/database';
 import { eq, or, like, and, desc } from 'drizzle-orm';
-import { activityLogs } from '@project-atlas/database';
+import { ActivityService } from '../lib/activity';
 
 // Adjuster schema for validation
 const adjusterSchema = z.object({
@@ -18,29 +18,6 @@ const adjusterSchema = z.object({
   notes: z.string().optional(),
   active: z.boolean().default(true),
 });
-
-// Helper function to log activity
-async function logActivity(
-  companyId: string,
-  userId: string | undefined,
-  action: string,
-  entityType: string,
-  entityId: string,
-  metadata?: any
-) {
-  try {
-    await db.insert(activityLogs).values({
-      companyId,
-      userId,
-      action,
-      entityType,
-      entityId,
-      metadata: metadata || {},
-    });
-  } catch (error) {
-    console.error('Failed to log activity:', error);
-  }
-}
 
 export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
   // Register generic CRUD routes
@@ -58,10 +35,18 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
       };
     },
     afterCreate: async (result, req) => {
-      const userId = (req as any).userId;
+      const userInfo = ActivityService.getUserInfo(req);
       const companyId = (req as any).companyId;
-      await logActivity(companyId, userId, 'create', 'adjuster', (result as any).id, {
-        fullName: (result as any).fullName,
+      await ActivityService.logCreate({
+        companyId,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        entityType: 'adjuster',
+        entityId: (result as any).id,
+        entityName: (result as any).fullName,
+        description: `Created adjuster: ${(result as any).fullName}`,
+        newValues: { fullName: (result as any).fullName },
+        ipAddress: userInfo.ipAddress,
       });
     },
   });
@@ -136,6 +121,7 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
     const { id } = req.params as any;
     const companyId = (req as any).companyId;
     const userId = (req as any).userId;
+    const userInfo = ActivityService.getUserInfo(req);
 
     const parsed = adjusterSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -168,9 +154,17 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
       .returning();
 
     // Log activity
-    await logActivity(companyId, userId, 'update', 'adjuster', id, {
-      fullName: (updated as any).fullName,
-      changes: parsed.data,
+    await ActivityService.logUpdate({
+      companyId,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      entityType: 'adjuster',
+      entityId: id,
+      entityName: (updated as any).fullName,
+      description: `Updated adjuster: ${(updated as any).fullName}`,
+      previousValues: { fullName: (existing as any).fullName },
+      newValues: { fullName: (updated as any).fullName, changes: parsed.data },
+      ipAddress: userInfo.ipAddress,
     });
 
     reply.send(updated);
@@ -181,6 +175,7 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
     const { id } = req.params as any;
     const companyId = (req as any).companyId;
     const userId = (req as any).userId;
+    const userInfo = ActivityService.getUserInfo(req);
 
     // Verify ownership
     const [existing] = await db
@@ -197,8 +192,16 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     // Log activity before delete
-    await logActivity(companyId, userId, 'delete', 'adjuster', id, {
-      fullName: (existing as any).fullName,
+    await ActivityService.logDelete({
+      companyId,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      entityType: 'adjuster',
+      entityId: id,
+      entityName: (existing as any).fullName,
+      description: `Deleted adjuster: ${(existing as any).fullName}`,
+      previousValues: { fullName: (existing as any).fullName },
+      ipAddress: userInfo.ipAddress,
     });
 
     // Delete
