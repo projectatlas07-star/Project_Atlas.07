@@ -277,6 +277,28 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
     });
   });
 
+  // Get interviews for a claim
+  fastify.get('/:id/interviews', async (req, reply) => {
+    const { id } = req.params as any;
+    const companyId = (req as any).companyId;
+
+    const { interviews } = await import('@project-atlas/database');
+
+    const claimInterviews = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).claimId, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .orderBy(desc((interviews as any).createdAt));
+
+    reply.send({
+      interviews: claimInterviews,
+      count: claimInterviews.length,
+    });
+  });
+
   // Get available status transitions for a claim
   fastify.get('/:id/transitions', async (req, reply) => {
     const { id } = req.params as any;

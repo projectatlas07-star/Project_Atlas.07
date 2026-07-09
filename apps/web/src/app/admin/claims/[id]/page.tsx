@@ -53,6 +53,20 @@ interface SupplementsResponse {
   };
 }
 
+interface Interview {
+  id: string;
+  interviewNumber: string;
+  templateName: string;
+  status: string;
+  progress: number;
+  createdAt: string;
+}
+
+interface InterviewsResponse {
+  interviews: Interview[];
+  count: number;
+}
+
 interface StatusTransition {
   value: string;
   label: string;
@@ -89,6 +103,7 @@ export default function ClaimDetailPage() {
   const [claim, setClaim] = useState<Claim | null>(null);
   const [transitions, setTransitions] = useState<TransitionResponse | null>(null);
   const [supplementsData, setSupplementsData] = useState<SupplementsResponse | null>(null);
+  const [interviewsData, setInterviewsData] = useState<InterviewsResponse | null>(null);
   const [status, setStatus] = useState('');
   const [reason, setReason] = useState('');
   const [showStatusDialog, setShowStatusDialog] = useState(false);
@@ -103,6 +118,7 @@ export default function ClaimDetailPage() {
     loadClaim();
     loadTransitions();
     loadSupplements();
+    loadInterviews();
   }, [session, router, claimId]);
 
   const loadClaim = async () => {
@@ -132,6 +148,15 @@ export default function ClaimDetailPage() {
       setSupplementsData(data);
     } catch (e: any) {
       console.error('Error loading supplements:', e);
+    }
+  };
+
+  const loadInterviews = async () => {
+    try {
+      const data = await apiFetch<InterviewsResponse>(`/claims/${claimId}/interviews`);
+      setInterviewsData(data);
+    } catch (e: any) {
+      console.error('Error loading interviews:', e);
     }
   };
 
@@ -303,6 +328,45 @@ export default function ClaimDetailPage() {
               </div>
             ) : (
               <p className="text-sm text-gray-500">Loading supplements...</p>
+            )}
+          </div>
+
+          {/* Interviews Summary */}
+          <div className="bg-white rounded shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Interviews</h2>
+            {interviewsData ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Interview Count</label>
+                  <p className="mt-1 text-sm text-gray-900">{interviewsData.count}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Latest Interview</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {interviewsData.interviews.length > 0 
+                      ? interviewsData.interviews[0].interviewNumber
+                      : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Latest Status</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {interviewsData.interviews.length > 0 
+                      ? interviewsData.interviews[0].status
+                      : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Latest Progress</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {interviewsData.interviews.length > 0 
+                      ? `${Math.round(interviewsData.interviews[0].progress)}%`
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Loading interviews...</p>
             )}
           </div>
 

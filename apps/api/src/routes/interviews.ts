@@ -1,93 +1,474 @@
 // apps/api/src/routes/interviews.ts
 import { FastifyPluginAsync } from 'fastify';
-import { registerCrudRoutes } from './crud';
+import { eq, and, desc, sql } from 'drizzle-orm';
+import { interviews } from '@project-atlas/database';
 import { db } from '@project-atlas/database';
-import { interviews, interviewQuestions } from '@project-atlas/database';
 import { z } from 'zod';
-import { supabase } from '../lib/supabase';
-import { generateInterviewAnswer } from '../lib/ai';
-import { Readable } from 'stream';
-import { eq, and } from 'drizzle-orm';
+import { 
+  InterviewWorkflowService, 
+  InterviewStatus 
+} from '../lib/interviews-workflow';
+import { FNOL_TEMPLATE } from '../lib/fnol-template';
+import { ActivityService } from '../lib/activity';
 
-// Interview schema – adjust fields to match DB definition
 const interviewSchema = z.object({
-  candidateName: z.string().min(1),
-  // add other fields as needed, e.g., position, status
+  companyId: z.string().uuid(),
+  propertyId: z.string().uuid().optional(),
+  claimId: z.string().uuid().optional(),
+  templateId: z.string().min(1),
+  templateName: z.string().min(1),
+  status: z.enum(['draft', 'in_progress', 'completed', 'archived']).optional(),
+  currentSection: z.string().optional(),
+  responses: z.record(z.any()).optional(),
+  conversationHistory: z.array(z.any()).optional(),
+  metadata: z.record(z.any()).optional(),
 });
 
-// Interview question schema (for creating questions)
-const interviewQuestionSchema = z.object({
-  interviewId: z.string().uuid(),
-  question: z.string().min(1),
-  order: z.number().int().positive().default(1),
+const updateResponseSchema = z.object({
+  questionId: z.string(),
+  value: z.any(),
+  sectionId: z.string(),
+});
+
+const statusChangeSchema = z.object({
+  status: z.enum(['draft', 'in_progress', 'completed', 'archived']),
 });
 
 export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
-  // CRUD for interviews
-  registerCrudRoutes(fastify, {
-    basePath: '/',
-    table: interviews,
-    schema: interviewSchema,
-  });
+  // GET /interviews - List interviews
+  fastify.get('/', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const { status, templateId, page = '1', limit = '20' } = req.query as any;
 
-  // CRUD for interview questions under a specific interview
-  fastify.register(async (questionFastify) => {
-    // base: /:interviewId/questions
-    const base = '/:interviewId/questions';
-    // List questions
-    questionFastify.get(base, async (req, reply) => {
-      const { interviewId } = req.params as any;
-      const rows = await db.select().from(interviewQuestions).where(eq((interviewQuestions as any).interviewId, interviewId));
-      reply.send(rows);
-    });
-    // Create question
-    questionFastify.post(base, async (req, reply) => {
-      const parsed = interviewQuestionSchema.safeParse(req.body);
-      if (!parsed.success) {
-        return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
-      }
-      const created = await db.insert(interviewQuestions).values(parsed.data).returning();
-      // @ts-ignore
-      reply.code(201).send(created[0]);
-    });
-  });
+    const offset = (parseInt(page) - 1) * parseInt(limit);
 
-  // Upload a document for an interview – stores in Supabase bucket "interview-documents"
-  fastify.post('/:id/upload-document', async (req: any, reply) => {
-    const { id } = req.params as any;
-    const multipart = await req.file();
-    if (!multipart) return reply.code(400).send({ error: 'File missing' });
-    const { filename, mimetype } = multipart;
-    const filePath = `${id}/${filename}`;
-    const { error } = await supabase.storage.from('interview-documents').upload(filePath, multipart.file as any, {
-      contentType: mimetype,
-      upsert: true,
-    });
-    if (error) return reply.code(500).send({ error: error.message });
-    const { data } = supabase.storage.from('interview-documents').getPublicUrl(filePath);
-    reply.send({ url: data.publicUrl });
-  });
+    let conditions = [eq((interviews as any).companyId, companyId)];
 
-  // Generate AI answer for a specific question, optionally with context from uploaded docs
-  fastify.post('/:interviewId/questions/:questionId/generate-answer', async (req, reply) => {
-    const { interviewId, questionId } = req.params as any;
-    // Retrieve question text
-    const [questionRow] = await db.select().from(interviewQuestions).where(
-      (interviewQuestions as any).id.equals(questionId).and((interviewQuestions as any).interviewId.equals(interviewId))
-    );
-    if (!questionRow) return reply.code(404).send({ error: 'Question not found' });
-    // Optional: fetch related documents (concatenate their public URLs as context)
-    const { data: files } = await supabase.storage.from('interview-documents').list(`${interviewId}`);
-    let contextText = '';
-    if (files && files.length) {
-      const texts: string[] = [];
-      for (const file of files) {
-        const { data } = supabase.storage.from('interview-documents').getPublicUrl(`${interviewId}/${file.name}`);
-        texts.push(data.publicUrl);
-      }
-      contextText = texts.join('\n');
+    if (status) {
+      conditions.push(eq((interviews as any).status, status));
     }
-    const answer = await generateInterviewAnswer(questionRow.question, contextText);
-    reply.send({ answer, contextUsed: !!contextText });
+
+    if (templateId) {
+      conditions.push(eq((interviews as any).templateId, templateId));
+    }
+
+    const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
+
+    const [data, countResult] = await Promise.all([
+      db
+        .select()
+        .from(interviews)
+        .where(whereClause)
+        .orderBy(desc((interviews as any).updatedAt))
+        .limit(parseInt(limit))
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(interviews)
+        .where(whereClause),
+    ]);
+
+    const total = countResult[0]?.count || 0;
+    const totalPages = Math.ceil(total / parseInt(limit));
+
+    reply.send({
+      data,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages,
+      },
+    });
+  });
+
+  // GET /interviews/:id - Get interview details
+  fastify.get<{ Params: { id: string } }>('/:id', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const { id } = req.params;
+
+    const [interview] = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!interview) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    // Calculate progress
+    const template = interview.templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+    const progress = template 
+      ? InterviewWorkflowService.calculateProgress(template, (interview as any).responses || {})
+      : Number((interview as any).progress) || 0;
+
+    reply.send({
+      ...interview,
+      progress,
+    });
+  });
+
+  // POST /interviews - Create interview
+  fastify.post('/', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const userId = (req as any).userId;
+    const userName = (req as any).userName;
+    const ipAddress = (req as any).ipAddress;
+    const body = interviewSchema.parse(req.body);
+
+    const interviewNumber = InterviewWorkflowService.generateInterviewNumber();
+
+    const [newInterview] = await db
+      .insert(interviews)
+      .values({
+        companyId,
+        propertyId: body.propertyId || null,
+        claimId: body.claimId || null,
+        createdBy: userId,
+        updatedBy: userId,
+        interviewNumber,
+        templateId: body.templateId,
+        templateName: body.templateName,
+        status: body.status || 'draft',
+        currentSection: body.currentSection || null,
+        responses: body.responses || {},
+        conversationHistory: body.conversationHistory || [],
+        metadata: body.metadata || {},
+        progress: '0',
+        startedAt: new Date(),
+      })
+      .returning();
+
+    // Log activity
+    await ActivityService.logCreate({
+      companyId,
+      userId,
+      userName,
+      entityType: 'interview',
+      entityId: newInterview.id,
+      entityName: interviewNumber,
+      description: `Created interview ${interviewNumber}`,
+      ipAddress,
+    });
+
+    reply.send(newInterview);
+  });
+
+  // PUT /interviews/:id - Update interview
+  fastify.put<{ Params: { id: string } }>('/:id', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const userId = (req as any).userId;
+    const userName = (req as any).userName;
+    const ipAddress = (req as any).ipAddress;
+    const { id } = req.params;
+    const body = interviewSchema.partial().parse(req.body);
+
+    const existing = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!existing) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    const [updated] = await db
+      .update(interviews)
+      .set({
+        ...body,
+        updatedBy: userId,
+        updatedAt: new Date(),
+      })
+      .where(eq((interviews as any).id, id))
+      .returning();
+
+    // Log activity
+    await ActivityService.logUpdate({
+      companyId,
+      userId,
+      userName,
+      entityType: 'interview',
+      entityId: id,
+      entityName: (existing as any).interviewNumber,
+      description: `Updated interview ${(existing as any).interviewNumber}`,
+      previousValues: existing,
+      newValues: updated,
+      ipAddress,
+    });
+
+    reply.send(updated);
+  });
+
+  // DELETE /interviews/:id - Delete interview
+  fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const userId = (req as any).userId;
+    const userName = (req as any).userName;
+    const ipAddress = (req as any).ipAddress;
+    const { id } = req.params;
+
+    const existing = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!existing) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    await db.delete(interviews).where(eq((interviews as any).id, id));
+
+    // Log activity
+    await ActivityService.logDelete({
+      companyId,
+      userId,
+      userName,
+      entityType: 'interview',
+      entityId: id,
+      entityName: (existing as any).interviewNumber,
+      description: `Deleted interview ${(existing as any).interviewNumber}`,
+      ipAddress,
+    });
+
+    reply.send({ success: true });
+  });
+
+  // PUT /interviews/:id/responses - Update interview responses (autosave)
+  fastify.put<{ Params: { id: string } }>('/:id/responses', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const { id } = req.params;
+    const { questionId, value, sectionId } = updateResponseSchema.parse(req.body);
+
+    const existing = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!existing) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    const interview = existing[0];
+    const responses = (interview as any).responses || {};
+    responses[questionId] = value;
+
+    // Calculate progress
+    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+    const progress = template 
+      ? InterviewWorkflowService.calculateProgress(template, responses)
+      : 0;
+
+    const [updated] = await db
+      .update(interviews)
+      .set({
+        responses,
+        currentSection: sectionId,
+        progress: progress.toString(),
+        updatedAt: new Date(),
+      })
+      .where(eq((interviews as any).id, id))
+      .returning();
+
+    reply.send(updated);
+  });
+
+  // PUT /interviews/:id/status - Change interview status
+  fastify.put<{ Params: { id: string } }>('/:id/status', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const userId = (req as any).userId;
+    const userName = (req as any).userName;
+    const ipAddress = (req as any).ipAddress;
+    const { id } = req.params;
+    const { status } = statusChangeSchema.parse(req.body);
+
+    const existing = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!existing) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    const updates: any = {
+      status,
+      updatedBy: userId,
+      updatedAt: new Date(),
+    };
+
+    if (status === 'in_progress' && !(existing as any).startedAt) {
+      updates.startedAt = new Date();
+    }
+
+    if (status === 'completed' && !(existing as any).completedAt) {
+      updates.completedAt = new Date();
+    }
+
+    if (status === 'archived' && !(existing as any).archivedAt) {
+      updates.archivedAt = new Date();
+    }
+
+    const [updated] = await db
+      .update(interviews)
+      .set(updates)
+      .where(eq((interviews as any).id, id))
+      .returning();
+
+    // Log activity
+    await ActivityService.logStatusChange({
+      companyId,
+      userId,
+      userName,
+      entityType: 'interview',
+      entityId: id,
+      entityName: (existing as any).interviewNumber,
+      description: `Changed interview status to ${status}`,
+      previousValues: { status: (existing as any).status },
+      newValues: { status },
+      ipAddress,
+    });
+
+    reply.send(updated);
+  });
+
+  // GET /interviews/:id/template - Get interview template
+  fastify.get<{ Params: { id: string } }>('/:id/template', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const { id } = req.params;
+
+    const [interview] = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!interview) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+
+    if (!template) {
+      reply.code(404).send({ error: 'Template not found' });
+      return;
+    }
+
+    reply.send(template);
+  });
+
+  // GET /interviews/:id/progress - Get interview progress
+  fastify.get<{ Params: { id: string } }>('/:id/progress', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const { id } = req.params;
+
+    const [interview] = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!interview) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+    const responses = (interview as any).responses || {};
+
+    if (!template) {
+      reply.code(404).send({ error: 'Template not found' });
+      return;
+    }
+
+    const progress = InterviewWorkflowService.calculateProgress(template, responses);
+    const isComplete = InterviewWorkflowService.isInterviewComplete(template, responses);
+    const missingFields = InterviewWorkflowService.getMissingRequiredFields(template, responses);
+
+    reply.send({
+      progress,
+      isComplete,
+      missingFields,
+      currentSection: (interview as any).currentSection,
+    });
+  });
+
+  // GET /interviews/templates/fnol - Get FNOL template
+  fastify.get('/templates/fnol', async (req, reply) => {
+    reply.send(FNOL_TEMPLATE);
+  });
+
+  // POST /interviews/:id/generate-claim - Generate claim from completed interview
+  fastify.post<{ Params: { id: string } }>('/:id/generate-claim', async (req, reply) => {
+    const companyId = (req as any).companyId;
+    const userId = (req as any).userId;
+    const { id } = req.params;
+
+    const [interview] = await db
+      .select()
+      .from(interviews)
+      .where(and(
+        eq((interviews as any).id, id),
+        eq((interviews as any).companyId, companyId)
+      ))
+      .limit(1);
+
+    if (!interview) {
+      reply.code(404).send({ error: 'Interview not found' });
+      return;
+    }
+
+    if ((interview as any).status !== 'completed') {
+      reply.code(400).send({ error: 'Interview must be completed before generating claim' });
+      return;
+    }
+
+    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+    if (!template) {
+      reply.code(400).send({ error: 'Template not found' });
+      return;
+    }
+
+    const responses = (interview as any).responses || {};
+    const claimData = InterviewWorkflowService.extractClaimData(responses, template);
+
+    // TODO: Implement actual claim generation logic
+    // This would create/update customer, property, claim, adjuster entities
+    // For now, return the extracted data
+    reply.send({
+      claimData,
+      message: 'Claim data extracted. Claim generation not yet implemented.',
+    });
   });
 };
