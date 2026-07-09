@@ -191,7 +191,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
         ))
         .limit(1);
 
-      if (!existing) {
+      if (existing.length === 0) {
         reply.code(404).send({ error: 'Interview not found' });
         return;
       }
@@ -244,7 +244,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
         ))
         .limit(1);
 
-      if (!existing) {
+      if (existing.length === 0) {
         reply.code(404).send({ error: 'Interview not found' });
         return;
       }
@@ -285,7 +285,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
         ))
         .limit(1);
 
-      if (!existing) {
+      if (existing.length === 0) {
         reply.code(404).send({ error: 'Interview not found' });
         return;
       }
@@ -336,7 +336,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
         ))
         .limit(1);
 
-      if (!existing) {
+      if (existing.length === 0) {
         reply.code(404).send({ error: 'Interview not found' });
         return;
       }
