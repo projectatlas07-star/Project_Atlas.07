@@ -271,46 +271,50 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /interviews/:id/responses - Update interview responses (autosave)
   fastify.put<{ Params: { id: string } }>('/:id/responses', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { id } = req.params;
-    const { questionId, value, sectionId } = updateResponseSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { id } = req.params;
+      const { questionId, value, sectionId } = updateResponseSchema.parse(req.body);
 
-    const existing = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!existing) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
-    }
+      if (!existing) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
 
-    const interview = existing[0];
-    const responses = (interview as any).responses || {};
-    responses[questionId] = value;
+      const interview = existing[0];
+      const responses = (interview as any).responses || {};
+      responses[questionId] = value;
 
-    // Calculate progress
-    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
-    const progress = template 
-      ? InterviewWorkflowService.calculateProgress(template, responses)
-      : 0;
+      // Calculate progress
+      const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+      const progress = template 
+        ? InterviewWorkflowService.calculateProgress(template, responses)
+        : 0;
 
-    const [updated] = await db
-      .update(interviews)
-      .set({
-        responses,
-        currentSection: sectionId,
-        progress: progress.toString(),
-        updatedAt: new Date(),
-      })
+      const [updated] = await db
+        .update(interviews)
+        .set({
+          responses,
+          currentSection: sectionId,
+          progress: progress.toString(),
+          updatedAt: new Date(),
+        })
       .where(eq((interviews as any).id, id))
       .returning();
 
-    reply.send(updated);
+      reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to update interview responses' });
+    }
   });
 
   // PUT /interviews/:id/status - Change interview status
