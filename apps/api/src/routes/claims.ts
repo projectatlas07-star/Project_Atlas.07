@@ -7,6 +7,7 @@ import { db } from '@project-atlas/database';
 import { eq, and, like, or, desc } from 'drizzle-orm';
 import { ActivityService } from '../lib/activity';
 import { ClaimsWorkflowService, ClaimStatus, STATUS_LABELS } from '../lib/claims-workflow';
+import { AuthenticatedRequest } from '../types/request';
 
 // Claim schema for validation
 const claimSchema = z.object({
@@ -34,8 +35,8 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
     table: claims,
     schema: claimSchema,
     beforeCreate: async (data, req) => {
-      const userId = (req as any).userId;
-      const companyId = (req as any).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const companyId = (req as AuthenticatedRequest).companyId;
       return {
         ...data,
         companyId,
@@ -45,13 +46,13 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
           status: data.status || 'new',
           timestamp: new Date().toISOString(),
           userId,
-          userName: (req as any).userName,
+          userName: (req as AuthenticatedRequest).userName,
         }],
       };
     },
     afterCreate: async (result, req) => {
       const userInfo = ActivityService.getUserInfo(req);
-      const companyId = (req as any).companyId;
+      const companyId = (req as AuthenticatedRequest).companyId;
       await ActivityService.logCreate({
         companyId,
         userId: userInfo.userId,
@@ -68,8 +69,9 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // List claims with search, filters, and pagination
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const query = req.query as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const query = req.query as any;
 
     // Pagination
     const page = parseInt(query.page) || 1;
@@ -133,16 +135,20 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
         totalPages: Math.ceil(total / limit),
       },
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch claims' });
+    }
   });
 
   // Update claim status with validation
   fastify.put('/:id/status', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userInfo = ActivityService.getUserInfo(req);
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userInfo = ActivityService.getUserInfo(req);
 
-    const { status, reason } = req.body as { status: ClaimStatus; reason?: string };
+      const { status, reason } = req.body as { status: ClaimStatus; reason?: string };
 
     // Verify ownership
     const [existing] = await db
@@ -205,12 +211,16 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to change claim status' });
+    }
   });
 
   // Get claim details with related data
   fastify.get('/:id', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
 
     const [claim] = await db
       .select()
@@ -231,30 +241,38 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
       ...claim,
       financialSummary,
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch claim details' });
+    }
   });
 
   // Get dashboard statistics
   fastify.get('/dashboard/stats', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const allClaims = await db
-      .select()
-      .from(claims)
-      .where(eq((claims as any).companyId, companyId));
+      const allClaims = await db
+        .select()
+        .from(claims)
+        .where(eq((claims as any).companyId, companyId));
 
-    const stats = ClaimsWorkflowService.getDashboardStats(allClaims);
+      const stats = ClaimsWorkflowService.getDashboardStats(allClaims);
 
-    reply.send(stats);
+      reply.send(stats);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get dashboard stats' });
+    }
   });
 
   // Get supplements for a claim
   fastify.get('/:id/supplements', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const claimSupplements = await db
-      .select()
-      .from(supplements)
+      const claimSupplements = await db
+        .select()
+        .from(supplements)
       .where(and(
         eq((supplements as any).claimId, id),
         eq((supplements as any).companyId, companyId)
@@ -275,16 +293,20 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
       supplements: claimSupplements,
       summary,
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch claim supplements' });
+    }
   });
 
   // Get interviews for a claim
   fastify.get('/:id/interviews', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const { interviews } = await import('@project-atlas/database');
+      const { interviews } = await import('@project-atlas/database');
 
-    const claimInterviews = await db
+      const claimInterviews = await db
       .select()
       .from(interviews)
       .where(and(
@@ -297,16 +319,20 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
       interviews: claimInterviews,
       count: claimInterviews.length,
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch claim interviews' });
+    }
   });
 
   // Get available status transitions for a claim
   fastify.get('/:id/transitions', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const [claim] = await db
-      .select()
-      .from(claims)
+      const [claim] = await db
+        .select()
+        .from(claims)
       .where(and(
         eq((claims as any).id, id),
         eq((claims as any).companyId, companyId)
@@ -327,5 +353,8 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
         label: STATUS_LABELS[status],
       })),
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get claim transitions' });
+    }
   });
 };
