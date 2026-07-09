@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { eq } from 'drizzle-orm';
 import { db } from '@project-atlas/database';
 import { ActivityService } from '../lib/activity';
+import { AuthenticatedRequest } from '../types/request';
 
 // Document schema for validation
 const documentSchema = z.object({
@@ -26,15 +27,16 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Upload document
   fastify.post('/upload', async (req: any, reply) => {
-    const multipart = await req.file();
-    if (!multipart) {
-      return reply.code(400).send({ error: 'File missing' });
-    }
+    try {
+      const multipart = await req.file();
+      if (!multipart) {
+        return reply.code(400).send({ error: 'File missing' });
+      }
 
-    const { filename, mimetype, file } = multipart;
-    const companyId = (req as any).companyId;
-    const claimId = (req.body as any).claimId;
-    const userInfo = ActivityService.getUserInfo(req);
+      const { filename, mimetype, file } = multipart;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const claimId = (req.body as any).claimId;
+      const userInfo = ActivityService.getUserInfo(req);
 
     // Generate unique file path
     const fileExtension = filename.split('.').pop();
@@ -80,19 +82,23 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     reply.code(201).send(document);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to upload document' });
+    }
   });
 
   // Upload document for specific claim
   fastify.post('/claims/:claimId/upload', async (req: any, reply) => {
-    const { claimId } = req.params as any;
-    const multipart = await req.file();
-    if (!multipart) {
-      return reply.code(400).send({ error: 'File missing' });
-    }
+    try {
+      const { claimId } = req.params as any;
+      const multipart = await req.file();
+      if (!multipart) {
+        return reply.code(400).send({ error: 'File missing' });
+      }
 
-    const { filename, mimetype, file } = multipart;
-    const companyId = (req as any).companyId;
-    const userInfo = ActivityService.getUserInfo(req);
+      const { filename, mimetype, file } = multipart;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userInfo = ActivityService.getUserInfo(req);
 
     // Generate unique file path
     const fileExtension = filename.split('.').pop();
@@ -138,103 +144,118 @@ export const documentsRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     reply.code(201).send(document);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to upload document for claim' });
+    }
   });
 
   // Get documents for a specific claim
   fastify.get('/claims/:claimId', async (req, reply) => {
-    const { claimId } = req.params as any;
-    const companyId = (req as any).companyId;
+    try {
+      const { claimId } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const claimDocuments = await db
-      .select()
-      .from(documents)
-      .where(eq((documents as any).claimId, claimId));
+      const claimDocuments = await db
+        .select()
+        .from(documents)
+        .where(eq((documents as any).claimId, claimId));
 
-    // Filter by company for security
-    const filtered = claimDocuments.filter((doc: any) => doc.companyId === companyId);
+      // Filter by company for security
+      const filtered = claimDocuments.filter((doc: any) => doc.companyId === companyId);
 
-    reply.send(filtered);
+      reply.send(filtered);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch documents' });
+    }
   });
 
   // Delete document (both from database and storage)
   fastify.delete('/:id', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
-    const userInfo = ActivityService.getUserInfo(req);
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userInfo = ActivityService.getUserInfo(req);
 
-    // Get document first to verify ownership and get URL
-    const [document] = await db
-      .select()
-      .from(documents)
-      .where(eq((documents as any).id, id));
+      // Get document first to verify ownership and get URL
+      const [document] = await db
+        .select()
+        .from(documents)
+        .where(eq((documents as any).id, id));
 
-    if (!document) {
-      return reply.code(404).send({ error: 'Document not found' });
+      if (!document) {
+        return reply.code(404).send({ error: 'Document not found' });
+      }
+
+      if ((document as any).companyId !== companyId) {
+        return reply.code(403).send({ error: 'Access denied' });
+      }
+
+      // Log activity before delete
+      await ActivityService.logDelete({
+        companyId,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        entityType: 'document',
+        entityId: id,
+        entityName: (document as any).fileName,
+        description: `Deleted document: ${(document as any).fileName}`,
+        previousValues: { fileName: (document as any).fileName, url: (document as any).url },
+        ipAddress: userInfo.ipAddress,
+      });
+
+      // Delete from Supabase storage
+      const url = (document as any).url;
+      const filePath = url.split('/documents/')[1];
+      if (filePath) {
+        await supabase.storage.from('documents').remove([`documents/${filePath}`]);
+      }
+
+      // Delete from database
+      await db.delete(documents).where(eq((documents as any).id, id));
+
+      reply.code(204).send();
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to delete document' });
     }
-
-    if ((document as any).companyId !== companyId) {
-      return reply.code(403).send({ error: 'Access denied' });
-    }
-
-    // Log activity before delete
-    await ActivityService.logDelete({
-      companyId,
-      userId: userInfo.userId,
-      userName: userInfo.userName,
-      entityType: 'document',
-      entityId: id,
-      entityName: (document as any).fileName,
-      description: `Deleted document: ${(document as any).fileName}`,
-      previousValues: { fileName: (document as any).fileName, url: (document as any).url },
-      ipAddress: userInfo.ipAddress,
-    });
-
-    // Delete from Supabase storage
-    const url = (document as any).url;
-    const filePath = url.split('/documents/')[1];
-    if (filePath) {
-      await supabase.storage.from('documents').remove([`documents/${filePath}`]);
-    }
-
-    // Delete from database
-    await db.delete(documents).where(eq((documents as any).id, id));
-
-    reply.code(204).send();
   });
 
   // Download document (redirect to public URL)
   fastify.get('/:id/download', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
-    const userInfo = ActivityService.getUserInfo(req);
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userInfo = ActivityService.getUserInfo(req);
 
-    // Get document to verify ownership
-    const [document] = await db
-      .select()
-      .from(documents)
-      .where(eq((documents as any).id, id));
+      // Get document to verify ownership
+      const [document] = await db
+        .select()
+        .from(documents)
+        .where(eq((documents as any).id, id));
 
-    if (!document) {
-      return reply.code(404).send({ error: 'Document not found' });
+      if (!document) {
+        return reply.code(404).send({ error: 'Document not found' });
+      }
+
+      if ((document as any).companyId !== companyId) {
+        return reply.code(403).send({ error: 'Access denied' });
+      }
+
+      // Log activity
+      await ActivityService.logDownload({
+        companyId,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        entityType: 'document',
+        entityId: id,
+        entityName: (document as any).fileName,
+        description: `Downloaded document: ${(document as any).fileName}`,
+        ipAddress: userInfo.ipAddress,
+      });
+
+      // Redirect to the public URL
+      reply.redirect((document as any).url);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to download document' });
     }
-
-    if ((document as any).companyId !== companyId) {
-      return reply.code(403).send({ error: 'Access denied' });
-    }
-
-    // Log activity
-    await ActivityService.logDownload({
-      companyId,
-      userId: userInfo.userId,
-      userName: userInfo.userName,
-      entityType: 'document',
-      entityId: id,
-      entityName: (document as any).fileName,
-      description: `Downloaded document: ${(document as any).fileName}`,
-      ipAddress: userInfo.ipAddress,
-    });
-
-    // Redirect to the public URL
-    reply.redirect((document as any).url);
   });
 };
