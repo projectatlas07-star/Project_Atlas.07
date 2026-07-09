@@ -53,82 +53,86 @@ const statusChangeSchema = z.object({
 export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /supplements - List with filters, search, pagination
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { status, adjusterId, carrier, search, page = '1', limit = '20' } = req.query as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { status, adjusterId, carrier, search, page = '1', limit = '20' } = req.query as any;
 
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+      const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    let conditions = [eq(supplements.companyId, companyId)];
+      let conditions = [eq(supplements.companyId, companyId)];
 
-    if (status) {
-      conditions.push(eq(supplements.status, status));
+      if (status) {
+        conditions.push(eq(supplements.status, status));
+      }
+
+      if (adjusterId) {
+        conditions.push(eq(supplements.adjusterId, adjusterId));
+      }
+
+      if (carrier) {
+        conditions.push(like(supplements.carrier, `%${carrier}%`));
+      }
+
+      if (search) {
+        conditions.push(
+          or(
+            like(supplements.supplementNumber, `%${search}%`),
+            like(supplements.carrier, `%${search}%`)
+          )!
+        );
+      }
+
+      const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
+
+      const [data, countResult] = await Promise.all([
+        db
+          .select({
+            id: supplements.id,
+            supplementNumber: supplements.supplementNumber,
+            version: supplements.version,
+            status: supplements.status,
+            carrier: supplements.carrier,
+            requestedAmount: supplements.requestedAmount,
+            approvedAmount: supplements.approvedAmount,
+            difference: supplements.difference,
+            submissionDate: supplements.submissionDate,
+            responseDate: supplements.responseDate,
+            approvalDate: supplements.approvalDate,
+            createdAt: supplements.createdAt,
+            updatedAt: supplements.updatedAt,
+            claimId: supplements.claimId,
+            claimNumber: claims.claimNumber,
+            adjusterId: supplements.adjusterId,
+            adjusterName: adjusters.fullName,
+          })
+          .from(supplements)
+          .leftJoin(claims, eq(supplements.claimId, claims.id))
+          .leftJoin(adjusters, eq(supplements.adjusterId, adjusters.id))
+          .where(whereClause)
+          .orderBy(desc(supplements.updatedAt))
+          .limit(parseInt(limit))
+          .offset(offset),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(supplements)
+          .where(whereClause),
+      ]);
+
+      const total = countResult[0]?.count || 0;
+      const totalPages = Math.ceil(total / parseInt(limit));
+
+      reply.send({
+        data,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch supplements' });
     }
-
-    if (adjusterId) {
-      conditions.push(eq(supplements.adjusterId, adjusterId));
-    }
-
-    if (carrier) {
-      conditions.push(like(supplements.carrier, `%${carrier}%`));
-    }
-
-    if (search) {
-      conditions.push(
-        or(
-          like(supplements.supplementNumber, `%${search}%`),
-          like(supplements.carrier, `%${search}%`)
-        )!
-      );
-    }
-
-    const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
-
-    const [data, countResult] = await Promise.all([
-      db
-        .select({
-          id: supplements.id,
-          supplementNumber: supplements.supplementNumber,
-          version: supplements.version,
-          status: supplements.status,
-          carrier: supplements.carrier,
-          requestedAmount: supplements.requestedAmount,
-          approvedAmount: supplements.approvedAmount,
-          difference: supplements.difference,
-          submissionDate: supplements.submissionDate,
-          responseDate: supplements.responseDate,
-          approvalDate: supplements.approvalDate,
-          createdAt: supplements.createdAt,
-          updatedAt: supplements.updatedAt,
-          claimId: supplements.claimId,
-          claimNumber: claims.claimNumber,
-          adjusterId: supplements.adjusterId,
-          adjusterName: adjusters.fullName,
-        })
-        .from(supplements)
-        .leftJoin(claims, eq(supplements.claimId, claims.id))
-        .leftJoin(adjusters, eq(supplements.adjusterId, adjusters.id))
-        .where(whereClause)
-        .orderBy(desc(supplements.updatedAt))
-        .limit(parseInt(limit))
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(supplements)
-        .where(whereClause),
-    ]);
-
-    const total = countResult[0]?.count || 0;
-    const totalPages = Math.ceil(total / parseInt(limit));
-
-    reply.send({
-      data,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages,
-      },
-    });
   });
 
   // GET /supplements/:id - Get supplement details
