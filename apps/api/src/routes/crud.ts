@@ -25,57 +25,77 @@ export function registerCrudRoutes(
 
   // List all rows (company‑scoped)
   server.get(basePath, async (req: FastifyRequest, reply: FastifyReply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const rows = await db.select().from(table).where(eq((table as any).companyId, companyId));
-    reply.send(rows);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const rows = await db.select().from(table).where(eq((table as any).companyId, companyId));
+      reply.send(rows);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch records' });
+    }
   });
 
   // Get by id (ensuring same company)
   server.get(`${basePath}/:id`, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const { id } = req.params;
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const rows = await db.select().from(table).where(
-      and(eq((table as any).id, id), eq((table as any).companyId, companyId))
-    );
-    if (!rows || rows.length === 0) return reply.code(404).send({ error: 'Not found' });
-    reply.send(rows[0]);
+    try {
+      const { id } = req.params;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const rows = await db.select().from(table).where(
+        and(eq((table as any).id, id), eq((table as any).companyId, companyId))
+      );
+      if (!rows || rows.length === 0) return reply.code(404).send({ error: 'Not found' });
+      reply.send(rows[0]);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch record' });
+    }
   });
 
   // Create
   server.post(basePath, async (req: FastifyRequest, reply: FastifyReply) => {
-    const parsed = schema.safeParse(req.body);
-    if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
-    let payload = parsed.data;
-    const companyId = (req as AuthenticatedRequest).companyId;
-    payload = { ...payload, companyId };
-    if (beforeCreate) payload = await beforeCreate(payload, req);
-    const created = await db.insert(table).values(payload).returning();
-    if (afterCreate) await afterCreate((created as any)[0], req);
-    reply.code(201).send((created as any)[0]);
+    try {
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
+      let payload = parsed.data;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      payload = { ...payload, companyId };
+      if (beforeCreate) payload = await beforeCreate(payload, req);
+      const created = await db.insert(table).values(payload).returning();
+      if (afterCreate) await afterCreate((created as any)[0], req);
+      reply.code(201).send((created as any)[0]);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to create record' });
+    }
   });
 
   // Update (partial)
   server.patch(`${basePath}/:id`, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const { id } = req.params;
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const parsed = (schema as any).partial().safeParse(req.body);
-    if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
-    const updated = await db
-      .update(table)
-      .set(parsed.data)
-      .where(and(eq((table as any).id, id), eq((table as any).companyId, companyId)))
-      .returning();
-    // @ts-ignore
-    if (!updated || updated.length === 0) return reply.code(404).send({ error: 'Not found' });
-    // @ts-ignore
-    reply.send(updated[0]);
+    try {
+      const { id } = req.params;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const parsed = (schema as any).partial().safeParse(req.body);
+      if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
+      const updated = await db
+        .update(table)
+        .set(parsed.data)
+        .where(and(eq((table as any).id, id), eq((table as any).companyId, companyId)))
+        .returning();
+      // @ts-ignore
+      if (!updated || updated.length === 0) return reply.code(404).send({ error: 'Not found' });
+      // @ts-ignore
+      reply.send(updated[0]);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to update record' });
+    }
   });
 
   // Delete
   server.delete(`${basePath}/:id`, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const { id } = req.params;
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const result = await db.delete(table).where(and(eq((table as any).id, id), eq((table as any).companyId, companyId)));
-    reply.code(204).send();
+    try {
+      const { id } = req.params;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const result = await db.delete(table).where(and(eq((table as any).id, id), eq((table as any).companyId, companyId)));
+      reply.code(204).send();
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to delete record' });
+    }
   });
 }
