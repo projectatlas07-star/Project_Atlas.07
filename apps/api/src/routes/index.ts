@@ -12,6 +12,7 @@ import { supplementsRoutes } from './supplements';
 import { documentsRoutes } from './documents';
 import { adjustersRoutes } from './adjusters';
 import { activityRoutes } from './activity';
+import { aiSupplementsRoutes } from './ai-supplements';
 
 export async function registerRoutes(server: FastifyInstance) {
   // Companies CRUD + CSV import
@@ -49,4 +50,7 @@ export async function registerRoutes(server: FastifyInstance) {
 
   // Activity Timeline
   server.register(activityRoutes, { prefix: '/activity' });
+
+  // AI Supplement Generation
+  server.register(aiSupplementsRoutes, { prefix: '/ai-supplements' });
 }

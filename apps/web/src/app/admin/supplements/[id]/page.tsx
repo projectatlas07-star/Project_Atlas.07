@@ -60,6 +60,9 @@ export default function SupplementDetailPage() {
   const [status, setStatus] = useState('');
   const [reason, setReason] = useState('');
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showAIDialog, setShowAIDialog] = useState(false);
+  const [aiRecommendations, setAiRecommendations] = useState<any>(null);
 
   useEffect(() => {
     if (!session) {
@@ -186,6 +189,47 @@ export default function SupplementDetailPage() {
     setLineItems(lineItems.filter((_, i) => i !== index));
   };
 
+  const handleGenerateAISupplement = async () => {
+    try {
+      setIsGenerating(true);
+      const data = await apiFetch<{ recommendations: any; draft: any }>('/ai-supplements/generate', {
+        method: 'POST',
+        body: JSON.stringify({ supplementId: id }),
+      });
+      if (data && data.recommendations) {
+        setAiRecommendations(data.recommendations);
+        setShowAIDialog(true);
+      }
+    } catch (e: any) {
+      setStatus(`Error generating AI supplement: ${e.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleAcceptAIRecommendations = async () => {
+    try {
+      // Convert AI recommendations to line items
+      const newLineItems = aiRecommendations.recommendedLineItems.map((item: any) => ({
+        id: crypto.randomUUID(),
+        description: item.description,
+        category: item.category,
+        quantity: item.suggestedQuantity,
+        unit: item.suggestedUnit,
+        unitPrice: item.suggestedUnitPrice,
+        total: item.suggestedTotalPrice,
+        depreciation: 0,
+        tax: 0,
+      }));
+
+      setLineItems(newLineItems);
+      setShowAIDialog(false);
+      setStatus('AI recommendations applied. Review and save.');
+    } catch (e: any) {
+      setStatus(`Error applying recommendations: ${e.message}`);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!session) return null;
   if (!supplement) return <p>Loading supplement...</p>;
@@ -204,6 +248,13 @@ export default function SupplementDetailPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={handleGenerateAISupplement}
+            disabled={isGenerating}
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+          >
+            {isGenerating ? 'Generating...' : 'Generate AI Supplement'}
+          </button>
           <button
             onClick={() => setShowLineItemEditor(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -620,6 +671,175 @@ export default function SupplementDetailPage() {
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
               >
                 Save Line Items
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Recommendations Dialog */}
+      {showAIDialog && aiRecommendations && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">AI Supplement Recommendations</h2>
+              <button
+                onClick={() => setShowAIDialog(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Confidence and Risk Scores */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-blue-50 p-4 rounded">
+                <p className="text-sm text-gray-600">Confidence Score</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {Math.round(aiRecommendations.confidenceScore * 100)}%
+                </p>
+              </div>
+              <div className="bg-orange-50 p-4 rounded">
+                <p className="text-sm text-gray-600">Risk Score</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {Math.round(aiRecommendations.riskScore * 100)}%
+                </p>
+              </div>
+            </div>
+
+            {/* Supporting Justification */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Supporting Justification</h3>
+              <p className="text-gray-700">{aiRecommendations.supportingJustification}</p>
+            </div>
+
+            {/* Recommended Line Items */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Recommended Line Items</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Confidence</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {aiRecommendations.recommendedLineItems.map((item: any, index: number) => (
+                      <tr key={index}>
+                        <td className="px-4 py-2 text-sm">{item.description}</td>
+                        <td className="px-4 py-2 text-sm">{item.category}</td>
+                        <td className="px-4 py-2 text-sm">{item.suggestedQuantity}</td>
+                        <td className="px-4 py-2 text-sm">{item.suggestedUnit}</td>
+                        <td className="px-4 py-2 text-sm">${item.suggestedUnitPrice.toFixed(2)}</td>
+                        <td className="px-4 py-2 text-sm font-medium">${item.suggestedTotalPrice.toFixed(2)}</td>
+                        <td className="px-4 py-2 text-sm">
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            item.confidence > 0.8 ? 'bg-green-100 text-green-800' :
+                            item.confidence > 0.5 ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {Math.round(item.confidence * 100)}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Missing Damage Observations */}
+            {aiRecommendations.missingDamageObservations.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Missing Damage Observations</h3>
+                <ul className="space-y-2">
+                  {aiRecommendations.missingDamageObservations.map((obs: any, index: number) => (
+                    <li key={index} className="bg-gray-50 p-3 rounded">
+                      <p className="font-medium">{obs.location}</p>
+                      <p className="text-sm text-gray-600">{obs.description}</p>
+                      <p className="text-xs text-gray-500">Severity: {obs.severity} | Confidence: {Math.round(obs.confidence * 100)}%</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Missing Information */}
+            {aiRecommendations.missingInformation.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Missing Information</h3>
+                <ul className="space-y-2">
+                  {aiRecommendations.missingInformation.map((item: any, index: number) => (
+                    <li key={index} className="bg-yellow-50 p-3 rounded">
+                      <p className="font-medium">{item.description}</p>
+                      <p className="text-sm text-gray-600">Impact: {item.impact} | Source: {item.source}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Documentation Checklist */}
+            {aiRecommendations.documentationChecklist.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Documentation Checklist</h3>
+                <ul className="space-y-2">
+                  {aiRecommendations.documentationChecklist.map((item: any, index: number) => (
+                    <li key={index} className="bg-gray-50 p-3 rounded">
+                      <p className="font-medium">{item.description}</p>
+                      <p className="text-sm text-gray-600">Type: {item.type} | Status: {item.status}</p>
+                      <p className="text-xs text-gray-500">{item.reason}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Warnings */}
+            {aiRecommendations.warnings.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Warnings</h3>
+                <ul className="space-y-2">
+                  {aiRecommendations.warnings.map((warning: string, index: number) => (
+                    <li key={index} className="bg-red-50 p-3 rounded text-red-800">
+                      ⚠️ {warning}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* AI Explanation */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">AI Explanation</h3>
+              <div className="bg-gray-50 p-4 rounded">
+                <p className="mb-2"><strong>Overall Approach:</strong> {aiRecommendations.aiExplanation.overallApproach}</p>
+                <p className="mb-2"><strong>Data Sources Analyzed:</strong> {aiRecommendations.aiExplanation.dataSourcesAnalyzed.join(', ')}</p>
+                <p className="mb-2"><strong>Confidence Factors:</strong> {aiRecommendations.aiExplanation.confidenceFactors.join(', ')}</p>
+                <p className="mb-2"><strong>Limitations:</strong> {aiRecommendations.aiExplanation.limitations.join(', ')}</p>
+                <p><strong>Recommendations:</strong> {aiRecommendations.aiExplanation.recommendations.join(', ')}</p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setShowAIDialog(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              >
+                Reject
+              </button>
+              <button
+                onClick={handleAcceptAIRecommendations}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Accept & Apply
               </button>
             </div>
           </div>
