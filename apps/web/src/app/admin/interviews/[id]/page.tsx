@@ -417,6 +417,7 @@ export default function InterviewDetailPage() {
             <div
               className="bg-blue-600 h-2 rounded-full transition-all"
               style={{ width: `${interview.progress}%` }}
+              role="presentation"
             ></div>
           </div>
         </div>
