@@ -226,92 +226,96 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /supplements/:id - Update supplement
   fastify.put<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const { id } = req.params;
-    const body = supplementSchema.partial().parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const { id } = req.params;
+      const body = supplementSchema.partial().parse(req.body);
 
-    const existing = await db
-      .select()
-      .from(supplements)
-      .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(supplements)
+        .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
+        .limit(1);
 
-    if (existing.length === 0) {
-      reply.code(404).send({ error: 'Supplement not found' });
-      return;
-    }
+      if (existing.length === 0) {
+        reply.code(404).send({ error: 'Supplement not found' });
+        return;
+      }
 
-    const supplement = existing[0];
+      const supplement = existing[0];
 
-    // Calculate totals from line items if provided
-    let requestedAmount = body.requestedAmount;
-    if (body.lineItems && body.lineItems.length > 0) {
-      const totals = SupplementsWorkflowService.calculateSupplementTotals(body.lineItems);
-      requestedAmount = totals.requestedAmount;
-    }
+      // Calculate totals from line items if provided
+      let requestedAmount = body.requestedAmount;
+      if (body.lineItems && body.lineItems.length > 0) {
+        const totals = SupplementsWorkflowService.calculateSupplementTotals(body.lineItems);
+        requestedAmount = totals.requestedAmount;
+      }
 
-    // Calculate difference if both amounts are provided
-    let difference = body.difference;
-    if (requestedAmount && body.approvedAmount) {
-      difference = SupplementsWorkflowService.calculateDifference(requestedAmount, body.approvedAmount);
-    }
+      // Calculate difference if both amounts are provided
+      let difference = body.difference;
+      if (requestedAmount && body.approvedAmount) {
+        difference = SupplementsWorkflowService.calculateDifference(requestedAmount, body.approvedAmount);
+      }
 
-    // Increment version if line items changed
-    let version = Number(supplement.version) || 1;
-    if (body.lineItems) {
-      version = version + 1;
-    }
+      // Increment version if line items changed
+      let version = Number(supplement.version) || 1;
+      if (body.lineItems) {
+        version = version + 1;
+      }
 
-    const [updated] = await db
-      .update(supplements)
-      .set({
-        ...body,
-        requestedAmount: requestedAmount?.toString(),
-        approvedAmount: body.approvedAmount?.toString(),
-        difference: difference?.toString(),
-        version: version.toString(),
-        submissionDate: body.submissionDate ? new Date(body.submissionDate) : undefined,
-        responseDate: body.responseDate ? new Date(body.responseDate) : undefined,
-        approvalDate: body.approvalDate ? new Date(body.approvalDate) : undefined,
-        updatedBy: userId,
-        updatedAt: new Date(),
-      })
-      .where(eq(supplements.id, id))
-      .returning();
+      const [updated] = await db
+        .update(supplements)
+        .set({
+          ...body,
+          requestedAmount: requestedAmount?.toString(),
+          approvedAmount: body.approvedAmount?.toString(),
+          difference: difference?.toString(),
+          version: version.toString(),
+          submissionDate: body.submissionDate ? new Date(body.submissionDate) : undefined,
+          responseDate: body.responseDate ? new Date(body.responseDate) : undefined,
+          approvalDate: body.approvalDate ? new Date(body.approvalDate) : undefined,
+          updatedBy: userId,
+          updatedAt: new Date(),
+        })
+        .where(eq(supplements.id, id))
+        .returning();
 
-    // Add revision history if version changed
-    if (version > Number(supplement.version)) {
-      const revisionHistory = SupplementsWorkflowService.addRevisionHistoryEntry(
-        (supplement.revisionHistory as any) || [],
-        version,
+      // Add revision history if version changed
+      if (version > Number(supplement.version)) {
+        const revisionHistory = SupplementsWorkflowService.addRevisionHistoryEntry(
+          (supplement.revisionHistory as any) || [],
+          version,
+          userId,
+          userName,
+          'Updated line items'
+        );
+        await db
+          .update(supplements)
+          .set({ revisionHistory })
+          .where(eq(supplements.id, id));
+      }
+
+      // Log activity
+      await ActivityService.logUpdate({
+        companyId,
         userId,
         userName,
-        'Updated line items'
-      );
-      await db
-        .update(supplements)
-        .set({ revisionHistory })
-        .where(eq(supplements.id, id));
+        entityType: 'supplement',
+        entityId: id,
+        entityName: supplement.supplementNumber,
+        description: `Updated supplement ${supplement.supplementNumber}`,
+        previousValues: supplement,
+        newValues: updated,
+        ipAddress,
+      });
+
+      reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to update supplement' });
     }
-
-    // Log activity
-    await ActivityService.logUpdate({
-      companyId,
-      userId,
-      userName,
-      entityType: 'supplement',
-      entityId: id,
-      entityName: supplement.supplementNumber,
-      description: `Updated supplement ${supplement.supplementNumber}`,
-      previousValues: supplement,
-      newValues: updated,
-      ipAddress,
-    });
-
-    reply.send(updated);
   });
 
   // DELETE /supplements/:id - Delete supplement
