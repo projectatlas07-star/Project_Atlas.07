@@ -16,6 +16,7 @@ import { SupplementValidationService as VS } from '../lib/ai-supplement/validati
 import { SupplementRecommendationEngine as RE } from '../lib/ai-supplement/engine';
 import { ActivityService } from '../lib/activity';
 import { env } from '../lib/env';
+import { AuthenticatedRequest } from '../types/request';
 
 const generateSupplementSchema = z.object({
   supplementId: z.string().uuid(),
@@ -48,103 +49,104 @@ const rejectDraftSchema = z.object({
 export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
   // POST /ai-supplements/generate - Generate AI supplement recommendations
   fastify.post('/generate', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
-    const body = generateSupplementSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const body = generateSupplementSchema.parse(req.body);
 
-    // Get supplement details
-    const [supplement] = await db
-      .select()
-      .from(supplements)
-      .where(and(
-        eq((supplements as any).id, body.supplementId),
-        eq((supplements as any).companyId, companyId)
-      ))
-      .limit(1);
+      // Get supplement details
+      const [supplement] = await db
+        .select()
+        .from(supplements)
+        .where(and(
+          eq((supplements as any).id, body.supplementId),
+          eq((supplements as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!supplement) {
-      reply.code(404).send({ error: 'Supplement not found' });
-      return;
-    }
+      if (!supplement) {
+        reply.code(404).send({ error: 'Supplement not found' });
+        return;
+      }
 
-    // Get claim details
-    const [claim] = await db
-      .select()
-      .from(claims)
-      .where(eq((claims as any).id, (supplement as any).claimId))
-      .limit(1);
+      // Get claim details
+      const [claim] = await db
+        .select()
+        .from(claims)
+        .where(eq((claims as any).id, (supplement as any).claimId))
+        .limit(1);
 
-    if (!claim) {
-      reply.code(404).send({ error: 'Claim not found' });
-      return;
-    }
+      if (!claim) {
+        reply.code(404).send({ error: 'Claim not found' });
+        return;
+      }
 
-    // Get property details
-    const [property] = await db
-      .select()
-      .from(properties)
-      .where(eq((properties as any).id, (claim as any).propertyId))
-      .limit(1);
+      // Get property details
+      const [property] = await db
+        .select()
+        .from(properties)
+        .where(eq((properties as any).id, (claim as any).propertyId))
+        .limit(1);
 
-    // Get customer details (from claim)
-    const customer = {
-      id: (claim as any).customerId || '',
-      name: (claim as any).customerName || '',
-      phone: (claim as any).customerPhone || '',
-      email: (claim as any).customerEmail || '',
-      address: (claim as any).customerAddress || '',
-    };
+      // Get customer details (from claim)
+      const customer = {
+        id: (claim as any).customerId || '',
+        name: (claim as any).customerName || '',
+        phone: (claim as any).customerPhone || '',
+        email: (claim as any).customerEmail || '',
+        address: (claim as any).customerAddress || '',
+      };
 
-    // Get interview responses
-    const interviewResponses = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).claimId, claim.id),
-        eq((interviews as any).companyId, companyId),
-        eq((interviews as any).status, 'completed')
-      ))
-      .orderBy(desc((interviews as any).completedAt))
-      .limit(1);
+      // Get interview responses
+      const interviewResponses = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).claimId, claim.id),
+          eq((interviews as any).companyId, companyId),
+          eq((interviews as any).status, 'completed')
+        ))
+        .orderBy(desc((interviews as any).completedAt))
+        .limit(1);
 
-    // Get documents
-    const docs = await db
-      .select()
-      .from(documents)
-      .where(and(
-        eq((documents as any).claimId, claim.id),
-        eq((documents as any).companyId, companyId)
-      ));
+      // Get documents
+      const docs = await db
+        .select()
+        .from(documents)
+        .where(and(
+          eq((documents as any).claimId, claim.id),
+          eq((documents as any).companyId, companyId)
+        ));
 
-    // Get activities
-    const activityTimeline = await db
-      .select()
-      .from(activityLogs)
-      .where(eq((activityLogs as any).claimId, claim.id))
-      .orderBy(desc((activityLogs as any).createdAt))
-      .limit(20);
+      // Get activities
+      const activityTimeline = await db
+        .select()
+        .from(activityLogs)
+        .where(eq((activityLogs as any).claimId, claim.id))
+        .orderBy(desc((activityLogs as any).createdAt))
+        .limit(20);
 
-    // Build context
-    const context: SupplementGenerationContext = {
-      claim: {
-        id: claim.id,
-        claimNumber: (claim as any).claimNumber,
-        insuranceCompany: (claim as any).insuranceCompany,
-        policyNumber: (claim as any).policyNumber,
-        dateOfLoss: (claim as any).dateOfLoss,
-        causeOfLoss: (claim as any).causeOfLoss,
-        description: (claim as any).description,
-        status: (claim as any).status,
-        deductible: (claim as any).deductible ? Number((claim as any).deductible) : undefined,
-        totalApproved: (claim as any).totalApproved ? Number((claim as any).totalApproved) : undefined,
-        totalRequested: (claim as any).totalRequested ? Number((claim as any).totalRequested) : undefined,
-      },
-      property: property ? {
-        id: property.id,
-        address: (property as any).address,
-        type: (property as any).type,
+      // Build context
+      const context: SupplementGenerationContext = {
+        claim: {
+          id: claim.id,
+          claimNumber: (claim as any).claimNumber,
+          insuranceCompany: (claim as any).insuranceCompany,
+          policyNumber: (claim as any).policyNumber,
+          dateOfLoss: (claim as any).dateOfLoss,
+          causeOfLoss: (claim as any).causeOfLoss,
+          description: (claim as any).description,
+          status: (claim as any).status,
+          deductible: (claim as any).deductible ? Number((claim as any).deductible) : undefined,
+          totalApproved: (claim as any).totalApproved ? Number((claim as any).totalApproved) : undefined,
+          totalRequested: (claim as any).totalRequested ? Number((claim as any).totalRequested) : undefined,
+        },
+        property: property ? {
+          id: property.id,
+          address: (property as any).address,
+          type: (property as any).type,
         yearBuilt: (property as any).yearBuilt ? Number((property as any).yearBuilt) : undefined,
         squareFootage: (property as any).squareFootage ? Number((property as any).squareFootage) : undefined,
         occupancy: (property as any).occupancy,
@@ -207,59 +209,58 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
       validationService
     );
 
-    try {
-      // Generate recommendations
-      const recommendations = await engine.generateRecommendations(context);
+    // Generate recommendations
+    const recommendations = await engine.generateRecommendations(context);
 
-      // Calculate estimated revenue
-      const estimatedRevenue = recommendations.recommendedLineItems.reduce(
-        (sum: number, item: any) => sum + item.suggestedTotalPrice,
-        0
-      );
+    // Calculate estimated revenue
+    const estimatedRevenue = recommendations.recommendedLineItems.reduce(
+      (sum: number, item: any) => sum + item.suggestedTotalPrice,
+      0
+    );
 
-      // Get next version number
-      const [maxVersion] = await db
-        .select({ max: sql<number>`MAX(version)` })
-        .from(supplementDrafts)
-        .where(eq((supplementDrafts as any).supplementId, body.supplementId));
-      
-      const nextVersion = (maxVersion?.max || 0) + 1;
+    // Get next version number
+    const [maxVersion] = await db
+      .select({ max: sql<number>`MAX(version)` })
+      .from(supplementDrafts)
+      .where(eq((supplementDrafts as any).supplementId, body.supplementId));
+    
+    const nextVersion = (maxVersion?.max || 0) + 1;
 
-      // Save draft
-      const [draft] = await db
-        .insert(supplementDrafts)
-        .values({
-          supplementId: body.supplementId,
-          version: nextVersion.toString(),
-          status: 'draft',
-          generatedAt: new Date(),
-          recommendations: recommendations as any,
-          aiProvider: 'OpenAI',
-          aiModel: 'gpt-4-turbo-preview',
-          confidenceScore: recommendations.confidenceScore.toString(),
-          riskScore: recommendations.riskScore.toString(),
-          estimatedRevenue: estimatedRevenue.toString(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .returning();
+    // Save draft
+    const [draft] = await db
+      .insert(supplementDrafts)
+      .values({
+        supplementId: body.supplementId,
+        version: nextVersion.toString(),
+        status: 'draft',
+        generatedAt: new Date(),
+        recommendations: recommendations as any,
+        aiProvider: 'OpenAI',
+        aiModel: 'gpt-4-turbo-preview',
+        confidenceScore: recommendations.confidenceScore.toString(),
+        riskScore: recommendations.riskScore.toString(),
+        estimatedRevenue: estimatedRevenue.toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
 
-      // Log activity
-      await ActivityService.logCreate({
-        companyId,
-        userId,
-        userName,
-        entityType: 'supplement_draft',
-        entityId: draft.id,
-        entityName: `Draft v${nextVersion}`,
-        description: `Generated AI supplement draft v${nextVersion} for supplement ${(supplement as any).supplementNumber}`,
-        ipAddress,
-      });
+    // Log activity
+    await ActivityService.logCreate({
+      companyId,
+      userId,
+      userName,
+      entityType: 'supplement_draft',
+      entityId: draft.id,
+      entityName: `Draft v${nextVersion}`,
+      description: `Generated AI supplement draft v${nextVersion} for supplement ${(supplement as any).supplementNumber}`,
+      ipAddress,
+    });
 
-      reply.send({
-        draft,
-        recommendations,
-      });
+    reply.send({
+      draft,
+      recommendations,
+    });
     } catch (error) {
       reply.code(500).send({ 
         error: 'Failed to generate supplement recommendations',
@@ -270,25 +271,26 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /ai-supplements/approve - Approve a supplement draft
   fastify.put('/approve', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
-    const body = approveDraftSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const body = approveDraftSchema.parse(req.body);
 
-    const [draft] = await db
-      .select()
-      .from(supplementDrafts)
-      .where(eq((supplementDrafts as any).id, body.draftId))
-      .limit(1);
+      const [draft] = await db
+        .select()
+        .from(supplementDrafts)
+        .where(eq((supplementDrafts as any).id, body.draftId))
+        .limit(1);
 
-    if (!draft) {
-      reply.code(404).send({ error: 'Draft not found' });
-      return;
-    }
+      if (!draft) {
+        reply.code(404).send({ error: 'Draft not found' });
+        return;
+      }
 
-    // Update draft status
-    const [updatedDraft] = await db
+      // Update draft status
+      const [updatedDraft] = await db
       .update(supplementDrafts)
       .set({
         status: 'approved',
@@ -319,15 +321,19 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     reply.send(updatedDraft);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to approve supplement draft' });
+    }
   });
 
   // PUT /ai-supplements/reject - Reject a supplement draft
   fastify.put('/reject', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
-    const body = rejectDraftSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const body = rejectDraftSchema.parse(req.body);
 
     const [draft] = await db
       .select()
@@ -369,12 +375,16 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     reply.send(updatedDraft);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to reject supplement draft' });
+    }
   });
 
   // GET /ai-supplements/:supplementId/drafts - Get all drafts for a supplement
   fastify.get('/:supplementId/drafts', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const { supplementId } = req.params as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { supplementId } = req.params as any;
 
     // Verify supplement belongs to company
     const [supplement] = await db
@@ -398,18 +408,22 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
       .orderBy(desc((supplementDrafts as any).version));
 
     reply.send({ drafts });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch supplement drafts' });
+    }
   });
 
   // GET /ai-supplements/drafts/:draftId - Get a specific draft
   fastify.get('/drafts/:draftId', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const { draftId } = req.params as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { draftId } = req.params as any;
 
-    const [draft] = await db
-      .select()
-      .from(supplementDrafts)
-      .where(eq((supplementDrafts as any).id, draftId))
-      .limit(1);
+      const [draft] = await db
+        .select()
+        .from(supplementDrafts)
+        .where(eq((supplementDrafts as any).id, draftId))
+        .limit(1);
 
     if (!draft) {
       reply.code(404).send({ error: 'Draft not found' });
@@ -432,16 +446,20 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     reply.send(draft);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch draft' });
+    }
   });
 
   // POST /ai-supplements/drafts/compare - Compare two draft versions
   fastify.post('/drafts/compare', async (req, reply) => {
-    const { draftId1, draftId2 } = req.body as { draftId1: string; draftId2: string };
+    try {
+      const { draftId1, draftId2 } = req.body as { draftId1: string; draftId2: string };
 
-    const [draft1] = await db
-      .select()
-      .from(supplementDrafts)
-      .where(eq((supplementDrafts as any).id, draftId1))
+      const [draft1] = await db
+        .select()
+        .from(supplementDrafts)
+        .where(eq((supplementDrafts as any).id, draftId1))
       .limit(1);
 
     const [draft2] = await db
@@ -470,5 +488,8 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
     const comparison = engine.compareVersions(recommendations1, recommendations2);
 
     reply.send(comparison);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to compare drafts' });
+    }
   });
 };
