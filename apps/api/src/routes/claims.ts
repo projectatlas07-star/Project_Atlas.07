@@ -1,7 +1,7 @@
 // apps/api/src/routes/claims.ts
 import { FastifyPluginAsync } from 'fastify';
 import { registerCrudRoutes } from './crud';
-import { claims } from '@project-atlas/database';
+import { claims, supplements } from '@project-atlas/database';
 import { z } from 'zod';
 import { db } from '@project-atlas/database';
 import { eq, and, like, or, desc } from 'drizzle-orm';
@@ -245,6 +245,36 @@ export const claimsRoutes: FastifyPluginAsync = async (fastify) => {
     const stats = ClaimsWorkflowService.getDashboardStats(allClaims);
 
     reply.send(stats);
+  });
+
+  // Get supplements for a claim
+  fastify.get('/:id/supplements', async (req, reply) => {
+    const { id } = req.params as any;
+    const companyId = (req as any).companyId;
+
+    const claimSupplements = await db
+      .select()
+      .from(supplements)
+      .where(and(
+        eq((supplements as any).claimId, id),
+        eq((supplements as any).companyId, companyId)
+      ))
+      .orderBy(desc((supplements as any).createdAt));
+
+    // Calculate summary
+    const summary = {
+      count: claimSupplements.length,
+      totalRequested: claimSupplements.reduce((sum: number, s: any) => sum + (Number(s.requestedAmount) || 0), 0),
+      totalApproved: claimSupplements.reduce((sum: number, s: any) => sum + (Number(s.approvedAmount) || 0), 0),
+      totalOutstanding: claimSupplements.reduce((sum: number, s: any) => sum + ((Number(s.requestedAmount) || 0) - (Number(s.approvedAmount) || 0)), 0),
+      latestStatus: claimSupplements.length > 0 ? claimSupplements[0].status : null,
+      latestCarrierResponse: claimSupplements.length > 0 ? claimSupplements[0].responseDate : null,
+    };
+
+    reply.send({
+      supplements: claimSupplements,
+      summary,
+    });
   });
 
   // Get available status transitions for a claim

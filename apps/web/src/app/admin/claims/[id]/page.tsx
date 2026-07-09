@@ -29,6 +29,30 @@ interface Claim {
   updatedAt: string;
 }
 
+interface Supplement {
+  id: string;
+  supplementNumber: string;
+  version: number;
+  status: string;
+  carrier: string | null;
+  requestedAmount: number | null;
+  approvedAmount: number | null;
+  difference: number | null;
+  createdAt: string;
+}
+
+interface SupplementsResponse {
+  supplements: Supplement[];
+  summary: {
+    count: number;
+    totalRequested: number;
+    totalApproved: number;
+    totalOutstanding: number;
+    latestStatus: string | null;
+    latestCarrierResponse: string | null;
+  };
+}
+
 interface StatusTransition {
   value: string;
   label: string;
@@ -64,6 +88,7 @@ export default function ClaimDetailPage() {
 
   const [claim, setClaim] = useState<Claim | null>(null);
   const [transitions, setTransitions] = useState<TransitionResponse | null>(null);
+  const [supplementsData, setSupplementsData] = useState<SupplementsResponse | null>(null);
   const [status, setStatus] = useState('');
   const [reason, setReason] = useState('');
   const [showStatusDialog, setShowStatusDialog] = useState(false);
@@ -77,6 +102,7 @@ export default function ClaimDetailPage() {
     }
     loadClaim();
     loadTransitions();
+    loadSupplements();
   }, [session, router, claimId]);
 
   const loadClaim = async () => {
@@ -97,6 +123,15 @@ export default function ClaimDetailPage() {
       setTransitions(data);
     } catch (e: any) {
       console.error('Error loading transitions:', e);
+    }
+  };
+
+  const loadSupplements = async () => {
+    try {
+      const data = await apiFetch<SupplementsResponse>(`/claims/${claimId}/supplements`);
+      setSupplementsData(data);
+    } catch (e: any) {
+      console.error('Error loading supplements:', e);
     }
   };
 
@@ -230,6 +265,45 @@ export default function ClaimDetailPage() {
                 <p className="mt-1 text-sm text-gray-900">{formatCurrency(claim.financialSummary?.netApproved)}</p>
               </div>
             </div>
+          </div>
+
+          {/* Supplements Summary */}
+          <div className="bg-white rounded shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Supplements</h2>
+            {supplementsData ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Supplement Count</label>
+                  <p className="mt-1 text-sm text-gray-900">{supplementsData.summary.count}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Latest Status</label>
+                  <p className="mt-1 text-sm text-gray-900">{supplementsData.summary.latestStatus || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Total Requested</label>
+                  <p className="mt-1 text-sm text-gray-900">{formatCurrency(supplementsData.summary.totalRequested)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Total Approved</label>
+                  <p className="mt-1 text-sm text-gray-900">{formatCurrency(supplementsData.summary.totalApproved)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Outstanding Amount</label>
+                  <p className="mt-1 text-sm text-gray-900">{formatCurrency(supplementsData.summary.totalOutstanding)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Latest Carrier Response</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {supplementsData.summary.latestCarrierResponse 
+                      ? formatDate(supplementsData.summary.latestCarrierResponse)
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Loading supplements...</p>
+            )}
           </div>
 
           {/* Status History */}

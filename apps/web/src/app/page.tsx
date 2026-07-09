@@ -13,10 +13,24 @@ interface DashboardStats {
   recentlyUpdated: any[];
 }
 
+interface SupplementsStats {
+  total: number;
+  byStatus: Record<string, number>;
+  pending: number;
+  approved: number;
+  denied: number;
+  totalRequested: number;
+  totalApproved: number;
+  averageApprovalTime: number;
+  approvalRate: number;
+  recentlyUpdated: any[];
+}
+
 export default function Home() {
   const { session, loading, supabase } = useSupabase();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [supplementsStats, setSupplementsStats] = useState<SupplementsStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
@@ -28,6 +42,7 @@ export default function Home() {
   useEffect(() => {
     if (session) {
       loadDashboardStats();
+      loadSupplementsStats();
     }
   }, [session]);
 
@@ -40,6 +55,15 @@ export default function Home() {
       console.error('Error loading dashboard stats:', e);
     } finally {
       setLoadingStats(false);
+    }
+  };
+
+  const loadSupplementsStats = async () => {
+    try {
+      const data = await apiFetch<SupplementsStats>('/supplements/dashboard/stats');
+      setSupplementsStats(data);
+    } catch (e: any) {
+      console.error('Error loading supplements stats:', e);
     }
   };
 
@@ -79,6 +103,9 @@ export default function Home() {
                 </a>
                 <a href="/admin/adjusters" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                   Adjusters
+                </a>
+                <a href="/admin/supplements" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                  Supplements
                 </a>
                 <a href="/admin/documents" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                   Documents
@@ -193,6 +220,144 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(claim.updatedAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Supplements Workflow Widgets */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Supplements Overview</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Total Supplements</p>
+                    <p className="text-2xl font-bold text-gray-900">{supplementsStats?.total || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <span className="text-indigo-600 font-bold">💰</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-600">{supplementsStats?.pending || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <span className="text-yellow-600 font-bold">⏳</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Approved</p>
+                    <p className="text-2xl font-bold text-green-600">{supplementsStats?.approved || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 font-bold">✅</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Approval Rate</p>
+                    <p className="text-2xl font-bold text-blue-600">{supplementsStats?.approvalRate.toFixed(1) || 0}%</p>
+                  </div>
+                  <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-bold">📊</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Supplements Revenue Summary */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Summary</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Total Requested</p>
+                    <p className="text-2xl font-bold text-gray-900">${(supplementsStats?.totalRequested || 0).toLocaleString()}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span className="text-purple-600 font-bold">📈</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Total Approved</p>
+                    <p className="text-2xl font-bold text-green-600">${(supplementsStats?.totalApproved || 0).toLocaleString()}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 font-bold">💵</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Outstanding</p>
+                    <p className="text-2xl font-bold text-orange-600">${((supplementsStats?.totalRequested || 0) - (supplementsStats?.totalApproved || 0)).toLocaleString()}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span className="text-orange-600 font-bold">⚠️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recently Updated Supplements */}
+          {supplementsStats?.recentlyUpdated && supplementsStats.recentlyUpdated.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recently Updated Supplements</h3>
+              <div className="bg-white shadow rounded-lg overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplement #</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carrier</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {supplementsStats.recentlyUpdated.map((supplement) => (
+                      <tr key={supplement.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a href={`/admin/supplements/${supplement.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                            {supplement.supplementNumber}
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          v{supplement.version}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {supplement.status}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {supplement.carrier || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          ${supplement.requestedAmount?.toFixed(2) || '0.00'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(supplement.updatedAt).toLocaleDateString()}
                         </td>
                       </tr>
                     ))}
