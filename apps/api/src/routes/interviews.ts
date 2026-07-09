@@ -319,66 +319,70 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /interviews/:id/status - Change interview status
   fastify.put<{ Params: { id: string } }>('/:id/status', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const { id } = req.params;
-    const { status } = statusChangeSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const { id } = req.params;
+      const { status } = statusChangeSchema.parse(req.body);
 
-    const existing = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!existing) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!existing) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      const updates: any = {
+        status,
+        updatedBy: userId,
+        updatedAt: new Date(),
+      };
+
+      if (status === 'in_progress' && !(existing as any).startedAt) {
+        updates.startedAt = new Date();
+      }
+
+      if (status === 'completed' && !(existing as any).completedAt) {
+        updates.completedAt = new Date();
+      }
+
+      if (status === 'archived' && !(existing as any).archivedAt) {
+        updates.archivedAt = new Date();
+      }
+
+      const [updated] = await db
+        .update(interviews)
+        .set(updates)
+        .where(eq((interviews as any).id, id))
+        .returning();
+
+      // Log activity
+      await ActivityService.logStatusChange({
+        companyId,
+        userId,
+        userName,
+        entityType: 'interview',
+        entityId: id,
+        entityName: (existing as any).interviewNumber,
+        description: `Changed interview status to ${status}`,
+        previousValues: { status: (existing as any).status },
+        newValues: { status },
+        ipAddress,
+      });
+
+      reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to change interview status' });
     }
-
-    const updates: any = {
-      status,
-      updatedBy: userId,
-      updatedAt: new Date(),
-    };
-
-    if (status === 'in_progress' && !(existing as any).startedAt) {
-      updates.startedAt = new Date();
-    }
-
-    if (status === 'completed' && !(existing as any).completedAt) {
-      updates.completedAt = new Date();
-    }
-
-    if (status === 'archived' && !(existing as any).archivedAt) {
-      updates.archivedAt = new Date();
-    }
-
-    const [updated] = await db
-      .update(interviews)
-      .set(updates)
-      .where(eq((interviews as any).id, id))
-      .returning();
-
-    // Log activity
-    await ActivityService.logStatusChange({
-      companyId,
-      userId,
-      userName,
-      entityType: 'interview',
-      entityId: id,
-      entityName: (existing as any).interviewNumber,
-      description: `Changed interview status to ${status}`,
-      previousValues: { status: (existing as any).status },
-      newValues: { status },
-      ipAddress,
-    });
-
-    reply.send(updated);
   });
 
   // GET /interviews/:id/template - Get interview template
