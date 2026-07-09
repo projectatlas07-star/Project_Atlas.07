@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { db } from '@project-atlas/database';
 import { eq, or, like, and, desc } from 'drizzle-orm';
 import { ActivityService } from '../lib/activity';
+import { AuthenticatedRequest } from '../types/request';
 
 // Adjuster schema for validation
 const adjusterSchema = z.object({
@@ -26,8 +27,8 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
     table: adjusters,
     schema: adjusterSchema,
     beforeCreate: async (data, req) => {
-      const userId = (req as any).userId;
-      const companyId = (req as any).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const companyId = (req as AuthenticatedRequest).companyId;
       return {
         ...data,
         createdBy: userId,
@@ -36,7 +37,7 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
     },
     afterCreate: async (result, req) => {
       const userInfo = ActivityService.getUserInfo(req);
-      const companyId = (req as any).companyId;
+      const companyId = (req as AuthenticatedRequest).companyId;
       await ActivityService.logCreate({
         companyId,
         userId: userInfo.userId,
@@ -53,8 +54,9 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
 
   // List adjusters with search, pagination, and filtering
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const query = req.query as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const query = req.query as any;
     
     // Pagination
     const page = parseInt(query.page) || 1;
@@ -114,16 +116,20 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
         totalPages: Math.ceil(total / limit),
       },
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch adjusters' });
+    }
   });
 
   // Update adjuster with activity logging
   fastify.put('/:id', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userInfo = ActivityService.getUserInfo(req);
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userInfo = ActivityService.getUserInfo(req);
 
-    const parsed = adjusterSchema.safeParse(req.body);
+      const parsed = adjusterSchema.safeParse(req.body);
     if (!parsed.success) {
       return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
     }
@@ -168,45 +174,52 @@ export const adjustersRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to update adjuster' });
+    }
   });
 
   // Delete adjuster with activity logging
   fastify.delete('/:id', async (req, reply) => {
-    const { id } = req.params as any;
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userInfo = ActivityService.getUserInfo(req);
+    try {
+      const { id } = req.params as any;
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userInfo = ActivityService.getUserInfo(req);
 
-    // Verify ownership
-    const [existing] = await db
-      .select()
-      .from(adjusters)
-      .where(eq((adjusters as any).id, id));
+      // Verify ownership
+      const [existing] = await db
+        .select()
+        .from(adjusters)
+        .where(eq((adjusters as any).id, id));
 
-    if (!existing) {
-      return reply.code(404).send({ error: 'Adjuster not found' });
-    }
+      if (!existing) {
+        return reply.code(404).send({ error: 'Adjuster not found' });
+      }
 
-    if ((existing as any).companyId !== companyId) {
-      return reply.code(403).send({ error: 'Access denied' });
-    }
+      if ((existing as any).companyId !== companyId) {
+        return reply.code(403).send({ error: 'Access denied' });
+      }
 
-    // Log activity before delete
-    await ActivityService.logDelete({
-      companyId,
-      userId: userInfo.userId,
-      userName: userInfo.userName,
-      entityType: 'adjuster',
-      entityId: id,
-      entityName: (existing as any).fullName,
-      description: `Deleted adjuster: ${(existing as any).fullName}`,
-      previousValues: { fullName: (existing as any).fullName },
-      ipAddress: userInfo.ipAddress,
-    });
+      // Log activity before delete
+      await ActivityService.logDelete({
+        companyId,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        entityType: 'adjuster',
+        entityId: id,
+        entityName: (existing as any).fullName,
+        description: `Deleted adjuster: ${(existing as any).fullName}`,
+        previousValues: { fullName: (existing as any).fullName },
+        ipAddress: userInfo.ipAddress,
+      });
 
-    // Delete
-    await db.delete(adjusters).where(eq((adjusters as any).id, id));
+      // Delete
+      await db.delete(adjusters).where(eq((adjusters as any).id, id));
 
     reply.code(204).send();
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to delete adjuster' });
+    }
   });
 };
