@@ -6,6 +6,7 @@ import { claims } from '../../../../packages/database/src/schema/claims';
 import { adjusters } from '../../../../packages/database/src/schema/adjusters';
 import { db } from '../../../../packages/database/src';
 import { z } from 'zod';
+import { AuthenticatedRequest } from '../types/request';
 import { 
   SupplementsWorkflowService, 
   STATUS_LABELS, 
@@ -52,7 +53,7 @@ const statusChangeSchema = z.object({
 export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /supplements - List with filters, search, pagination
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { status, adjusterId, carrier, search, page = '1', limit = '20' } = req.query as any;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
