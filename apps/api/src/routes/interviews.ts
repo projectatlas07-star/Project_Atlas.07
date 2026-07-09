@@ -124,48 +124,52 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // POST /interviews - Create interview
   fastify.post('/', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const body = interviewSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const body = interviewSchema.parse(req.body);
 
-    const interviewNumber = InterviewWorkflowService.generateInterviewNumber();
+      const interviewNumber = InterviewWorkflowService.generateInterviewNumber();
 
-    const [newInterview] = await db
-      .insert(interviews)
-      .values({
-        companyId,
-        propertyId: body.propertyId || null,
-        claimId: body.claimId || null,
-        createdBy: userId,
-        updatedBy: userId,
-        interviewNumber,
-        templateId: body.templateId,
-        templateName: body.templateName,
-        status: body.status || 'draft',
-        currentSection: body.currentSection || null,
-        responses: body.responses || {},
-        conversationHistory: body.conversationHistory || [],
+      const [newInterview] = await db
+        .insert(interviews)
+        .values({
+          companyId,
+          propertyId: body.propertyId || null,
+          claimId: body.claimId || null,
+          createdBy: userId,
+          updatedBy: userId,
+          interviewNumber,
+          templateId: body.templateId,
+          templateName: body.templateName,
+          status: body.status || 'draft',
+          currentSection: body.currentSection || null,
+          responses: body.responses || {},
+          conversationHistory: body.conversationHistory || [],
         metadata: body.metadata || {},
         progress: '0',
         startedAt: new Date(),
       })
       .returning();
 
-    // Log activity
-    await ActivityService.logCreate({
-      companyId,
-      userId,
-      userName,
-      entityType: 'interview',
-      entityId: newInterview.id,
-      entityName: interviewNumber,
-      description: `Created interview ${interviewNumber}`,
-      ipAddress,
-    });
+      // Log activity
+      await ActivityService.logCreate({
+        companyId,
+        userId,
+        userName,
+        entityType: 'interview',
+        entityId: newInterview.id,
+        entityName: interviewNumber,
+        description: `Created interview ${interviewNumber}`,
+        ipAddress,
+      });
 
-    reply.send(newInterview);
+      reply.send(newInterview);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to create interview' });
+    }
   });
 
   // PUT /interviews/:id - Update interview
