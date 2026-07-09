@@ -174,52 +174,56 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /interviews/:id - Update interview
   fastify.put<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const { id } = req.params;
-    const body = interviewSchema.partial().parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const { id } = req.params;
+      const body = interviewSchema.partial().parse(req.body);
 
-    const existing = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!existing) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!existing) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      const [updated] = await db
+        .update(interviews)
+        .set({
+          ...body,
+          updatedBy: userId,
+          updatedAt: new Date(),
+        })
+        .where(eq((interviews as any).id, id))
+        .returning();
+
+      // Log activity
+      await ActivityService.logUpdate({
+        companyId,
+        userId,
+        userName,
+        entityType: 'interview',
+        entityId: id,
+        entityName: (existing as any).interviewNumber,
+        description: `Updated interview ${(existing as any).interviewNumber}`,
+        previousValues: existing,
+        newValues: updated,
+        ipAddress,
+      });
+
+      reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to update interview' });
     }
-
-    const [updated] = await db
-      .update(interviews)
-      .set({
-        ...body,
-        updatedBy: userId,
-        updatedAt: new Date(),
-      })
-      .where(eq((interviews as any).id, id))
-      .returning();
-
-    // Log activity
-    await ActivityService.logUpdate({
-      companyId,
-      userId,
-      userName,
-      entityType: 'interview',
-      entityId: id,
-      entityName: (existing as any).interviewNumber,
-      description: `Updated interview ${(existing as any).interviewNumber}`,
-      previousValues: existing,
-      newValues: updated,
-      ipAddress,
-    });
-
-    reply.send(updated);
   });
 
   // DELETE /interviews/:id - Delete interview
