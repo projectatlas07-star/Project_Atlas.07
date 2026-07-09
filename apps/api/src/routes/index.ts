@@ -9,6 +9,7 @@ import { tenantsRoutes } from './tenants';
 import { usersRoutes } from './users';
 import { tenantMembersRoutes } from './tenant_members';
 import { supplementsRoutes } from './supplements';
+import { documentsRoutes } from './documents';
 
 export async function registerRoutes(server: FastifyInstance) {
   // Companies CRUD + CSV import
@@ -22,14 +23,22 @@ export async function registerRoutes(server: FastifyInstance) {
 
   // Claims CRUD
   server.register(claimsRoutes, { prefix: '/claims' });
-    // Properties CRUD
-    server.register(propertiesRoutes, { prefix: '/properties' });
-    // Tenants CRUD
-    server.register(tenantsRoutes, { prefix: '/tenants' });
-    // Users CRUD
-    server.register(usersRoutes, { prefix: '/users' });
-    // Tenant Members CRUD
-    server.register(tenantMembersRoutes, { prefix: '/tenant-members' });
-    // Supplements CRUD
-    server.register(supplementsRoutes, { prefix: '/supplements' });
+
+  // Properties CRUD
+  server.register(propertiesRoutes, { prefix: '/properties' });
+
+  // Tenants CRUD
+  server.register(tenantsRoutes, { prefix: '/tenants' });
+
+  // Users CRUD
+  server.register(usersRoutes, { prefix: '/users' });
+
+  // Tenant Members CRUD
+  server.register(tenantMembersRoutes, { prefix: '/tenant-members' });
+
+  // Supplements CRUD
+  server.register(supplementsRoutes, { prefix: '/supplements' });
+
+  // Documents CRUD
+  server.register(documentsRoutes, { prefix: '/documents' });
 }
