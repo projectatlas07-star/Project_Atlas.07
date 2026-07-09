@@ -4,6 +4,7 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 import { interviews } from '@project-atlas/database';
 import { db } from '@project-atlas/database';
 import { z } from 'zod';
+import { AuthenticatedRequest } from '../types/request';
 import { 
   InterviewWorkflowService, 
   InterviewStatus 
@@ -37,7 +38,7 @@ const statusChangeSchema = z.object({
 export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /interviews - List interviews
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { status, templateId, page = '1', limit = '20' } = req.query as any;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -84,7 +85,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /interviews/:id - Get interview details
   fastify.get<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { id } = req.params;
 
     const [interview] = await db
@@ -115,10 +116,10 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // POST /interviews - Create interview
   fastify.post('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const body = interviewSchema.parse(req.body);
 
     const interviewNumber = InterviewWorkflowService.generateInterviewNumber();
@@ -161,10 +162,10 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /interviews/:id - Update interview
   fastify.put<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const { id } = req.params;
     const body = interviewSchema.partial().parse(req.body);
 
@@ -211,10 +212,10 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // DELETE /interviews/:id - Delete interview
   fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const { id } = req.params;
 
     const existing = await db
@@ -250,7 +251,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /interviews/:id/responses - Update interview responses (autosave)
   fastify.put<{ Params: { id: string } }>('/:id/responses', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { id } = req.params;
     const { questionId, value, sectionId } = updateResponseSchema.parse(req.body);
 
@@ -294,10 +295,10 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /interviews/:id/status - Change interview status
   fastify.put<{ Params: { id: string } }>('/:id/status', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const { id } = req.params;
     const { status } = statusChangeSchema.parse(req.body);
 
@@ -358,7 +359,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /interviews/:id/template - Get interview template
   fastify.get<{ Params: { id: string } }>('/:id/template', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { id } = req.params;
 
     const [interview] = await db
@@ -387,7 +388,7 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /interviews/:id/progress - Get interview progress
   fastify.get<{ Params: { id: string } }>('/:id/progress', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { id } = req.params;
 
     const [interview] = await db
@@ -431,8 +432,8 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // POST /interviews/:id/generate-claim - Generate claim from completed interview
   fastify.post<{ Params: { id: string } }>('/:id/generate-claim', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
     const { id } = req.params;
 
     const [interview] = await db

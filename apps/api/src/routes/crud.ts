@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodSchema, z } from 'zod';
 import { db } from '@project-atlas/database';
 import { eq, and } from 'drizzle-orm';
+import { AuthenticatedRequest } from '../types/request';
 
 /**
  * Register a set of standard CRUD routes for a given table.
@@ -24,7 +25,7 @@ export function registerCrudRoutes(
 
   // List all rows (company‑scoped)
   server.get(basePath, async (req: FastifyRequest, reply: FastifyReply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const rows = await db.select().from(table).where(eq((table as any).companyId, companyId));
     reply.send(rows);
   });
@@ -32,7 +33,7 @@ export function registerCrudRoutes(
   // Get by id (ensuring same company)
   server.get(`${basePath}/:id`, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     const { id } = req.params;
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const rows = await db.select().from(table).where(
       and(eq((table as any).id, id), eq((table as any).companyId, companyId))
     );
@@ -45,7 +46,7 @@ export function registerCrudRoutes(
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
     let payload = parsed.data;
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     payload = { ...payload, companyId };
     if (beforeCreate) payload = await beforeCreate(payload, req);
     const created = await db.insert(table).values(payload).returning();
@@ -56,7 +57,7 @@ export function registerCrudRoutes(
   // Update (partial)
   server.patch(`${basePath}/:id`, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     const { id } = req.params;
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const parsed = (schema as any).partial().safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload', details: parsed.error.format() });
     const updated = await db
@@ -73,7 +74,7 @@ export function registerCrudRoutes(
   // Delete
   server.delete(`${basePath}/:id`, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     const { id } = req.params;
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const result = await db.delete(table).where(and(eq((table as any).id, id), eq((table as any).companyId, companyId)));
     reply.code(204).send();
   });

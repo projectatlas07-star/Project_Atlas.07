@@ -133,7 +133,7 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /supplements/:id - Get supplement details
   fastify.get<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { id } = req.params;
 
     const result = await db
@@ -158,10 +158,10 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // POST /supplements - Create supplement
   fastify.post('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const body = supplementSchema.parse(req.body);
 
     // Calculate totals from line items if provided
@@ -214,10 +214,10 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /supplements/:id - Update supplement
   fastify.put<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const { id } = req.params;
     const body = supplementSchema.partial().parse(req.body);
 
@@ -304,10 +304,10 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // DELETE /supplements/:id - Delete supplement
   fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const { id } = req.params;
 
     const existing = await db
@@ -342,10 +342,10 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /supplements/:id/status - Change status
   fastify.put<{ Params: { id: string } }>('/:id/status', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const userId = (req as any).userId;
-    const userName = (req as any).userName;
-    const ipAddress = (req as any).ipAddress;
+    const companyId = (req as AuthenticatedRequest).companyId;
+    const userId = (req as AuthenticatedRequest).userId;
+    const userName = (req as AuthenticatedRequest).userName;
+    const ipAddress = (req as AuthenticatedRequest).ipAddress;
     const { id } = req.params;
     const { status, reason } = statusChangeSchema.parse(req.body);
 
@@ -428,7 +428,7 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /supplements/:id/transitions - Get available status transitions
   fastify.get<{ Params: { id: string } }>('/:id/transitions', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
     const { id } = req.params;
 
     const result = await db
@@ -459,7 +459,7 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /supplements/dashboard/stats - Get dashboard statistics
   fastify.get('/dashboard/stats', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    const companyId = (req as AuthenticatedRequest).companyId;
 
     const allSupplements = await db
       .select()
