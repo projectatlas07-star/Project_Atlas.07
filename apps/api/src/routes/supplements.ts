@@ -320,40 +320,44 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // DELETE /supplements/:id - Delete supplement
   fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const { id } = req.params;
 
-    const existing = await db
-      .select()
-      .from(supplements)
-      .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(supplements)
+        .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
+        .limit(1);
 
-    if (existing.length === 0) {
-      reply.code(404).send({ error: 'Supplement not found' });
-      return;
+      if (existing.length === 0) {
+        reply.code(404).send({ error: 'Supplement not found' });
+        return;
+      }
+
+      const supplement = existing[0];
+
+      await db.delete(supplements).where(eq(supplements.id, id));
+
+      // Log activity
+      await ActivityService.logDelete({
+        companyId,
+        userId,
+        userName,
+        entityType: 'supplement',
+        entityId: id,
+        entityName: supplement.supplementNumber,
+        description: `Deleted supplement ${supplement.supplementNumber}`,
+        ipAddress,
+      });
+
+      reply.send({ success: true });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to delete supplement' });
     }
-
-    const supplement = existing[0];
-
-    await db.delete(supplements).where(eq(supplements.id, id));
-
-    // Log activity
-    await ActivityService.logDelete({
-      companyId,
-      userId,
-      userName,
-      entityType: 'supplement',
-      entityId: id,
-      entityName: supplement.supplementNumber,
-      description: `Deleted supplement ${supplement.supplementNumber}`,
-      ipAddress,
-    });
-
-    reply.send({ success: true });
   });
 
   // PUT /supplements/:id/status - Change status
