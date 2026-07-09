@@ -89,33 +89,37 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /interviews/:id - Get interview details
   fastify.get<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { id } = req.params;
 
-    const [interview] = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const [interview] = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!interview) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!interview) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      // Calculate progress
+      const template = interview.templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+      const progress = template 
+        ? InterviewWorkflowService.calculateProgress(template, (interview as any).responses || {})
+        : Number((interview as any).progress) || 0;
+
+      reply.send({
+        ...interview,
+        progress,
+      });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch interview' });
     }
-
-    // Calculate progress
-    const template = interview.templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
-    const progress = template 
-      ? InterviewWorkflowService.calculateProgress(template, (interview as any).responses || {})
-      : Number((interview as any).progress) || 0;
-
-    reply.send({
-      ...interview,
-      progress,
-    });
   });
 
   // POST /interviews - Create interview
