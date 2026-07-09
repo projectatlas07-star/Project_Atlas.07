@@ -11,18 +11,30 @@ interface Claim {
   status: string;
   dateOfLoss: string;
   description: string;
+  adjusterId: string | null;
+  adjuster?: {
+    id: string;
+    fullName: string;
+  };
+}
+
+interface Adjuster {
+  id: string;
+  fullName: string;
 }
 
 export default function ClaimsPage() {
   const { session, loading } = useSupabase();
   const router = useRouter();
   const [claims, setClaims] = useState<Claim[]>([]);
+  const [adjusters, setAdjusters] = useState<Adjuster[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     claimNumber: '',
     status: 'open',
     dateOfLoss: '',
     description: '',
+    adjusterId: '',
   });
   const [status, setStatus] = useState('');
 
@@ -32,6 +44,7 @@ export default function ClaimsPage() {
       return;
     }
     loadClaims();
+    loadAdjusters();
   }, [session, router]);
 
   const loadClaims = async () => {
@@ -43,16 +56,42 @@ export default function ClaimsPage() {
     }
   };
 
+  const loadAdjusters = async () => {
+    try {
+      const data = await apiFetch<Adjuster[]>('/adjusters');
+      setAdjusters(data);
+    } catch (e: any) {
+      console.error('Error loading adjusters:', e);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        adjusterId: formData.adjusterId || null,
+      };
       await apiFetch<Claim>('/claims', {
         method: 'POST',
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       setStatus('Claim created');
       setShowForm(false);
-      setFormData({ claimNumber: '', status: 'open', dateOfLoss: '', description: '' });
+      setFormData({ claimNumber: '', status: 'open', dateOfLoss: '', description: '', adjusterId: '' });
+      loadClaims();
+    } catch (e: any) {
+      setStatus(`Error: ${e.message}`);
+    }
+  };
+
+  const handleAssignAdjuster = async (claimId: string, adjusterId: string) => {
+    try {
+      await apiFetch(`/claims/${claimId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ adjusterId: adjusterId || null }),
+      });
+      setStatus('Adjuster assigned');
       loadClaims();
     } catch (e: any) {
       setStatus(`Error: ${e.message}`);
@@ -134,6 +173,22 @@ export default function ClaimsPage() {
                 rows={3}
               />
             </div>
+            <div>
+              <label htmlFor="adjuster" className="block mb-1 text-sm font-medium text-gray-700">Assign Adjuster</label>
+              <select
+                id="adjuster"
+                value={formData.adjusterId}
+                onChange={(e) => setFormData({ ...formData, adjusterId: e.target.value })}
+                className="w-full p-2 border rounded"
+              >
+                <option value="">No adjuster assigned</option>
+                {adjusters.map((adjuster) => (
+                  <option key={adjuster.id} value={adjuster.id}>
+                    {adjuster.fullName}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <button
             type="submit"
@@ -151,6 +206,7 @@ export default function ClaimsPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claim #</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Loss</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adjuster</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -169,6 +225,21 @@ export default function ClaimsPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{claim.dateOfLoss || '-'}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <select
+                    value={claim.adjusterId || ''}
+                    onChange={(e) => handleAssignAdjuster(claim.id, e.target.value)}
+                    className="p-1 border rounded text-sm"
+                    aria-label="Assign adjuster"
+                  >
+                    <option value="">Unassigned</option>
+                    {adjusters.map((adjuster) => (
+                      <option key={adjuster.id} value={adjuster.id}>
+                        {adjuster.fullName}
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">{claim.description || '-'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
@@ -182,7 +253,7 @@ export default function ClaimsPage() {
             ))}
             {claims.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
                   No claims found
                 </td>
               </tr>

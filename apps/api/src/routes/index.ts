@@ -10,6 +10,7 @@ import { usersRoutes } from './users';
 import { tenantMembersRoutes } from './tenant_members';
 import { supplementsRoutes } from './supplements';
 import { documentsRoutes } from './documents';
+import { adjustersRoutes } from './adjusters';
 
 export async function registerRoutes(server: FastifyInstance) {
   // Companies CRUD + CSV import
@@ -41,4 +42,7 @@ export async function registerRoutes(server: FastifyInstance) {
 
   // Documents CRUD
   server.register(documentsRoutes, { prefix: '/documents' });
+
+  // Adjusters CRUD
+  server.register(adjustersRoutes, { prefix: '/adjusters' });
 }
