@@ -166,58 +166,62 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // POST /supplements - Create supplement
   fastify.post('/', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const body = supplementSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const body = supplementSchema.parse(req.body);
 
-    // Calculate totals from line items if provided
-    let requestedAmount = body.requestedAmount;
-    if (body.lineItems && body.lineItems.length > 0) {
-      const totals = SupplementsWorkflowService.calculateSupplementTotals(body.lineItems);
-      requestedAmount = totals.requestedAmount;
-    }
+      // Calculate totals from line items if provided
+      let requestedAmount = body.requestedAmount;
+      if (body.lineItems && body.lineItems.length > 0) {
+        const totals = SupplementsWorkflowService.calculateSupplementTotals(body.lineItems);
+        requestedAmount = totals.requestedAmount;
+      }
 
-    const [newSupplement] = await db
-      .insert(supplements)
-      .values({
+      const [newSupplement] = await db
+        .insert(supplements)
+        .values({
+          companyId,
+          claimId: body.claimId,
+          adjusterId: body.adjusterId || null,
+          supplementNumber: body.supplementNumber,
+          version: (body.version || 1).toString(),
+          status: body.status || 'draft',
+          carrier: body.carrier || null,
+          requestedAmount: requestedAmount?.toString(),
+          approvedAmount: body.approvedAmount?.toString() || null,
+          difference: body.difference?.toString() || null,
+          lineItems: body.lineItems || [],
+          internalNotes: body.internalNotes || null,
+          submissionDate: body.submissionDate ? new Date(body.submissionDate) : null,
+          responseDate: body.responseDate ? new Date(body.responseDate) : null,
+          approvalDate: body.approvalDate ? new Date(body.approvalDate) : null,
+          denialReason: body.denialReason || null,
+          statusHistory: [],
+          revisionHistory: [],
+          createdBy: userId,
+          updatedBy: userId,
+        })
+        .returning();
+
+      // Log activity
+      await ActivityService.logCreate({
         companyId,
-        claimId: body.claimId,
-        adjusterId: body.adjusterId || null,
-        supplementNumber: body.supplementNumber,
-        version: (body.version || 1).toString(),
-        status: body.status || 'draft',
-        carrier: body.carrier || null,
-        requestedAmount: requestedAmount?.toString(),
-        approvedAmount: body.approvedAmount?.toString() || null,
-        difference: body.difference?.toString() || null,
-        lineItems: body.lineItems || [],
-        internalNotes: body.internalNotes || null,
-        submissionDate: body.submissionDate ? new Date(body.submissionDate) : null,
-        responseDate: body.responseDate ? new Date(body.responseDate) : null,
-        approvalDate: body.approvalDate ? new Date(body.approvalDate) : null,
-        denialReason: body.denialReason || null,
-        statusHistory: [],
-        revisionHistory: [],
-        createdBy: userId,
-        updatedBy: userId,
-      })
-      .returning();
+        userId,
+        userName,
+        entityType: 'supplement',
+        entityId: newSupplement.id,
+        entityName: newSupplement.supplementNumber,
+        description: `Created supplement ${newSupplement.supplementNumber}`,
+        ipAddress,
+      });
 
-    // Log activity
-    await ActivityService.logCreate({
-      companyId,
-      userId,
-      userName,
-      entityType: 'supplement',
-      entityId: newSupplement.id,
-      entityName: newSupplement.supplementNumber,
-      description: `Created supplement ${newSupplement.supplementNumber}`,
-      ipAddress,
-    });
-
-    reply.send(newSupplement);
+      reply.send(newSupplement);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to create supplement' });
+    }
   });
 
   // PUT /supplements/:id - Update supplement
