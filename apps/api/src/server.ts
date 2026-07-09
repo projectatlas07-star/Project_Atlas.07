@@ -5,9 +5,18 @@ import { supabase } from './lib/supabase'; // Supabase client wrapper (will be c
 import { authMiddleware } from './middleware/auth';
 import { roleMiddleware } from './middleware/role';
 import { registerRoutes } from './routes';
+import { validateEnv, env } from './lib/env';
 
 export const buildFastify = () => {
   const server = Fastify({ logger: true });
+
+  // Validate environment variables
+  const envValidation = validateEnv();
+  if (!envValidation.valid) {
+    server.log.error('Environment validation failed:');
+    envValidation.errors.forEach(error => server.log.error(`  - ${error}`));
+    process.exit(1);
+  }
 
   // Register multipart support for file uploads
   server.register(multipart);
@@ -35,7 +44,7 @@ if (require.main === module) {
   const server = buildFastify();
   const start = async () => {
     try {
-      await server.listen({ port: Number(process.env.PORT) || 3000, host: '0.0.0.0' });
+      await server.listen({ port: Number(env.PORT), host: '0.0.0.0' });
       server.log.info(`Server listening on ${server.server.address()?.toString()}`);
     } catch (err) {
       server.log.error(err);

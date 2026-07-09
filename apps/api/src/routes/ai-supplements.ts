@@ -15,6 +15,7 @@ import { SupplementResultParser as RP } from '../lib/ai-supplement/result-parser
 import { SupplementValidationService as VS } from '../lib/ai-supplement/validation';
 import { SupplementRecommendationEngine as RE } from '../lib/ai-supplement/engine';
 import { ActivityService } from '../lib/activity';
+import { env } from '../lib/env';
 
 const generateSupplementSchema = z.object({
   supplementId: z.string().uuid(),
@@ -189,7 +190,7 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
     };
 
     // Initialize AI components
-    const openaiKey = process.env.OPENAI_API_KEY;
+    const openaiKey = env.OPENAI_API_KEY;
     if (!openaiKey) {
       reply.code(500).send({ error: 'OpenAI API key not configured' });
       return;
@@ -458,7 +459,7 @@ export const aiSupplementsRoutes: FastifyPluginAsync = async (fastify) => {
     const validationService = new VS();
     const engine = new RE(
       new PB(),
-      new OpenAIProvider({ apiKey: process.env.OPENAI_API_KEY || '' }),
+      new OpenAIProvider({ apiKey: env.OPENAI_API_KEY || '' }),
       resultParser,
       validationService
     );
