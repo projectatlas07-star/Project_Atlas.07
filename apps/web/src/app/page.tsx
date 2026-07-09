@@ -2,17 +2,46 @@
 
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
+
+interface DashboardStats {
+  total: number;
+  byStatus: Record<string, number>;
+  awaitingSupplement: number;
+  awaitingCarrier: number;
+  recentlyUpdated: any[];
+}
 
 export default function Home() {
   const { session, loading, supabase } = useSupabase();
   const router = useRouter();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     if (!loading && !session) {
       router.push('/login');
     }
   }, [session, loading, router]);
+
+  useEffect(() => {
+    if (session) {
+      loadDashboardStats();
+    }
+  }, [session]);
+
+  const loadDashboardStats = async () => {
+    try {
+      setLoadingStats(true);
+      const data = await apiFetch<DashboardStats>('/claims/dashboard/stats');
+      setStats(data);
+    } catch (e: any) {
+      console.error('Error loading dashboard stats:', e);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -83,6 +112,96 @@ export default function Home() {
         <div className="px-4 py-6 sm:px-0">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h2>
           
+          {/* Claims Workflow Widgets */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Claims Overview</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Total Claims</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats?.total || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-bold">📋</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Awaiting Supplement</p>
+                    <p className="text-2xl font-bold text-orange-600">{stats?.awaitingSupplement || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span className="text-orange-600 font-bold">⚠️</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Awaiting Carrier</p>
+                    <p className="text-2xl font-bold text-pink-600">{stats?.awaitingCarrier || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-pink-100 rounded-full flex items-center justify-center">
+                    <span className="text-pink-600 font-bold">🕐</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Recently Updated</p>
+                    <p className="text-2xl font-bold text-green-600">{stats?.recentlyUpdated.length || 0}</p>
+                  </div>
+                  <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 font-bold">🔄</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recently Updated Claims */}
+          {stats?.recentlyUpdated && stats.recentlyUpdated.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recently Updated Claims</h3>
+              <div className="bg-white shadow rounded-lg overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claim Number</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {stats.recentlyUpdated.map((claim) => (
+                      <tr key={claim.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <a href={`/admin/claims/${claim.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                            {claim.claimNumber}
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {claim.status}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {claim.customerName || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(claim.updatedAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
