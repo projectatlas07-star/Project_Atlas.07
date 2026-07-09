@@ -452,46 +452,54 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /supplements/:id/transitions - Get available status transitions
   fastify.get<{ Params: { id: string } }>('/:id/transitions', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { id } = req.params;
 
-    const result = await db
-      .select()
-      .from(supplements)
-      .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
-      .limit(1);
+      const result = await db
+        .select()
+        .from(supplements)
+        .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
+        .limit(1);
 
-    if (result.length === 0) {
-      reply.code(404).send({ error: 'Supplement not found' });
-      return;
+      if (result.length === 0) {
+        reply.code(404).send({ error: 'Supplement not found' });
+        return;
+      }
+
+      const supplement = result[0];
+      const currentStatus = supplement.status as SupplementStatus;
+      const nextStatuses = SupplementsWorkflowService.getNextStatuses(currentStatus);
+
+      reply.send({
+        currentStatus,
+        currentStatusLabel: STATUS_LABELS[currentStatus],
+        nextStatuses: nextStatuses.map((status) => ({
+          value: status,
+          label: STATUS_LABELS[status],
+          color: STATUS_COLORS[status],
+        })),
+      });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get supplement transitions' });
     }
-
-    const supplement = result[0];
-    const currentStatus = supplement.status as SupplementStatus;
-    const nextStatuses = SupplementsWorkflowService.getNextStatuses(currentStatus);
-
-    reply.send({
-      currentStatus,
-      currentStatusLabel: STATUS_LABELS[currentStatus],
-      nextStatuses: nextStatuses.map((status) => ({
-        value: status,
-        label: STATUS_LABELS[status],
-        color: STATUS_COLORS[status],
-      })),
-    });
   });
 
   // GET /supplements/dashboard/stats - Get dashboard statistics
   fastify.get('/dashboard/stats', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const allSupplements = await db
-      .select()
-      .from(supplements)
-      .where(eq(supplements.companyId, companyId));
+      const allSupplements = await db
+        .select()
+        .from(supplements)
+        .where(eq(supplements.companyId, companyId));
 
-    const stats = SupplementsWorkflowService.getDashboardStats(allSupplements);
+      const stats = SupplementsWorkflowService.getDashboardStats(allSupplements);
 
-    reply.send(stats);
+      reply.send(stats);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get dashboard stats' });
+    }
   });
 };
