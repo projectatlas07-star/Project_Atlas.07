@@ -362,88 +362,92 @@ export const supplementsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // PUT /supplements/:id/status - Change status
   fastify.put<{ Params: { id: string } }>('/:id/status', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const { id } = req.params;
-    const { status, reason } = statusChangeSchema.parse(req.body);
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const { id } = req.params;
+      const { status, reason } = statusChangeSchema.parse(req.body);
 
-    const existing = await db
-      .select()
-      .from(supplements)
-      .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(supplements)
+        .where(and(eq(supplements.id, id), eq(supplements.companyId, companyId)))
+        .limit(1);
 
-    if (existing.length === 0) {
-      reply.code(404).send({ error: 'Supplement not found' });
-      return;
+      if (existing.length === 0) {
+        reply.code(404).send({ error: 'Supplement not found' });
+        return;
+      }
+
+      const supplement = existing[0];
+      const currentStatus = supplement.status as SupplementStatus;
+
+      // Validate transition
+      const transition = SupplementsWorkflowService.validateTransition(currentStatus, status);
+      if (!transition.allowed) {
+        reply.code(400).send({ error: transition.reason });
+        return;
+      }
+
+      // Add status history entry
+      const statusHistory = SupplementsWorkflowService.addStatusHistoryEntry(
+        (supplement.statusHistory as any) || [],
+        status,
+        userId,
+        userName,
+        reason
+      );
+
+      // Update dates based on status
+      const updates: any = {
+        status,
+        statusHistory,
+        updatedBy: userId,
+        updatedAt: new Date(),
+      };
+
+      if (status === 'submitted' && !supplement.submissionDate) {
+        updates.submissionDate = new Date();
+      }
+
+      if (status === 'waiting_for_carrier' && !supplement.responseDate) {
+        updates.responseDate = new Date();
+      }
+
+      if (status === 'approved' && !supplement.approvalDate) {
+        updates.approvalDate = new Date();
+      }
+
+      if (status === 'denied') {
+        updates.denialReason = reason || null;
+      }
+
+      const [updated] = await db
+        .update(supplements)
+        .set(updates)
+        .where(eq(supplements.id, id))
+        .returning();
+
+      // Log activity
+      await ActivityService.logStatusChange({
+        companyId,
+        userId,
+        userName,
+        entityType: 'supplement',
+        entityId: id,
+        entityName: supplement.supplementNumber,
+        description: `Changed supplement status from ${STATUS_LABELS[currentStatus]} to ${STATUS_LABELS[status]}`,
+        previousValues: { status: currentStatus },
+        newValues: { status, reason },
+        ipAddress,
+      });
+
+      reply.send(updated);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to change supplement status' });
     }
-
-    const supplement = existing[0];
-    const currentStatus = supplement.status as SupplementStatus;
-
-    // Validate transition
-    const transition = SupplementsWorkflowService.validateTransition(currentStatus, status);
-    if (!transition.allowed) {
-      reply.code(400).send({ error: transition.reason });
-      return;
-    }
-
-    // Add status history entry
-    const statusHistory = SupplementsWorkflowService.addStatusHistoryEntry(
-      (supplement.statusHistory as any) || [],
-      status,
-      userId,
-      userName,
-      reason
-    );
-
-    // Update dates based on status
-    const updates: any = {
-      status,
-      statusHistory,
-      updatedBy: userId,
-      updatedAt: new Date(),
-    };
-
-    if (status === 'submitted' && !supplement.submissionDate) {
-      updates.submissionDate = new Date();
-    }
-
-    if (status === 'waiting_for_carrier' && !supplement.responseDate) {
-      updates.responseDate = new Date();
-    }
-
-    if (status === 'approved' && !supplement.approvalDate) {
-      updates.approvalDate = new Date();
-    }
-
-    if (status === 'denied') {
-      updates.denialReason = reason || null;
-    }
-
-    const [updated] = await db
-      .update(supplements)
-      .set(updates)
-      .where(eq(supplements.id, id))
-      .returning();
-
-    // Log activity
-    await ActivityService.logStatusChange({
-      companyId,
-      userId,
-      userName,
-      entityType: 'supplement',
-      entityId: id,
-      entityName: supplement.supplementNumber,
-      description: `Changed supplement status from ${STATUS_LABELS[currentStatus]} to ${STATUS_LABELS[status]}`,
-      previousValues: { status: currentStatus },
-      newValues: { status, reason },
-      ipAddress,
-    });
-
-    reply.send(updated);
   });
 
   // GET /supplements/:id/transitions - Get available status transitions
