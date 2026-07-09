@@ -1,0 +1,84 @@
+// apps/api/src/routes/companies.ts
+import { FastifyPluginAsync } from 'fastify';
+import { registerCrudRoutes } from './crud';
+import { db } from '@project-atlas/database';
+import { companies } from '@project-atlas/database';
+import { z } from 'zod';
+import { pipeline } from 'stream';
+import csv from 'csv-parser'; // ensure csv-parser is installed
+import { supabase } from '../lib/supabase';
+
+// Zod schema for a company – adjust fields according to DB schema
+const companySchema = z.object({
+  name: z.string().min(1),
+  // add other required fields here (e.g., address, email)
+});
+
+// Mapping schema – maps CSV column names to DB column names
+const columnMappingSchema = z.record(z.string());
+
+export const companiesRoutes: FastifyPluginAsync = async (fastify) => {
+  // Register generic CRUD routes
+  registerCrudRoutes(fastify, {
+    basePath: '/',
+    table: companies,
+    schema: companySchema,
+  });
+
+  // CSV import endpoint: multipart/form-data with 'file' and 'mapping' fields
+  fastify.post('/import-csv', async (req, reply) => {
+    const multipart = await req.file();
+    if (!multipart) {
+      return reply.code(400).send({ error: 'File missing' });
+    }
+    const { fields } = multipart;
+    const mappingRaw = fields?.mapping as string | undefined;
+    if (!mappingRaw) {
+      return reply.code(400).send({ error: 'Column mapping missing' });
+    }
+    const mappingParse = columnMappingSchema.safeParse(JSON.parse(mappingRaw));
+    if (!mappingParse.success) {
+      return reply.code(400).send({ error: 'Invalid column mapping', details: mappingParse.error.format() });
+    }
+    const mapping = mappingParse.data; // { csvColumn: dbField }
+
+    const rows: any[] = [];
+    await new Promise<void>((resolve, reject) => {
+      const parser = csv();
+      pipeline(
+        multipart.file,
+        parser,
+        (err) => {
+          if (err) reject(err);
+        }
+      );
+      parser.on('data', (data) => {
+        const payload: any = {};
+        for (const [csvCol, dbField] of Object.entries(mapping)) {
+          payload[dbField] = data[csvCol];
+        }
+        rows.push(payload);
+      });
+      parser.on('end', () => resolve());
+      parser.on('error', (e) => reject(e));
+    });
+
+    const validated: any[] = [];
+    for (const row of rows) {
+      const parsed = companySchema.safeParse(row);
+      if (!parsed.success) {
+        return reply.code(400).send({ error: 'Row validation failed', row, details: parsed.error.format() });
+      }
+      const companyId = (req as any).companyId;
+      validated.push({ ...parsed.data, companyId });
+    }
+
+    const inserted: any[] = [];
+    for (const payload of validated) {
+      const [record] = await db.insert(companies).values(payload).returning();
+      inserted.push(record);
+    }
+
+    reply.code(201).send({ insertedCount: inserted.length, inserted });
+  });
+};

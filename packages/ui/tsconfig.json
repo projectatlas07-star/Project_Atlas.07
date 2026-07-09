@@ -1,0 +1,7 @@
+{
+  "extends": "@project-atlas/config-typescript/base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*"]
+}
