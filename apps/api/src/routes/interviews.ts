@@ -228,41 +228,45 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // DELETE /interviews/:id - Delete interview
   fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const userName = (req as AuthenticatedRequest).userName;
-    const ipAddress = (req as AuthenticatedRequest).ipAddress;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const userName = (req as AuthenticatedRequest).userName;
+      const ipAddress = (req as AuthenticatedRequest).ipAddress;
+      const { id } = req.params;
 
-    const existing = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const existing = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!existing) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!existing) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      await db.delete(interviews).where(eq((interviews as any).id, id));
+
+      // Log activity
+      await ActivityService.logDelete({
+        companyId,
+        userId,
+        userName,
+        entityType: 'interview',
+        entityId: id,
+        entityName: (existing as any).interviewNumber,
+        description: `Deleted interview ${(existing as any).interviewNumber}`,
+        ipAddress,
+      });
+
+      reply.send({ success: true });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to delete interview' });
     }
-
-    await db.delete(interviews).where(eq((interviews as any).id, id));
-
-    // Log activity
-    await ActivityService.logDelete({
-      companyId,
-      userId,
-      userName,
-      entityType: 'interview',
-      entityId: id,
-      entityName: (existing as any).interviewNumber,
-      description: `Deleted interview ${(existing as any).interviewNumber}`,
-      ipAddress,
-    });
-
-    reply.send({ success: true });
   });
 
   // PUT /interviews/:id/responses - Update interview responses (autosave)
