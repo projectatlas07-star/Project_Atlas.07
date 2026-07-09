@@ -38,49 +38,53 @@ const statusChangeSchema = z.object({
 export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /interviews - List interviews
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { status, templateId, page = '1', limit = '20' } = req.query as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { status, templateId, page = '1', limit = '20' } = req.query as any;
 
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+      const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    let conditions = [eq((interviews as any).companyId, companyId)];
+      let conditions = [eq((interviews as any).companyId, companyId)];
 
-    if (status) {
-      conditions.push(eq((interviews as any).status, status));
+      if (status) {
+        conditions.push(eq((interviews as any).status, status));
+      }
+
+      if (templateId) {
+        conditions.push(eq((interviews as any).templateId, templateId));
+      }
+
+      const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
+
+      const [data, countResult] = await Promise.all([
+        db
+          .select()
+          .from(interviews)
+          .where(whereClause)
+          .orderBy(desc((interviews as any).updatedAt))
+          .limit(parseInt(limit))
+          .offset(offset),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(interviews)
+          .where(whereClause),
+      ]);
+
+      const total = countResult[0]?.count || 0;
+      const totalPages = Math.ceil(total / parseInt(limit));
+
+      reply.send({
+        data,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch interviews' });
     }
-
-    if (templateId) {
-      conditions.push(eq((interviews as any).templateId, templateId));
-    }
-
-    const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
-
-    const [data, countResult] = await Promise.all([
-      db
-        .select()
-        .from(interviews)
-        .where(whereClause)
-        .orderBy(desc((interviews as any).updatedAt))
-        .limit(parseInt(limit))
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(interviews)
-        .where(whereClause),
-    ]);
-
-    const total = countResult[0]?.count || 0;
-    const totalPages = Math.ceil(total / parseInt(limit));
-
-    reply.send({
-      data,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages,
-      },
-    });
   });
 
   // GET /interviews/:id - Get interview details
