@@ -387,117 +387,133 @@ export const interviewsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /interviews/:id/template - Get interview template
   fastify.get<{ Params: { id: string } }>('/:id/template', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { id } = req.params;
 
-    const [interview] = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const [interview] = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!interview) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!interview) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+
+      if (!template) {
+        reply.code(404).send({ error: 'Template not found' });
+        return;
+      }
+
+      reply.send(template);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get interview template' });
     }
-
-    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
-
-    if (!template) {
-      reply.code(404).send({ error: 'Template not found' });
-      return;
-    }
-
-    reply.send(template);
   });
 
   // GET /interviews/:id/progress - Get interview progress
   fastify.get<{ Params: { id: string } }>('/:id/progress', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const { id } = req.params;
 
-    const [interview] = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const [interview] = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!interview) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!interview) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+      const responses = (interview as any).responses || {};
+
+      if (!template) {
+        reply.code(404).send({ error: 'Template not found' });
+        return;
+      }
+
+      const progress = InterviewWorkflowService.calculateProgress(template, responses);
+      const isComplete = InterviewWorkflowService.isInterviewComplete(template, responses);
+      const missingFields = InterviewWorkflowService.getMissingRequiredFields(template, responses);
+
+      reply.send({
+        progress,
+        isComplete,
+        missingFields,
+        currentSection: (interview as any).currentSection,
+      });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get interview progress' });
     }
-
-    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
-    const responses = (interview as any).responses || {};
-
-    if (!template) {
-      reply.code(404).send({ error: 'Template not found' });
-      return;
-    }
-
-    const progress = InterviewWorkflowService.calculateProgress(template, responses);
-    const isComplete = InterviewWorkflowService.isInterviewComplete(template, responses);
-    const missingFields = InterviewWorkflowService.getMissingRequiredFields(template, responses);
-
-    reply.send({
-      progress,
-      isComplete,
-      missingFields,
-      currentSection: (interview as any).currentSection,
-    });
   });
 
   // GET /interviews/templates/fnol - Get FNOL template
   fastify.get('/templates/fnol', async (req, reply) => {
-    reply.send(FNOL_TEMPLATE);
+    try {
+      reply.send(FNOL_TEMPLATE);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to get FNOL template' });
+    }
   });
 
   // POST /interviews/:id/generate-claim - Generate claim from completed interview
   fastify.post<{ Params: { id: string } }>('/:id/generate-claim', async (req, reply) => {
-    const companyId = (req as AuthenticatedRequest).companyId;
-    const userId = (req as AuthenticatedRequest).userId;
-    const { id } = req.params;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const userId = (req as AuthenticatedRequest).userId;
+      const { id } = req.params;
 
-    const [interview] = await db
-      .select()
-      .from(interviews)
-      .where(and(
-        eq((interviews as any).id, id),
-        eq((interviews as any).companyId, companyId)
-      ))
-      .limit(1);
+      const [interview] = await db
+        .select()
+        .from(interviews)
+        .where(and(
+          eq((interviews as any).id, id),
+          eq((interviews as any).companyId, companyId)
+        ))
+        .limit(1);
 
-    if (!interview) {
-      reply.code(404).send({ error: 'Interview not found' });
-      return;
+      if (!interview) {
+        reply.code(404).send({ error: 'Interview not found' });
+        return;
+      }
+
+      if ((interview as any).status !== 'completed') {
+        reply.code(400).send({ error: 'Interview must be completed before generating claim' });
+        return;
+      }
+
+      const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
+      if (!template) {
+        reply.code(400).send({ error: 'Template not found' });
+        return;
+      }
+
+      const responses = (interview as any).responses || {};
+      const claimData = InterviewWorkflowService.extractClaimData(responses, template);
+
+      // TODO: Implement actual claim generation logic
+      // This would create/update customer, property, claim, adjuster entities
+      // For now, return the extracted data
+      reply.send({
+        claimData,
+        message: 'Claim data extracted. Claim generation not yet implemented.',
+      });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to generate claim from interview' });
     }
-
-    if ((interview as any).status !== 'completed') {
-      reply.code(400).send({ error: 'Interview must be completed before generating claim' });
-      return;
-    }
-
-    const template = (interview as any).templateId === 'fnol-v1' ? FNOL_TEMPLATE : null;
-    if (!template) {
-      reply.code(400).send({ error: 'Template not found' });
-      return;
-    }
-
-    const responses = (interview as any).responses || {};
-    const claimData = InterviewWorkflowService.extractClaimData(responses, template);
-
-    // TODO: Implement actual claim generation logic
-    // This would create/update customer, property, claim, adjuster entities
-    // For now, return the extracted data
-    reply.send({
-      claimData,
-      message: 'Claim data extracted. Claim generation not yet implemented.',
-    });
   });
 };
