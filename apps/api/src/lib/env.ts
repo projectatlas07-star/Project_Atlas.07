@@ -7,6 +7,7 @@ const envSchema = z.object({
   SUPABASE_URL: z.string().url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   OPENAI_API_KEY: z.string().optional(),
+  CORS_ORIGIN: z.string().default('http://localhost:3000'),
 });
 
 export const env = envSchema.parse(process.env);

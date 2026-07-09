@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import multipart from '@fastify/multipart';
+import cors from '@fastify/cors';
 import { supabase } from './lib/supabase'; // Supabase client wrapper (will be created)
 import { authMiddleware } from './middleware/auth';
 import { roleMiddleware } from './middleware/role';
@@ -17,6 +18,12 @@ export const buildFastify = () => {
     envValidation.errors.forEach(error => server.log.error(`  - ${error}`));
     process.exit(1);
   }
+
+  // Register CORS for security
+  server.register(cors, {
+    origin: env.CORS_ORIGIN,
+    credentials: true,
+  });
 
   // Register multipart support for file uploads
   server.register(multipart);
