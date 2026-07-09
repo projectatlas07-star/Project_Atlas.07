@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import multipart from '@fastify/multipart';
 import cors from '@fastify/cors';
+import rateLimit from '@fastify/rate-limit';
 import { supabase } from './lib/supabase'; // Supabase client wrapper (will be created)
 import { authMiddleware } from './middleware/auth';
 import { roleMiddleware } from './middleware/role';
@@ -23,6 +24,12 @@ export const buildFastify = () => {
   server.register(cors, {
     origin: env.CORS_ORIGIN,
     credentials: true,
+  });
+
+  // Register rate limiting for security
+  server.register(rateLimit, {
+    max: 100,
+    timeWindow: '1 minute',
   });
 
   // Register multipart support for file uploads
