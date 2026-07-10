@@ -35,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading && !session) {
-      router.push('/login');
+      router.push('/landing');
     }
   }, [session, loading, router]);
 
