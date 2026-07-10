@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import styles from './SplashScreen.module.css';
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(true);
@@ -45,9 +46,9 @@ export default function SplashScreen() {
 
         {/* Loading Animation */}
         <div className="flex space-x-2">
-          <div className="w-2 h-2 bg-[var(--brand-cyan)] rounded-full animate-bounce [animation-delay:0ms]" />
-          <div className="w-2 h-2 bg-[var(--brand-purple)] rounded-full animate-bounce [animation-delay:150ms]" />
-          <div className="w-2 h-2 bg-[var(--brand-cyan)] rounded-full animate-bounce [animation-delay:300ms]" />
+          <div className="w-2 h-2 bg-[var(--brand-cyan)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 bg-[var(--brand-purple)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2 h-2 bg-[var(--brand-cyan)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>

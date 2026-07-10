@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { STATUS_LABELS, STATUS_COLORS, InterviewStatus } from '@/lib/interviews-workflow';
-import styles from './page.module.css';
 
 interface Interview {
   id: string;
@@ -196,8 +195,8 @@ export default function InterviewsPage() {
                   <div className="flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2 mr-2 overflow-hidden">
                       <div
-                        className={`bg-blue-600 h-2 rounded-full transition-all ${styles.progressBar}`}
-                        style={{ '--progress-width': `${interview.progress}%` } as React.CSSProperties}
+                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        style={{ width: `${interview.progress}%` }} /* eslint-disable-line react/no-inline-styles */
                       ></div>
                     </div>
                     <span className="text-sm text-gray-600">{Math.round(interview.progress)}%</span>

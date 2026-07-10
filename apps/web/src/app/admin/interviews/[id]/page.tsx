@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { STATUS_LABELS, STATUS_COLORS, InterviewStatus, QuestionType, Section, Question } from '@/lib/interviews-workflow';
-import styles from './page.module.css';
 
 interface Interview {
   id: string;
@@ -411,13 +410,13 @@ export default function InterviewDetailPage() {
             className="w-full bg-gray-200 rounded-full h-2"
             role="progressbar"
             aria-label="Interview progress"
-            aria-valuenow={Math.round(interview.progress)}
+            aria-valuenow={Math.round(interview.progress).toString()}
             aria-valuemin="0"
             aria-valuemax="100"
           >
             <div
-              className={`bg-blue-600 h-2 rounded-full transition-all ${styles.progressBar}`}
-              style={{ '--progress-width': `${interview.progress}%` } as React.CSSProperties}
+              className="bg-blue-600 h-2 rounded-full transition-all"
+              style={{ width: `${interview.progress}%` }} /* eslint-disable-line react/no-inline-styles */
               role="presentation"
             ></div>
           </div>
