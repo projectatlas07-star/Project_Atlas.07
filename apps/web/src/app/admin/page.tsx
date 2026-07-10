@@ -5,6 +5,8 @@ import { apiFetch } from '@/lib/api';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import DemoModeControls from '@/components/DemoModeControls';
+import GuidedDemoMode from '@/components/GuidedDemoMode';
 
 interface DashboardStats {
   totalClaims: number;
@@ -141,6 +143,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Demo Mode Controls */}
+      <DemoModeControls />
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card, index) => (
@@ -158,6 +163,9 @@ export default function DashboardPage() {
           </a>
         ))}
       </div>
+
+      {/* Guided Demo Mode */}
+      <GuidedDemoMode />
 
       {/* Recent Activity */}
       <div className="bg-[var(--surface)] rounded-xl shadow-lg p-6 border border-[var(--neutral-gray-200)]">
