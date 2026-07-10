@@ -5,6 +5,7 @@ import { useSupabase } from '@/providers/SupabaseProvider';
 import { Button } from '@project-atlas/ui';
 import { Input } from '@project-atlas/ui';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const { supabase } = useSupabase();
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,21 +43,125 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <form onSubmit={handleLogin} className="w-full max-w-md space-y-4 rounded bg-white p-8 shadow dark:bg-gray-800">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Sign In</h2>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <Button type="submit" disabled={loading}>Sign In</Button>
-        <div className="flex justify-between text-sm">
-          <button type="button" className="text-blue-600 hover:underline" onClick={handleMagicLink} disabled={loading}>Magic Link</button>
-          <a href="/auth/reset-password" className="text-blue-600 hover:underline">Forgot password?</a>
-        </div>
-        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          Don&apos;t have an account? <a href="/auth/signup" className="text-blue-600 hover:underline">Sign Up</a>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--brand-navy)] via-[var(--brand-navy-light)] to-[var(--brand-purple)] p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
+          backgroundSize: '40px 40px'
+        }} />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Glassmorphism Card */}
+        <form
+          onSubmit={handleLogin}
+          className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl space-y-6"
+        >
+          {/* Full Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="relative w-64 h-20">
+              <Image
+                src="/brand/logo-full.svg"
+                alt="Project Atlas"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Welcome Message */}
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-bold text-white">Welcome to Project Atlas</h1>
+            <p className="text-[var(--brand-cyan-light)] text-sm">AI Operating System for Insurance Restoration</p>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3">
+              <p className="text-sm text-red-200 text-center">{error}</p>
+            </div>
+          )}
+
+          {/* Form Fields */}
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-white">Email</label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-white/10 border-white/20 text-white placeholder-white/50"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">Password</label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="bg-white/10 border-white/20 text-white placeholder-white/50"
+              />
+            </div>
+          </div>
+
+          {/* Remember Me & Forgot Password */}
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center space-x-2 text-white/80 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded border-white/20 bg-white/10 text-[var(--brand-cyan)] focus:ring-[var(--brand-cyan)]"
+              />
+              <span>Remember me</span>
+            </label>
+            <a
+              href="/auth/reset-password"
+              className="text-[var(--brand-cyan)] hover:text-[var(--brand-cyan-light)] transition-colors"
+            >
+              Forgot password?
+            </a>
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-light)] text-[var(--brand-navy)] font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
+
+          {/* Magic Link */}
+          <button
+            type="button"
+            onClick={handleMagicLink}
+            disabled={loading}
+            className="w-full text-sm text-white/70 hover:text-white transition-colors"
+          >
+            Or sign in with magic link
+          </button>
+
+          {/* Sign Up Link */}
+          <p className="text-center text-sm text-white/70">
+            Don&apos;t have an account?{' '}
+            <a href="/auth/signup" className="text-[var(--brand-cyan)] hover:text-[var(--brand-cyan-light)] transition-colors font-medium">
+              Sign Up
+            </a>
+          </p>
+        </form>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-white/40 mt-6">
+          © 2026 Project Atlas. All rights reserved.
         </p>
-      </form>
+      </div>
     </div>
   );
 }
