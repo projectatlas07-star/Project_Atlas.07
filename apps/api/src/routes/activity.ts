@@ -3,12 +3,14 @@ import { FastifyPluginAsync } from 'fastify';
 import { activityLogs } from '@project-atlas/database';
 import { db } from '@project-atlas/database';
 import { eq, and, like, or, desc, gte, lte } from 'drizzle-orm';
+import { AuthenticatedRequest } from '../types/request';
 
 export const activityRoutes: FastifyPluginAsync = async (fastify) => {
   // Get activity timeline with filters, search, and pagination
   fastify.get('/', async (req, reply) => {
-    const companyId = (req as any).companyId;
-    const query = req.query as any;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
+      const query = req.query as any;
 
     // Pagination
     const page = parseInt(query.page) || 1;
@@ -87,51 +89,66 @@ export const activityRoutes: FastifyPluginAsync = async (fastify) => {
         totalPages: Math.ceil(total / limit),
       },
     });
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch activity timeline' });
+    }
   });
 
   // Get unique users for filter dropdown
   fastify.get('/users', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const users = await db
-      .selectDistinct({
-        userId: (activityLogs as any).userId,
-        userName: (activityLogs as any).userName,
-      })
-      .from(activityLogs)
-      .where(eq((activityLogs as any).companyId, companyId))
-      .orderBy((activityLogs as any).userName);
+      const users = await db
+        .selectDistinct({
+          userId: (activityLogs as any).userId,
+          userName: (activityLogs as any).userName,
+        })
+        .from(activityLogs)
+        .where(eq((activityLogs as any).companyId, companyId))
+        .orderBy((activityLogs as any).userName);
 
-    reply.send(users);
+      reply.send(users);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch users' });
+    }
   });
 
   // Get unique entity types for filter dropdown
   fastify.get('/entity-types', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const entityTypes = await db
-      .selectDistinct({
-        entityType: (activityLogs as any).entityType,
-      })
-      .from(activityLogs)
-      .where(eq((activityLogs as any).companyId, companyId))
-      .orderBy((activityLogs as any).entityType);
+      const entityTypes = await db
+        .selectDistinct({
+          entityType: (activityLogs as any).entityType,
+        })
+        .from(activityLogs)
+        .where(eq((activityLogs as any).companyId, companyId))
+        .orderBy((activityLogs as any).entityType);
 
-    reply.send(entityTypes);
+      reply.send(entityTypes);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch entity types' });
+    }
   });
 
   // Get unique actions for filter dropdown
   fastify.get('/actions', async (req, reply) => {
-    const companyId = (req as any).companyId;
+    try {
+      const companyId = (req as AuthenticatedRequest).companyId;
 
-    const actions = await db
-      .selectDistinct({
-        action: (activityLogs as any).action,
-      })
-      .from(activityLogs)
-      .where(eq((activityLogs as any).companyId, companyId))
-      .orderBy((activityLogs as any).action);
+      const actions = await db
+        .selectDistinct({
+          action: (activityLogs as any).action,
+        })
+        .from(activityLogs)
+        .where(eq((activityLogs as any).companyId, companyId))
+        .orderBy((activityLogs as any).action);
 
-    reply.send(actions);
+      reply.send(actions);
+    } catch (error) {
+      reply.code(500).send({ error: 'Failed to fetch actions' });
+    }
   });
 };
