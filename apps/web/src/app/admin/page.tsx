@@ -22,6 +22,11 @@ interface RecentActivity {
   createdAt: string;
 }
 
+interface DemoStatus {
+  enabled: boolean;
+  hasData: boolean;
+}
+
 export default function DashboardPage() {
   const { session, loading } = useSupabase();
   const router = useRouter();
@@ -33,14 +38,31 @@ export default function DashboardPage() {
   });
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [demoStatus, setDemoStatus] = useState<DemoStatus | null>(null);
 
   useEffect(() => {
     if (!session) {
       router.push('/login');
       return;
     }
+    checkDemoStatus();
     loadDashboardData();
   }, [session, router]);
+
+  const checkDemoStatus = async () => {
+    try {
+      const response = await apiFetch('/demo/status');
+      const status = response as DemoStatus;
+      setDemoStatus(status);
+      
+      // If demo mode is enabled, redirect to demo experience
+      if (status.enabled) {
+        router.push('/admin/demo');
+      }
+    } catch (error) {
+      // Demo endpoint might not be available, ignore error
+    }
+  };
 
   const loadDashboardData = async () => {
     try {

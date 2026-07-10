@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { apiFetch } from '@/lib/api';
 
 interface NavItem {
   href: string;
@@ -28,9 +29,15 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
+interface DemoStatus {
+  enabled: boolean;
+  hasData: boolean;
+}
+
 export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [demoStatus, setDemoStatus] = useState<DemoStatus | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -51,6 +58,18 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
       setCollapsed(true);
     }
   }, [isMobile]);
+
+  useEffect(() => {
+    const fetchDemoStatus = async () => {
+      try {
+        const response = await apiFetch('/demo/status');
+        setDemoStatus(response as DemoStatus);
+      } catch (error) {
+        // Demo endpoint might not be available, ignore error
+      }
+    };
+    fetchDemoStatus();
+  }, []);
 
   return (
     <>
@@ -123,6 +142,26 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
             );
           })}
         </nav>
+
+        {/* Demo Badge */}
+        {demoStatus?.enabled && !collapsed && (
+          <div className="mx-2 p-3 bg-gradient-to-r from-[var(--brand-cyan)] to-[var(--brand-purple)] rounded-lg">
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="text-lg">🎯</span>
+              <span className="text-white font-semibold text-sm">Demo Mode Active</span>
+            </div>
+            <div className="space-y-1 text-xs text-white/80">
+              <div className="flex justify-between">
+                <span>Seed:</span>
+                <span className="font-mono">42</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Data:</span>
+                <span>{demoStatus.hasData ? 'Generated' : 'None'}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Collapse Toggle at Bottom */}
         <div className="absolute bottom-4 left-0 right-0 px-2">
