@@ -53,8 +53,7 @@ export default function EmptyState({
             {secondaryAction && (
               <Button
                 onClick={secondaryAction.onClick}
-                variant="outline"
-                className="border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10"
+                className="border border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10 bg-transparent"
               >
                 {secondaryAction.label}
               </Button>

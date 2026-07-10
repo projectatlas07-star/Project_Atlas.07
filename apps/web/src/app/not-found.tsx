@@ -41,7 +41,7 @@ export default function NotFound() {
             </Button>
           </Link>
           <Link href="/admin/claims">
-            <Button variant="outline" className="border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10">
+            <Button className="border border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10 bg-transparent">
               View Claims
             </Button>
           </Link>

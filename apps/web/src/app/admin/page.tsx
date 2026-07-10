@@ -116,7 +116,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Total Revenue',
-      value: `$${totalRevenue.toLocaleString()}`,
+      value: `$${stats.totalRevenue.toLocaleString()}`,
       icon: '💵',
       gradientClass: 'gradient-cyan',
       link: '/admin/supplements',

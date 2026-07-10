@@ -41,7 +41,7 @@ export default function Unauthorized() {
             </Button>
           </Link>
           <Link href="/login">
-            <Button variant="outline" className="border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10">
+            <Button className="border border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10 bg-transparent">
               Sign In
             </Button>
           </Link>

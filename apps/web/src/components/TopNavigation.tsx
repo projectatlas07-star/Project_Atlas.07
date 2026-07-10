@@ -5,7 +5,11 @@ import Image from 'next/image';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 
-export default function TopNavigation() {
+interface TopNavigationProps {
+  onMobileMenuToggle?: () => void;
+}
+
+export default function TopNavigation({ onMobileMenuToggle }: TopNavigationProps) {
   const { supabase, session } = useSupabase();
   const router = useRouter();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -17,21 +21,37 @@ export default function TopNavigation() {
   };
 
   return (
-    <header className="fixed top-0 right-0 left-64 h-16 bg-[var(--brand-navy-light)] border-b border-white/10 flex items-center justify-between px-6 z-40">
-      {/* Horizontal Logo */}
-      <div className="relative w-36 h-10">
-        <Image
-          src="/brand/logo-horizontal.svg"
-          alt="Project Atlas"
-          fill
-          className="object-contain"
-        />
+    <header className="fixed top-0 right-0 left-0 md:left-64 h-16 bg-[var(--brand-navy-light)] border-b border-white/10 flex items-center justify-between px-4 md:px-6 z-40">
+      {/* Mobile Menu Button & Logo */}
+      <div className="flex items-center space-x-4">
+        <button
+          onClick={onMobileMenuToggle}
+          className="md:hidden p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+        <div className="relative w-28 h-8 md:w-36 md:h-10">
+          <Image
+            src="/brand/logo-horizontal.svg"
+            alt="Project Atlas"
+            fill
+            className="object-contain"
+          />
+        </div>
       </div>
 
       {/* Right Side Actions */}
-      <div className="flex items-center space-x-4">
-        {/* Search */}
-        <div className="relative">
+      <div className="flex items-center space-x-2 md:space-x-4">
+        {/* Search - Hidden on mobile */}
+        <div className="relative hidden md:block">
           <input
             type="text"
             placeholder="Search..."

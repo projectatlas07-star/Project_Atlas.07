@@ -53,7 +53,7 @@ export default function Error({
             Try Again
           </Button>
           <Link href="/admin">
-            <Button variant="outline" className="border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10">
+            <Button className="border border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10 bg-transparent">
               Go to Dashboard
             </Button>
           </Link>
