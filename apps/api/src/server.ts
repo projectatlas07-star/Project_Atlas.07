@@ -35,12 +35,26 @@ export const buildFastify = () => {
   // Register multipart support for file uploads
   server.register(multipart);
 
-  // Register plugins
+  // Register auth middleware as a plugin (can be skipped per-route)
   server.register(fastifyPlugin(async (fastify) => {
-    fastify.addHook('preHandler', authMiddleware);
+    fastify.addHook('onRequest', async (request, reply) => {
+      // Skip auth for health check and public routes
+      if (request.url === '/health' || request.url.startsWith('/public')) {
+        return;
+      }
+      await authMiddleware(request, reply);
+    });
   }));
+  
+  // Register role middleware as a plugin (can be skipped per-route)
   server.register(fastifyPlugin(async (fastify) => {
-    fastify.addHook('preHandler', roleMiddleware);
+    fastify.addHook('onRequest', async (request, reply) => {
+      // Skip role check for health check and public routes
+      if (request.url === '/health' || request.url.startsWith('/public')) {
+        return;
+      }
+      await roleMiddleware(request, reply);
+    });
   }));
 
   // Register all API routes under /api/v1

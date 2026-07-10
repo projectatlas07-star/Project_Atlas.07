@@ -211,6 +211,45 @@ export async function up() {
       )
     `);
 
+    // Create edge function for handling auth.user creation -> profiles sync
+    await client.query(`
+      CREATE OR REPLACE FUNCTION public.handle_new_user()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        INSERT INTO public.profiles (id, email, first_name, last_name)
+        VALUES (NEW.id, NEW.email, NULL, NULL);
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql SECURITY DEFINER;
+    `);
+
+    // Create trigger to call the function on auth.users creation
+    await client.query(`
+      CREATE OR REPLACE TRIGGER on_auth_user_created
+        AFTER INSERT ON auth.users
+        FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+    `);
+
+    // Create edge function for updating profile on auth.user update
+    await client.query(`
+      CREATE OR REPLACE FUNCTION public.handle_user_update()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        UPDATE public.profiles
+        SET email = NEW.email
+        WHERE id = NEW.id;
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql SECURITY DEFINER;
+    `);
+
+    // Create trigger to call the function on auth.users update
+    await client.query(`
+      CREATE OR REPLACE TRIGGER on_auth_user_updated
+        AFTER UPDATE ON auth.users
+        FOR EACH ROW EXECUTE FUNCTION public.handle_user_update();
+    `);
+
     // RLS policies – company isolation
     const tables = [
       "companies",
@@ -243,6 +282,17 @@ export async function up() {
 }
 
 export async function down() {
+  // Drop triggers and functions first
+  const client = await pool.connect();
+  try {
+    await client.query(`DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users`);
+    await client.query(`DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users`);
+    await client.query(`DROP FUNCTION IF EXISTS public.handle_new_user`);
+    await client.query(`DROP FUNCTION IF EXISTS public.handle_user_update`);
+  } finally {
+    client.release();
+  }
+
   // Drop tables in reverse order
   const dropOrder = [
     "ai_conversations",
@@ -262,12 +312,12 @@ export async function down() {
     "tenants",
     "companies",
   ];
-  const client = await pool.connect();
+  const client2 = await pool.connect();
   try {
     for (const tbl of dropOrder) {
-      await client.query(`DROP TABLE IF EXISTS ${tbl} CASCADE`);
+      await client2.query(`DROP TABLE IF EXISTS ${tbl} CASCADE`);
     }
   } finally {
-    client.release();
+    client2.release();
   }
 }
