@@ -1,11 +1,12 @@
 {
   "name": "project-atlas-api",
   "version": "0.1.0",
-  "main": "src/server.ts",
+  "main": "dist/server.js",
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
+    "start": "node dist/server.js",
     "lint": "echo 'Linting skipped for API package - typecheck covers TypeScript validation'",
     "typecheck": "tsc --noEmit",
     "test": "jest",
