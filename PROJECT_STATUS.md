@@ -1326,6 +1326,95 @@ Based on the priority order provided and audit findings:
 
 ---
 
+### 25. Atlas Intelligence (Phase 5)
+
+**Status: Complete (100%)**
+
+#### Completed Features:
+- ✅ Analytics Service with natural language query engine
+- ✅ Business Intelligence Service with real-time insights
+- ✅ Recommendation Engine with proactive suggestions
+- ✅ Learning Repository for AI interaction tracking
+- ✅ Health Service for system monitoring
+- ✅ Diagnostics Service for system diagnostics
+- ✅ Ask Atlas interface with natural language input
+- ✅ Business Insights Dashboard with key metrics
+- ✅ Recommendations UI with priority filtering
+- ✅ Learning Stats UI with pattern analysis
+- ✅ System Health Center admin page
+- ✅ Self tests with pass/fail display
+- ✅ Deployment Readiness Checklist
+- ✅ Admin tools (clear cache, refresh health, export diagnostics)
+- ✅ Navigation integration (Intelligence and System Health)
+- ✅ API routes for all intelligence endpoints
+
+#### Technical Implementation:
+- Query engine supporting 21 business questions across 7 categories
+- Explainability built into all AI answers (reasoning, statistics, supporting records, confidence, data sources)
+- 10 business insights with real-time metrics and trend analysis
+- 8 proactive recommendations with priority, impact, and suggested actions
+- Learning system tracking accepted/rejected/edited AI recommendations
+- Pattern identification for denial reasons, supplement revisions, documentation requests, carrier preferences
+- Health checks for database, storage, AI provider, authentication, API, demo data
+- Deployment readiness checklist with 10 critical checks
+- System diagnostics including memory usage, response times, worker status, background jobs
+- Admin tools for cache management, health refresh, diagnostics export
+
+#### Supported Question Categories:
+- **Revenue:** Revenue loss, pending approval, outstanding balances
+- **Claims:** Stalled claims, immediate attention, inspection-to-claim conversion
+- **Supplements:** Pending supplements, denied supplements, revision likelihood
+- **Adjusters:** Approval speed, denial patterns, carrier response times
+- **Operations:** Estimator performance, inspector opportunities, documentation gaps
+- **Documents:** Missing required documents, incomplete interviews
+- **AI:** Recommendation acceptance/rejection, recurring opportunities
+
+#### Architecture:
+- Modular service architecture (Analytics, BI, Recommendation, Learning, Health, Diagnostics)
+- Type-safe TypeScript interfaces throughout
+- RESTful API endpoints under `/intelligence` prefix
+- React components with proper state management
+- Integration with existing authentication and navigation
+- No breaking changes to existing functionality
+
+#### Files Created:
+- `apps/api/src/lib/intelligence/analytics-service.ts`
+- `apps/api/src/lib/intelligence/business-intelligence-service.ts`
+- `apps/api/src/lib/intelligence/recommendation-service.ts`
+- `apps/api/src/lib/intelligence/learning-repository.ts`
+- `apps/api/src/lib/intelligence/health-service.ts`
+- `apps/api/src/lib/intelligence/diagnostics-service.ts`
+- `apps/api/src/routes/intelligence.ts`
+- `apps/web/src/app/admin/intelligence/page.tsx`
+- `apps/web/src/components/intelligence/AskAtlas.tsx`
+- `apps/web/src/components/intelligence/BusinessInsights.tsx`
+- `apps/web/src/components/intelligence/Recommendations.tsx`
+- `apps/web/src/components/intelligence/LearningStats.tsx`
+- `apps/web/src/app/admin/system-health/page.tsx`
+
+#### Dependencies:
+- No new external dependencies
+- Uses existing infrastructure (Fastify, React, TypeScript)
+- Integrates with existing API patterns
+
+#### Implementation Effort:
+- 13 new service files
+- 5 new React components
+- 2 new page routes
+- 1 new API route module
+- Navigation updates
+- Build and type check successful
+
+#### Quality Metrics:
+- ✅ Build passing
+- ✅ Type check passing
+- ✅ No breaking changes
+- ✅ TypeScript safety maintained
+- ✅ Modular architecture
+- ✅ No duplicated logic
+
+---
+
 ## Success Metrics
 
 ### MVP Completion Criteria

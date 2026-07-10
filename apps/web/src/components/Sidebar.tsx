@@ -14,6 +14,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: '📊' },
+  { href: '/admin/intelligence', label: 'Intelligence', icon: '🧠' },
   { href: '/admin/claims', label: 'Claims', icon: '📋' },
   { href: '/admin/interviews', label: 'Interviews', icon: '💬' },
   { href: '/admin/supplements', label: 'Supplements', icon: '💰' },
@@ -22,6 +23,7 @@ const navItems: NavItem[] = [
   { href: '/admin/companies', label: 'Companies', icon: '🏢' },
   { href: '/admin/properties', label: 'Properties', icon: '🏠' },
   { href: '/admin/activity', label: 'Activity', icon: '📈' },
+  { href: '/admin/system-health', label: 'System Health', icon: '🏥' },
 ];
 
 interface SidebarProps {

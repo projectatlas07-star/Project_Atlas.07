@@ -14,6 +14,7 @@ import { adjustersRoutes } from './adjusters';
 import { activityRoutes } from './activity';
 import { aiSupplementsRoutes } from './ai-supplements';
 import { demoRoutes } from './demo';
+import intelligenceRoutes from './intelligence';
 
 export async function registerRoutes(server: FastifyInstance) {
   // Companies CRUD + CSV import
@@ -57,4 +58,7 @@ export async function registerRoutes(server: FastifyInstance) {
 
   // Demo Mode
   server.register(demoRoutes, { prefix: '/demo' });
+
+  // Atlas Intelligence
+  server.register(intelligenceRoutes, { prefix: '/intelligence' });
 }
