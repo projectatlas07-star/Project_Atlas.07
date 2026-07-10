@@ -206,6 +206,7 @@ export default function AdjustersPage() {
               setPage(1);
             }}
             className="p-2 border rounded"
+            aria-label="Filter by status"
           >
             <option value="">All Status</option>
             <option value="true">Active</option>
