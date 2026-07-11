@@ -1,6 +1,6 @@
 'use client';
 
-// apps/web/src/app/admin/interviews/[interviewId]/questions/page.tsx
+// apps/web/src/app/admin/interviews/[id]/questions/page.tsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
@@ -15,7 +15,7 @@ interface Question {
 export default function InterviewQuestionsPage() {
   const router = useRouter();
   const { session, loading } = useSupabase();
-  const interviewId = (router as any).query?.interviewId as string;
+  const interviewId = (router as any).query?.id as string;
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [newQuestion, setNewQuestion] = useState('');
