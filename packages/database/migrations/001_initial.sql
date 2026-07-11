@@ -242,10 +242,6 @@ ALTER TABLE tenant_members ENABLE ROW LEVEL SECURITY;
 CREATE POLICY tenant_members_company_isolation ON tenant_members
   USING (company_id = current_setting('app.current_company', true)::uuid);
 
-ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
-CREATE POLICY contacts_company_isolation ON contacts
-  USING (company_id = current_setting('app.current_company', true)::uuid);
-
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
 CREATE POLICY properties_company_isolation ON properties
   USING (company_id = current_setting('app.current_company', true)::uuid);
