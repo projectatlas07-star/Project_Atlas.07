@@ -21,8 +21,8 @@ export class StorageService {
     path: string,
     file: Buffer | Uint8Array,
     contentType: string,
-    options: { upsert?: boolean } = {}
-  ): Promise<{ path: string; url: string }> {
+    options: { upsert?: boolean; expiresIn?: number } = {}
+  ): Promise<{ path: string; url: string; signedUrl?: string }> {
     const { data, error } = await this.supabase.storage
       .from(bucket)
       .upload(path, file, {
@@ -34,14 +34,19 @@ export class StorageService {
       throw new Error(`Storage upload error: ${error.message}`);
     }
 
-    // Get public URL
-    const { data: urlData } = this.supabase.storage
+    // Generate signed URL for secure access (default 1 hour expiry)
+    const { data: signedData, error: signedError } = await this.supabase.storage
       .from(bucket)
-      .getPublicUrl(data.path);
+      .createSignedUrl(data.path, options.expiresIn ?? 3600);
+
+    if (signedError) {
+      throw new Error(`Storage signed URL error: ${signedError.message}`);
+    }
 
     return {
       path: data.path,
-      url: urlData.publicUrl,
+      url: signedData.signedUrl,
+      signedUrl: signedData.signedUrl,
     };
   }
 
@@ -59,23 +64,12 @@ export class StorageService {
   }
 
   /**
-   * Get a public URL for a file
-   */
-  getPublicUrl(bucket: string, path: string): string {
-    const { data } = this.supabase.storage
-      .from(bucket)
-      .getPublicUrl(path);
-
-    return data.publicUrl;
-  }
-
-  /**
    * Generate a signed URL for temporary access
    */
   async getSignedUrl(
     bucket: string,
     path: string,
-    expiresIn: number = 60
+    expiresIn: number = 3600
   ): Promise<string> {
     const { data, error } = await this.supabase.storage
       .from(bucket)

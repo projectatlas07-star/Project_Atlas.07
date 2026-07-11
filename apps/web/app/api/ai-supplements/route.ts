@@ -6,20 +6,18 @@ import { createAIService } from '@project-atlas/ai';
 const generateSupplementSchema = z.object({
   supplementId: z.string().uuid(),
   claimId: z.string().uuid().optional(),
-  context: z.object({
-    claim: z.object({
-      claimNumber: z.string(),
-      insuranceCompany: z.string(),
-      dateOfLoss: z.string(),
-      description: z.string(),
-      status: z.string(),
-    }).optional(),
-    property: z.object({
-      address: z.string(),
-    }).optional(),
-    documents: z.array(z.any()).optional(),
-    interviewResponses: z.any().optional(),
+  claim: z.object({
+    claimNumber: z.string(),
+    insuranceCompany: z.string(),
+    dateOfLoss: z.string(),
+    description: z.string(),
+    status: z.string(),
   }).optional(),
+  property: z.object({
+    address: z.string(),
+  }).optional(),
+  documents: z.array(z.any()).optional(),
+  interviewResponses: z.any().optional(),
 });
 
 // POST /api/ai-supplements/generate - Generate AI supplement recommendations
@@ -27,7 +25,7 @@ export async function POST(request: NextRequest) {
   try {
     const context = await requireAuth();
     const body = await request.json();
-    const { supplementId, claimId, context: aiContext } = generateSupplementSchema.parse(body);
+    const { supplementId, claimId, claim, property, documents, interviewResponses } = generateSupplementSchema.parse(body);
 
     // Create AI service
     const aiService = createAIService();
@@ -47,7 +45,18 @@ export async function POST(request: NextRequest) {
     const recommendations = await aiService.generateSupplementRecommendations({
       supplementId,
       claimId: claimId || supplementId,
-      context: aiContext || {},
+      context: {
+        claim: claim || {
+          claimNumber: 'unknown',
+          insuranceCompany: 'unknown',
+          dateOfLoss: new Date().toISOString(),
+          description: 'No description provided',
+          status: 'draft'
+        },
+        property,
+        documents,
+        interviewResponses
+      },
     });
 
     return NextResponse.json({

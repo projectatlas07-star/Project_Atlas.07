@@ -410,9 +410,9 @@ export default function InterviewDetailPage() {
             className="w-full bg-gray-200 rounded-full h-2"
             role="progressbar"
             aria-label="Interview progress"
-            aria-valuenow={Math.round(interview.progress).toString()}
-            aria-valuemin="0"
-            aria-valuemax="100"
+            aria-valuenow={Math.round(interview.progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
           >
             <div
               className="bg-blue-600 h-2 rounded-full transition-all"

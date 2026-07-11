@@ -29,12 +29,12 @@ export async function POST(request: NextRequest) {
 
     // Upload to Supabase Storage
     const storage = getStorageService();
-    const { path: storagePath, url } = await storage.uploadFile(
+    const { path: storagePath, url, signedUrl } = await storage.uploadFile(
       'documents',
       path,
       buffer,
       file.type,
-      { upsert: false }
+      { upsert: false, expiresIn: 3600 } // 1 hour expiry for signed URLs
     );
 
     // Save document metadata to database

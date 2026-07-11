@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const allCompanies = await db
       .select()
       .from(companies)
-      .orderBy(desc(companies.createdAt));
+      .orderBy(desc(companies.created_at));
 
     return NextResponse.json(allCompanies);
   } catch (error) {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       .insert(companies)
       .values({
         ...validated,
-        createdBy: context.userId,
+        created_by: context.userId,
       })
       .returning();
 

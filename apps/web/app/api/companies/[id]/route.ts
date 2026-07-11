@@ -55,8 +55,8 @@ export async function PUT(
       .update(companies)
       .set({
         ...validated,
-        updatedBy: context.userId,
-        updatedAt: new Date(),
+        updated_by: context.userId,
+        updated_at: new Date(),
       })
       .where(eq(companies.id, id))
       .returning();
