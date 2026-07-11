@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- Create tenant_members table
 CREATE TABLE IF NOT EXISTS tenant_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   role TEXT NOT NULL,
@@ -233,16 +232,10 @@ CREATE OR REPLACE TRIGGER on_auth_user_updated
   FOR EACH ROW EXECUTE FUNCTION public.handle_user_update();
 
 -- Enable Row Level Security and create company isolation policies
-ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
-CREATE POLICY companies_company_isolation ON companies
-  USING (company_id = current_setting('app.current_company', true)::uuid);
-
-ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
-CREATE POLICY tenants_company_isolation ON tenants
-  USING (company_id = current_setting('app.current_company', true)::uuid);
-
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY profiles_company_isolation ON profiles
+-- Note: companies, tenants, and profiles are root tables without company_id
+-- They use application-level access control instead of RLS
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY contacts_company_isolation ON contacts
   USING (company_id = current_setting('app.current_company', true)::uuid);
 
 ALTER TABLE tenant_members ENABLE ROW LEVEL SECURITY;
@@ -291,7 +284,13 @@ CREATE POLICY interviews_company_isolation ON interviews
 
 ALTER TABLE interview_questions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY interview_questions_company_isolation ON interview_questions
-  USING (company_id = current_setting('app.current_company', true)::uuid);
+  USING (
+    EXISTS (
+      SELECT 1 FROM interviews 
+      WHERE interviews.id = interview_questions.interview_id 
+      AND interviews.company_id = current_setting('app.current_company', true)::uuid
+    )
+  );
 
 ALTER TABLE ai_conversations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY ai_conversations_company_isolation ON ai_conversations
