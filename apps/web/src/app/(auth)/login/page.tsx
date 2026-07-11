@@ -24,9 +24,16 @@ export default function LoginPage() {
     }
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    else router.push('/');
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+    
+    // Successful login - redirect to admin dashboard
+    router.push('/admin');
+    router.refresh(); // Refresh to update server-side auth state
     setLoading(false);
   };
 
