@@ -20,7 +20,7 @@ export * from "./schema/interview-templates";
 export * from "./schema/ai_conversations";
 export * from "./schema/tenant_members";
 
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 

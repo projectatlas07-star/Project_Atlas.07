@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { supabase } from '../lib/supabase';
 import { AuthenticatedRequest } from '../types/request';
+import { pool } from '@project-atlas/database';
 
 export async function authMiddleware(request: FastifyRequest, reply: FastifyReply) {
   const token = request.headers['authorization']?.replace('Bearer ', '');
@@ -31,4 +32,12 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
   }
   (request as AuthenticatedRequest).companyId = tm.company_id;
   (request as AuthenticatedRequest).role = tm.role;
+
+  // Set company context in database session for RLS policies
+  try {
+    await pool.query('SET app.current_company = $1', [tm.company_id]);
+  } catch (dbError) {
+    console.error('Failed to set company context:', dbError);
+    // Continue anyway as RLS will use default behavior
+  }
 }

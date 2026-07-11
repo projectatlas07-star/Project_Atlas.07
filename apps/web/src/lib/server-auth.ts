@@ -1,0 +1,99 @@
+import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+import { db } from './server-db';
+import { tenantMembers, profiles } from '@project-atlas/database';
+import { eq } from 'drizzle-orm';
+
+// Supabase server client for Route Handlers
+export const createServerClient = () => {
+  const cookieStore = cookies();
+  
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      },
+      global: {
+        headers: {
+          cookie: cookieStore.toString(),
+        },
+      },
+    }
+  );
+};
+
+// Get authenticated user from request
+export async function getAuthenticatedUser() {
+  try {
+    const supabase = createServerClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (error || !user) {
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Auth error:', error);
+    return null;
+  }
+}
+
+// Get company context for authenticated user
+export async function getCompanyContext() {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return null;
+  }
+
+  try {
+    // Get user's tenant membership using Drizzle
+    const [member] = await db
+      .select({
+        companyId: tenantMembers.companyId,
+        role: tenantMembers.role,
+      })
+      .from(tenantMembers)
+      .where(eq(tenantMembers.userId, user.id))
+      .limit(1);
+
+    if (!member) {
+      return null;
+    }
+
+    // Get user profile for name
+    const [profile] = await db
+      .select({
+        firstName: profiles.firstName,
+        lastName: profiles.lastName,
+        email: profiles.email,
+      })
+      .from(profiles)
+      .where(eq(profiles.id, user.id))
+      .limit(1);
+
+    return {
+      userId: user.id,
+      companyId: member.companyId,
+      role: member.role,
+      userName: profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || profile.email : user.email,
+      userEmail: user.email,
+    };
+  } catch (error) {
+    console.error('Company context error:', error);
+    return null;
+  }
+}
+
+// Require authentication for Route Handlers
+export async function requireAuth() {
+  const context = await getCompanyContext();
+  if (!context) {
+    throw new Error('Unauthorized');
+  }
+  return context;
+}

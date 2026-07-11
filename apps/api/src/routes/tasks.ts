@@ -1,7 +1,7 @@
 // apps/api/src/routes/tasks.ts
 import { FastifyPluginAsync } from 'fastify';
 import { registerCrudRoutes } from './crud';
-import { tasks } from '../../../../packages/database/src/schema/tasks';
+import { tasks } from '@project-atlas/database';
 import { z } from 'zod';
 
 // Adjust schema fields to match your tasks table definition

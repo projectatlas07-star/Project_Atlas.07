@@ -1,7 +1,7 @@
 // apps/api/src/routes/notes.ts
 import { FastifyPluginAsync } from 'fastify';
 import { registerCrudRoutes } from './crud';
-import { notes } from '../../../../packages/database/src/schema/notes';
+import { notes } from '@project-atlas/database';
 import { z } from 'zod';
 
 // Simple schema – adjust fields to match your notes table

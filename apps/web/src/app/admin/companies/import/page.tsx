@@ -19,7 +19,7 @@ export default function CompaniesImport() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('mapping', mapping);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/companies/import-csv`, {
+      const response = await fetch(`/companies/import-csv`, {
         method: 'POST',
         body: formData,
       });

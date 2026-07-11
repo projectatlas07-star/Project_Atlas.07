@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "echo 'Linting skipped for API package - typecheck covers TypeScript validation'",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "db:push": "node -r ts-node/register packages/database/src/migrations/run.ts"

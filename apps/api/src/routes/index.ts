@@ -15,6 +15,8 @@ import { activityRoutes } from './activity';
 import { aiSupplementsRoutes } from './ai-supplements';
 import { demoRoutes } from './demo';
 import intelligenceRoutes from './intelligence';
+import { notesRoutes } from './notes';
+import { tasksRoutes } from './tasks';
 
 export async function registerRoutes(server: FastifyInstance) {
   // Companies CRUD + CSV import
@@ -52,6 +54,12 @@ export async function registerRoutes(server: FastifyInstance) {
 
   // Activity Timeline
   server.register(activityRoutes, { prefix: '/activity' });
+
+  // Notes CRUD
+  server.register(notesRoutes, { prefix: '/notes' });
+
+  // Tasks CRUD
+  server.register(tasksRoutes, { prefix: '/tasks' });
 
   // AI Supplement Generation
   server.register(aiSupplementsRoutes, { prefix: '/ai-supplements' });

@@ -22,6 +22,10 @@ const navItems: NavItem[] = [
   { href: '/admin/adjusters', label: 'Adjusters', icon: '👷' },
   { href: '/admin/companies', label: 'Companies', icon: '🏢' },
   { href: '/admin/properties', label: 'Properties', icon: '🏠' },
+  { href: '/admin/contacts', label: 'Contacts', icon: '👥' },
+  { href: '/admin/notes', label: 'Notes', icon: '📝' },
+  { href: '/admin/users', label: 'Users', icon: '👤' },
+  { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
   { href: '/admin/activity', label: 'Activity', icon: '📈' },
   { href: '/admin/system-health', label: 'System Health', icon: '🏥' },
 ];

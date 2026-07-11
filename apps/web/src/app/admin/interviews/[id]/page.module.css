@@ -1,0 +1,5 @@
+.progressBar {
+  width: var(--progress-width);
+}
+
+/* Since progress is dynamic, we'll use inline style for the width but the class is still useful for other properties */

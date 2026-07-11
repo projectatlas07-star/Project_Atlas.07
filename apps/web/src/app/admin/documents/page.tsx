@@ -83,7 +83,7 @@ export default function DocumentsPage() {
         ? `/documents/claims/${selectedClaimId}/upload`
         : '/documents/upload';
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
+      const response = await fetch(`${endpoint}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session?.access_token}`,

@@ -72,8 +72,7 @@ Modular AI Provider Architecture
 Deployment
 
 Vercel
-Railway
-Supabase Storage
+Supabase (PostgreSQL + Auth + Storage)
 Current Status
 
 Project Atlas is currently in an invite-only pilot program with insurance restoration contractors.
