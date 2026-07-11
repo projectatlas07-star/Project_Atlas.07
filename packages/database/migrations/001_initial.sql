@@ -238,9 +238,10 @@ ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY contacts_company_isolation ON contacts
   USING (company_id = current_setting('app.current_company', true)::uuid);
 
-ALTER TABLE tenant_members ENABLE ROW LEVEL SECURITY;
-CREATE POLICY tenant_members_company_isolation ON tenant_members
-  USING (company_id = current_setting('app.current_company', true)::uuid);
+-- Note: tenant_members is a system lookup table that maps users to companies
+-- It must be accessible without company context to resolve user's company membership
+-- Therefore, RLS is NOT enabled on tenant_members
+-- Actual data isolation is enforced on the business tables (contacts, claims, etc.)
 
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
 CREATE POLICY properties_company_isolation ON properties
