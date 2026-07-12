@@ -154,7 +154,7 @@ export default function LandingPage() {
       <section id="hero" className="min-h-screen flex items-center justify-center px-6 pt-20 relative">
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-16 animate-fade-in-up">
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-tight">
+            <h1 className="text-[5.55rem] md:text-[7.4rem] lg:text-[8.3rem] font-bold mb-8 leading-tight">
               <span className="block animate-text-reveal">KNOW EVERYTHING.</span>
               <span className="block animate-text-reveal" style={{ animationDelay: '0.2s' }}>MISS NOTHING.</span>
             </h1>
@@ -259,7 +259,7 @@ export default function LandingPage() {
       <section id="ask-atlas" className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
+            <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-6">
               ASK YOUR COMPANY<br />
               <span className="gradient-mixed bg-clip-text text-transparent">ANYTHING.</span>
             </h2>
@@ -327,7 +327,7 @@ export default function LandingPage() {
       <section id="queryable" className="py-32 px-6 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
+            <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-6">
               YOUR BUSINESS<br />
               <span className="gradient-mixed bg-clip-text text-transparent">BECOMES QUERYABLE.</span>
             </h2>
@@ -351,7 +351,7 @@ export default function LandingPage() {
             <div className="flex justify-center my-12">
               <div className="atlas-interface-elevated rounded-2xl p-8 text-center cinematic-glow-purple animate-float">
                 <div className="w-20 h-20 gradient-mixed rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-brand">
-                  <span className="text-4xl font-bold">A</span>
+                  <span className="text-[3.7rem] font-bold">A</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-2">ATLAS INTELLIGENCE</h3>
                 <p className="text-sm" style={{ color: 'var(--neutral-gray-400)' }}>Every operational event becomes context</p>
@@ -378,7 +378,7 @@ export default function LandingPage() {
       <section id="supplement" className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
+            <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-6">
               FIND THE REVENUE<br />
               <span className="gradient-mixed bg-clip-text text-transparent">HIDING IN THE CLAIM.</span>
             </h2>
@@ -397,7 +397,7 @@ export default function LandingPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm mb-1" style={{ color: 'var(--neutral-gray-400)' }}>Potential Supplement</p>
-                    <p className="text-4xl font-bold" style={{ color: 'var(--brand-cyan)' }}>$8,420</p>
+                    <p className="text-[3.7rem] font-bold" style={{ color: 'var(--brand-cyan)' }}>$8,420</p>
                   </div>
                 </div>
 
@@ -440,7 +440,7 @@ export default function LandingPage() {
       <section id="executive" className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
+            <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-6">
               SEE THE BUSINESS<br />
               <span className="gradient-mixed bg-clip-text text-transparent">BEFORE IT BECOMES A PROBLEM.</span>
             </h2>
@@ -460,7 +460,7 @@ export default function LandingPage() {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <p className="text-sm mb-4" style={{ color: 'var(--neutral-gray-400)' }}>{metric.label}</p>
-                  <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: metric.color }}>{metric.value}</p>
+                  <p className="text-[4.625rem] md:text-[5.55rem] font-bold mb-2" style={{ color: metric.color }}>{metric.value}</p>
                 </div>
               ))}
             </div>
@@ -472,7 +472,7 @@ export default function LandingPage() {
       <section id="learning" className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
+            <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-6">
               ATLAS REMEMBERS<br />
               <span className="gradient-mixed bg-clip-text text-transparent">WHAT THE COMPANY LEARNS.</span>
             </h2>
@@ -513,7 +513,7 @@ export default function LandingPage() {
       <section id="scenes" className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
+            <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-6">
               EXPERIENCE<br />
               <span className="gradient-mixed bg-clip-text text-transparent">ATLAS IN ACTION.</span>
             </h2>
@@ -525,7 +525,7 @@ export default function LandingPage() {
               <div className="absolute top-0 left-0 w-64 h-64 rounded-full blur-3xl" style={{ backgroundColor: 'var(--brand-cyan)', opacity: 0.1 }} />
               
               <div className="relative">
-                <h3 className="text-3xl font-bold mb-4">CLAIM INTELLIGENCE</h3>
+                <h3 className="text-[2.775rem] font-bold mb-4">CLAIM INTELLIGENCE</h3>
                 <p className="text-xl mb-8" style={{ color: 'var(--neutral-gray-400)' }}>
                   Atlas understands the complete context of a claim.
                 </p>
@@ -537,7 +537,7 @@ export default function LandingPage() {
                       <h4 className="text-xl font-bold">Residential Storm Damage</h4>
                     </div>
                     <div className="text-right">
-                      <p className="text-3xl font-bold" style={{ color: 'var(--brand-cyan)' }}>94%</p>
+                      <p className="text-[2.775rem] font-bold" style={{ color: 'var(--brand-cyan)' }}>94%</p>
                       <p className="text-sm" style={{ color: 'var(--neutral-gray-400)' }}>accuracy</p>
                     </div>
                   </div>
@@ -565,7 +565,7 @@ export default function LandingPage() {
               <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl" style={{ backgroundColor: 'var(--brand-purple)', opacity: 0.1 }} />
               
               <div className="relative">
-                <h3 className="text-3xl font-bold mb-4">SUPPLEMENT OPPORTUNITY</h3>
+                <h3 className="text-[2.775rem] font-bold mb-4">SUPPLEMENT OPPORTUNITY</h3>
                 <p className="text-xl mb-8" style={{ color: 'var(--neutral-gray-400)' }}>
                   Atlas identifies patterns that may indicate missed supplement opportunities.
                 </p>
@@ -602,7 +602,7 @@ export default function LandingPage() {
               <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl" style={{ backgroundColor: 'var(--brand-cyan)', opacity: 0.1 }} />
               
               <div className="relative">
-                <h3 className="text-3xl font-bold mb-4">ADJUSTER INTELLIGENCE</h3>
+                <h3 className="text-[2.775rem] font-bold mb-4">ADJUSTER INTELLIGENCE</h3>
                 <p className="text-xl mb-8" style={{ color: 'var(--neutral-gray-400)' }}>
                   Atlas remembers historical interactions and operational patterns.
                 </p>
@@ -620,15 +620,15 @@ export default function LandingPage() {
                   
                   <div className="grid grid-cols-3 gap-4">
                     <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--brand-navy-dark)' }}>
-                      <p className="text-3xl font-bold mb-1" style={{ color: 'var(--brand-cyan)' }}>6.1</p>
+                      <p className="text-[2.775rem] font-bold mb-1" style={{ color: 'var(--brand-cyan)' }}>6.1</p>
                       <p className="text-sm" style={{ color: 'var(--neutral-gray-400)' }}>Avg Days</p>
                     </div>
                     <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--brand-navy-dark)' }}>
-                      <p className="text-3xl font-bold mb-1" style={{ color: 'var(--brand-purple)' }}>83%</p>
+                      <p className="text-[2.775rem] font-bold mb-1" style={{ color: 'var(--brand-purple)' }}>83%</p>
                       <p className="text-sm" style={{ color: 'var(--neutral-gray-400)' }}>Approval</p>
                     </div>
                     <div className="p-4 rounded-lg text-center" style={{ backgroundColor: 'var(--brand-navy-dark)' }}>
-                      <p className="text-3xl font-bold mb-1" style={{ color: 'var(--brand-cyan)' }}>High</p>
+                      <p className="text-[2.775rem] font-bold mb-1" style={{ color: 'var(--brand-cyan)' }}>High</p>
                       <p className="text-sm" style={{ color: 'var(--neutral-gray-400)' }}>Confidence</p>
                     </div>
                   </div>
@@ -650,14 +650,14 @@ export default function LandingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: 'var(--brand-cyan)', opacity: 0.1 }} />
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-5xl md:text-7xl font-bold mb-8 animate-fade-in-up">
+          <h2 className="text-[4.625rem] md:text-[6.475rem] font-bold mb-8 animate-fade-in-up">
             YOUR COMPANY<br />
             <span className="gradient-mixed bg-clip-text text-transparent">ALREADY HAS</span><br />
             <span className="animate-text-reveal" style={{ animationDelay: '0.3s' }}>THE ANSWERS.</span>
           </h2>
           
           <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <p className="text-3xl font-bold mb-4" style={{ color: 'var(--brand-cyan)' }}>
+            <p className="text-[2.775rem] font-bold mb-4" style={{ color: 'var(--brand-cyan)' }}>
               ATLAS KNOWS WHERE TO FIND THEM.
             </p>
           </div>
