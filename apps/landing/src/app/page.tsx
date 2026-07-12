@@ -1,254 +1,226 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import CommandPalette from '@/components/landing/CommandPalette';
+import Link from "next/link";
 
 const ATLAS_APP_URL = process.env.NEXT_PUBLIC_ATLAS_APP_URL || 'http://localhost:3000';
 
 export default function LandingPage() {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  const [typedAnswer, setTypedAnswer] = useState('');
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-
-  const questions = [
-    {
-      question: 'Where did we lose the most revenue this month?',
-      answer: 'Revenue currently waiting: $42,380\n12 supplements awaiting carrier approval.\n3 claims inactive for 21 days.\nRecommended action: Follow up with Carrier X.'
-    },
-    {
-      question: 'Which adjusters approve supplements fastest?',
-      answer: 'Michael Turner\nAverage approval: 6.1 days\nConfidence: High'
-    },
-    {
-      question: 'Which claims require attention today?',
-      answer: 'NPP-2026-0048\nMissing engineer report.\nRevenue at risk: $5,200'
-    },
-    {
-      question: 'What patterns are emerging?',
-      answer: 'Atlas identified that Carrier X requests code documentation before approval in 83% of supplements.\nRecommendation: Attach code documentation before submission.'
-    }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isTyping && !showAnswer) {
-        setIsTyping(true);
-        setShowAnswer(true);
-        typeAnswer(questions[currentQuestion].answer);
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [currentQuestion, isTyping, showAnswer]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setCommandPaletteOpen(true);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const typeAnswer = (text: string) => {
-    let i = 0;
-    setTypedAnswer('');
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        setTypedAnswer(prev => prev + text.charAt(i));
-        i++;
-      } else {
-        clearInterval(timer);
-        setIsTyping(false);
-        setTimeout(() => {
-          setShowAnswer(false);
-          setCurrentQuestion((prev) => (prev + 1) % questions.length);
-        }, 4000);
-      }
-    }, 30);
-  };
-
   return (
-    <div className="min-h-screen bg-black text-white">
-      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
-      
+    <div className="min-h-screen" style={{ backgroundColor: '#0a1628' }}>
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10" role="navigation" aria-label="Main navigation">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl flex items-center justify-center" aria-hidden="true">
-              <span className="text-xl font-bold">A</span>
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-white/10" style={{ backgroundColor: 'rgba(10, 22, 40, 0.9)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <span className="text-xl font-bold bg-gradient-to-r from-[#00d4ff] to-[#0077ff] bg-clip-text text-transparent">PROJECT ATLAS</span>
             </div>
-            <span className="text-xl font-bold">Atlas</span>
-          </div>
-          <div className="flex items-center space-x-6">
-            <button
-              onClick={() => setCommandPaletteOpen(true)}
-              className="text-white/70 hover:text-white transition-colors text-sm"
-              aria-label="Open Ask Atlas command palette (Press ⌘K)"
-            >
-              <kbd className="px-2 py-1 bg-white/10 rounded text-xs mr-2" aria-hidden="true">⌘K</kbd>
-              Ask Atlas
-            </button>
-            <a
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="#product" className="text-white/80 hover:text-white transition-colors">
+                Product
+              </Link>
+              <Link href="#intelligence" className="text-white/80 hover:text-white transition-colors">
+                Intelligence
+              </Link>
+              <Link href="#supplements" className="text-white/80 hover:text-white transition-colors">
+                Supplements
+              </Link>
+              <Link href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
+                How It Works
+              </Link>
+            </div>
+            <Link
               href={`${ATLAS_APP_URL}/login`}
-              className="text-white/70 hover:text-white transition-colors"
+              className="text-white px-6 py-2 rounded-lg font-medium transition-colors hover:bg-[#0077ff]"
+              style={{ backgroundColor: '#00d4ff' }}
             >
-              Sign In
-            </a>
-            <a
-              href={`${ATLAS_APP_URL}/login`}
-              className="px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-colors"
-            >
-              Request Pilot Access
-            </a>
+              LOGIN TO ATLAS
+            </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            Your Restoration Company<br />
+            <span className="bg-gradient-to-r from-[#00d4ff] to-[#0077ff] bg-clip-text text-transparent">Should Remember Everything.</span>
+          </h1>
+          <p className="text-xl text-white/70 max-w-3xl mx-auto mb-10">
+            Atlas turns claims, documents, supplements, adjuster interactions, and operational knowledge 
+            into company intelligence. Every decision becomes data. Every outcome becomes context.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href={`${ATLAS_APP_URL}/login`}
+              className="text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors hover:bg-[#0077ff]"
+              style={{ backgroundColor: '#00d4ff' }}
+            >
+              ENTER ATLAS
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="border border-white/30 hover:border-white/50 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors"
+            >
+              EXPLORE THE SYSTEM
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Closed Loop Intelligence Section */}
+      <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'rgba(15, 39, 68, 0.5)' }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
-              Know Everything.<br />Miss Nothing.
-            </h1>
-            <p className="text-xl text-white/60 max-w-3xl mx-auto mb-8">
-              Atlas is the AI Operating System for Insurance Restoration.
-              It connects your claims, supplements, documents, interviews, estimates, photos and operational data into one continuously improving intelligence layer.
+            <h2 className="text-4xl font-bold mb-4">Closed-Loop Intelligence</h2>
+            <p className="text-xl text-white/70 max-w-3xl mx-auto">
+              Every operational event becomes context for future decisions
             </p>
-            <div className="flex items-center justify-center space-x-4">
-              <a
-              href={`${ATLAS_APP_URL}/login`}
-              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
-            >
-              Request Pilot Access
-            </a>
-            <a
-              href={`${ATLAS_APP_URL}/demo`}
-              className="px-8 py-4 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors border border-white/20"
-            >
-              Explore Interactive Demo
-            </a>
-            </div>
           </div>
-
-          {/* Interactive Atlas Intelligence Panel */}
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-                  <span className="text-sm font-bold">A</span>
-                </div>
-                <span className="text-lg font-medium">Ask Atlas...</span>
-              </div>
-
-              {/* Question */}
-              <div className="mb-6">
-                <p className="text-white/60 text-lg">{questions[currentQuestion].question}</p>
-              </div>
-
-              {/* Answer */}
-              {showAnswer && (
-                <div className="bg-black/30 rounded-xl p-6 border border-white/10">
-                  <p className="text-white whitespace-pre-line font-mono text-sm">
-                    {typedAnswer}
-                  </p>
-                  {isTyping && <span className="inline-block w-2 h-4 bg-cyan-400 ml-1 animate-pulse" />}
-                </div>
-              )}
-
-              {/* Suggested Prompts */}
-              <div className="mt-6 flex flex-wrap gap-2">
-                {questions.map((q, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setCurrentQuestion(index);
-                      setShowAnswer(false);
-                      setIsTyping(true);
-                      setTimeout(() => {
-                        setShowAnswer(true);
-                        typeAnswer(q.answer);
-                      }, 100);
-                    }}
-                    className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                      currentQuestion === index
-                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                        : 'bg-white/5 text-white/60 hover:bg-white/10 border border-white/10'
-                    }`}
-                  >
-                    {q.question.slice(0, 30)}...
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-white/5">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">The Business Becomes Queryable</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { step: 'CLAIM', desc: 'Initial loss notice and claim details' },
+              { step: 'DOCUMENTS', desc: 'Photos, estimates, and correspondence' },
+              { step: 'ADJUSTER INTERACTIONS', desc: 'Communication history and notes' },
+              { step: 'SUPPLEMENTS', desc: 'Additional revenue recovery requests' },
+              { step: 'OUTCOMES', desc: 'Approvals, denials, and settlements' },
+              { step: 'ATLAS INTELLIGENCE', desc: 'Actionable insights and patterns' },
+            ].map((item, index) => (
+              <div key={item.step} className="relative">
+                <div className="rounded-lg p-6 h-full border border-white/10" style={{ backgroundColor: '#0a1628' }}>
+                  <div className="font-bold text-sm mb-2" style={{ color: '#00d4ff' }}>STEP {index + 1}</div>
+                  <div className="text-white font-semibold mb-2">{item.step}</div>
+                  <div className="text-white/60 text-sm">{item.desc}</div>
+                </div>
+                {index < 5 && (
+                  <div className="hidden lg:block absolute top-1/2 -right-2 transform -translate-y-1/2" style={{ color: '#00d4ff' }}>
+                    →
+                  </div>
+                )}
               </div>
-              <h3 className="text-xl font-bold mb-3">Claims Intelligence</h3>
-              <p className="text-white/60">Every claim, supplement, and document becomes part of your organizational knowledge base.</p>
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-3">AI-Powered Insights</h3>
-              <p className="text-white/60">Atlas learns from every interaction to provide increasingly accurate recommendations.</p>
-            </div>
+      {/* Supplement Intelligence Section */}
+      <section id="supplements" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Supplement Intelligence</h2>
+            <p className="text-xl text-white/70 max-w-3xl mx-auto">
+              Understand the factors that drive supplement outcomes
+            </p>
+          </div>
 
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'Claims Analysis', desc: 'Historical claim patterns and outcomes' },
+              { title: 'Estimate Review', desc: 'Line-item accuracy and completeness' },
+              { title: 'Document Assessment', desc: 'Photo quality and documentation strength' },
+              { title: 'Adjuster History', desc: 'Individual adjuster decision patterns' },
+              { title: 'Supplement Tracking', desc: 'Revenue recovery success rates' },
+              { title: 'Outcome Correlation', desc: 'Identify winning patterns' },
+              { title: 'Risk Assessment', desc: 'Flag high-risk supplements early' },
+              { title: 'Process Optimization', desc: 'Improve documentation workflows' },
+            ].map((item) => (
+              <div key={item.title} className="rounded-lg p-6 border border-white/10" style={{ backgroundColor: 'rgba(15, 39, 68, 0.3)' }}>
+                <div className="font-semibold mb-2" style={{ color: '#00d4ff' }}>{item.title}</div>
+                <div className="text-white/70">{item.desc}</div>
               </div>
-              <h3 className="text-xl font-bold mb-3">Revenue Recovery</h3>
-              <p className="text-white/60">Identify missed supplement opportunities and revenue at risk before it's too late.</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Atlas Intelligence Section */}
+      <section id="intelligence" className="py-20 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'rgba(15, 39, 68, 0.5)' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Atlas Intelligence</h2>
+            <p className="text-xl text-white/70 max-w-3xl mx-auto">
+              The queryable intelligence layer of your restoration company
+            </p>
+          </div>
+
+          <div className="rounded-lg p-8 border border-white/10" style={{ backgroundColor: '#0a1628' }}>
+            <div className="space-y-4">
+              {[
+                "Which adjusters deny supplements most often?",
+                "Where are we losing recoverable revenue?",
+                "What documentation patterns lead to successful supplements?",
+                "Which claims require immediate attention?",
+                "How does documentation timing affect supplement outcomes?",
+                "What are our most profitable claim types?",
+              ].map((question, index) => (
+                <div key={index} className="flex items-start gap-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(15, 39, 68, 0.3)' }}>
+                  <div className="font-bold" style={{ color: '#00d4ff' }}>Q{index + 1}</div>
+                  <div className="text-white/90">{question}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6">
+      {/* Operating System Section */}
+      <section id="product" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Complete Operating System</h2>
+            <p className="text-xl text-white/70 max-w-3xl mx-auto">
+              Interconnected modules designed for restoration operations
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { name: 'Intelligence', desc: 'Queryable insights and analytics' },
+              { name: 'Claims', desc: 'Complete claim lifecycle management' },
+              { name: 'Interviews', desc: 'Structured claim intake workflows' },
+              { name: 'Supplements', desc: 'Revenue recovery tracking' },
+              { name: 'Documents', desc: 'Centralized document management' },
+              { name: 'Adjusters', desc: 'Adjuster relationship tracking' },
+              { name: 'Companies', desc: 'Multi-tenant company management' },
+              { name: 'Properties', desc: 'Property and loss location data' },
+              { name: 'Contacts', desc: 'Stakeholder relationship management' },
+              { name: 'Notes', desc: 'Collaborative documentation' },
+              { name: 'Activity', desc: 'Complete audit trail' },
+              { name: 'Tasks', desc: 'Task and workflow management' },
+            ].map((module) => (
+              <div key={module.name} className="rounded-lg p-6 border border-white/10 hover:border-[#00d4ff]/30 transition-colors bg-gradient-to-br" style={{ backgroundColor: 'rgba(15, 39, 68, 0.3)', backgroundImage: 'linear-gradient(to bottom right, rgba(15, 39, 68, 0.3), rgba(10, 22, 40, 1))' }}>
+                <div className="font-bold text-lg mb-2" style={{ color: '#00d4ff' }}>{module.name}</div>
+                <div className="text-white/70">{module.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b" style={{ backgroundImage: 'linear-gradient(to bottom, rgba(15, 39, 68, 0.5), #0a1628)' }}>
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Restoration Business?</h2>
-          <p className="text-xl text-white/60 mb-8">Join the pilot program and experience the future of insurance restoration management.</p>
-          <a
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Turn Your Company Into<br />
+            <span className="bg-gradient-to-r from-[#00d4ff] to-[#0077ff] bg-clip-text text-transparent">A Closed Loop.</span>
+          </h2>
+          <p className="text-xl text-white/70 mb-10">
+            Stop losing operational knowledge to email threads and spreadsheets. 
+            Transform your restoration company with Atlas intelligence.
+          </p>
+          <Link
             href={`${ATLAS_APP_URL}/login`}
-            className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            className="text-white px-10 py-4 rounded-lg font-semibold text-lg transition-colors inline-block hover:bg-[#0077ff]"
+            style={{ backgroundColor: '#00d4ff' }}
           >
-            Request Pilot Access
-          </a>
+            LOGIN TO ATLAS
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-white/10">
-        <div className="max-w-7xl mx-auto text-center text-white/40 text-sm">
-          <p>© 2026 Project Atlas. All rights reserved.</p>
+      <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+        <div className="max-w-7xl mx-auto text-center text-white/50">
+          <p>&copy; 2026 Project Atlas. AI Operating System for Insurance Restoration.</p>
         </div>
       </footer>
     </div>

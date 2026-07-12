@@ -1,3 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-atlas-navy: #0a1628;
+  --color-atlas-dark: #0f2744;
+  --color-atlas-accent: #00d4ff;
+  --color-atlas-blue: #0077ff;
+  --color-atlas-light: #e8f4fc;
+}
