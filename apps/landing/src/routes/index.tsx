@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import atlasLogoFull from "@/assets/atlas-logo-full.png";
-import atlasMark from "@/assets/atlas-mark.png";
+import atlasMark from "@/assets/atlas-logo-full.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 /* Config                                                              */
 /* ------------------------------------------------------------------ */
 
-const SIGN_IN_URL = "#sign-in"; // placeholder for integration
+const SIGN_IN_URL = "https://project-atlas-07-web.vercel.app/login";
 const PILOT_URL = "#pilot";
 
 const PILOT_EVENT = "atlas:open-pilot";
