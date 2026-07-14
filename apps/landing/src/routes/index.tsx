@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import atlasLogoFull from "@/assets/atlas-logo-full.png";
-import atlasMark from "@/assets/atlas-logo-full.png";
+import atlasMark from "@/assets/atlas-mark.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -1697,7 +1697,11 @@ function Closing() {
       />
 
       <div className="relative mx-auto max-w-4xl text-center">
-        <AtlasMark className="mx-auto mb-10 h-10 w-10 animate-drift" />
+       <img 
+  src={atlasLogoFull} 
+  alt="Atlas Logo" 
+  className="mx-auto mb-10 h-32 w-32 animate-drift" 
+/>
         <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl">
           Your company
           <br />
