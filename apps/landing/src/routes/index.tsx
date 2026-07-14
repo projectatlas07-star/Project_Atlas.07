@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import atlasMarkAsset from "@/assets/atlas-mark.asset.json";
-import atlasLogoFullAsset from "@/assets/atlas-logo-full.asset.json";
+import atlasLogoFull from "@/assets/atlas-logo-full.png";
+import atlasMark from "@/assets/atlas-mark.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
