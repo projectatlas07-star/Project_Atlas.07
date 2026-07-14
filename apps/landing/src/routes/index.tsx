@@ -21,8 +21,8 @@ export const Route = createFileRoute("/")({
         content:
           "Connect every system a restoration company already uses into a single intelligence layer. Close the loop on supplements, claims, and operational visibility.",
       },
-      { property: "og:image", content: atlasLogoFullAsset.url },
-      { name: "twitter:image", content: atlasLogoFullAsset.url },
+      { property: "og:image", content: atlasLogoFull },
+      { name: "twitter:image", content: atlasLogoFull },
     ],
   }),
   component: LandingPage,
@@ -47,7 +47,7 @@ function openPilot() {
 function AtlasMark({ className = "" }: { className?: string }) {
   return (
     <img
-      src={atlasMarkAsset.url}
+      src={atlasMark}
       alt=""
       aria-hidden
       className={"select-none " + className}
