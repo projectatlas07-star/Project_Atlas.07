@@ -1700,7 +1700,7 @@ function Closing() {
        <img 
   src={atlasLogoFull} 
   alt="Atlas Logo" 
-  className="mx-auto mb-10 h-100 w-100 animate-drift" 
+  className="mx-auto mb-10 h-75 w-400 animate-drift" 
 />
         <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl">
           Your company
