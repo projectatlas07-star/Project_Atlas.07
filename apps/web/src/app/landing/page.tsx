@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { Input, Textarea } from "@project-atlas/ui";
 
 /* ------------------------------------------------------------------ */
 /* Config                                                              */
@@ -366,14 +367,14 @@ function Field({
         {label}
         {required && <span className="ml-1 text-atlas-cyan">*</span>}
       </span>
-      <input
+      <Input
         type={type}
         name={name}
         required={required}
         placeholder={placeholder}
         autoComplete={autoComplete}
         maxLength={500}
-        className="w-full rounded-lg border border-white/10 bg-atlas-void/70 px-4 py-2.5 text-[14px] text-white placeholder:text-white/25 outline-none transition focus:border-atlas-cyan/60 focus:ring-2 focus:ring-atlas-cyan/20"
+        className="!w-full !rounded-lg !border-white/10 !bg-atlas-void/70 !px-4 !py-2.5 !text-[14px] !text-foreground placeholder:!text-foreground/25 focus:!border-atlas-cyan/60 focus:!ring-2 focus:!ring-atlas-cyan/20 !transition"
       />
     </label>
   );
@@ -398,13 +399,13 @@ function TextareaField({
         {label}
         {required && <span className="ml-1 text-atlas-cyan">*</span>}
       </span>
-      <textarea
+      <Textarea
         name={name}
         rows={rows}
         required={required}
         placeholder={placeholder}
         maxLength={2000}
-        className="w-full resize-y rounded-lg border border-white/10 bg-atlas-void/70 px-4 py-2.5 text-[14px] leading-relaxed text-white placeholder:text-white/25 outline-none transition focus:border-atlas-cyan/60 focus:ring-2 focus:ring-atlas-cyan/20"
+        className="!w-full !resize-y !rounded-lg !border-white/10 !bg-atlas-void/70 !px-4 !py-2.5 !text-[14px] !leading-relaxed !text-foreground placeholder:!text-foreground/25 focus:!border-atlas-cyan/60 focus:!ring-2 focus:!ring-atlas-cyan/20 !transition"
       />
     </label>
   );

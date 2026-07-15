@@ -160,7 +160,7 @@ export default function DashboardPage() {
           />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">Dashboard</h1>
+          <h1 className="text-[1.40625rem] font-bold text-[var(--foreground)]">Dashboard</h1>
           <p className="text-[var(--neutral-gray-500)]">Welcome back to Project Atlas</p>
         </div>
       </div>

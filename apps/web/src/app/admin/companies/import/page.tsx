@@ -52,7 +52,7 @@ export default function CompaniesImport() {
             rows={4}
             value={mapping}
             onChange={(e) => setMapping(e.target.value)}
-            className="block w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            className="block w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
           />
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Example: {`{"Company Name":"name","Email":"email"}`}

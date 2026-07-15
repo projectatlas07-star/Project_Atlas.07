@@ -137,7 +137,7 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h2>
+          <h2 className="text-[1.125rem] font-bold text-gray-900 mb-6">Dashboard</h2>
           
           {/* Claims Workflow Widgets */}
           <div className="mb-8">

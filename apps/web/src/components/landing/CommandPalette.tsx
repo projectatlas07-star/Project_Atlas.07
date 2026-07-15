@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { Input } from '@project-atlas/ui';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -82,23 +83,25 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-2xl bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-2xl bg-atlas-void border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center px-4 py-3 border-b border-gray-700">
-          <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+        <div className="flex items-center px-4 py-3 border-b border-white/10">
+          <div className="w-8 h-8 bg-gradient-to-br from-atlas-cyan to-atlas-violet rounded-lg flex items-center justify-center mr-3">
             <span className="text-sm font-bold text-white">A</span>
           </div>
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask Atlas..."
-            className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-lg"
-          />
+          <div className="flex-1">
+            <Input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ask Atlas..."
+              className="!w-full !bg-transparent !border-0 !px-0 !py-0 !text-lg !text-foreground placeholder:!text-foreground/50 focus:!ring-0"
+            />
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-white/50 hover:text-white transition-colors"
             aria-label="Close command palette"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,13 +114,13 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
         <div className="max-h-[500px] overflow-y-auto">
           {!selectedPrompt ? (
             <div className="p-4">
-              <p className="text-gray-400 text-sm mb-3">Suggested questions:</p>
+              <p className="text-white/50 text-sm mb-3">Suggested questions:</p>
               <div className="space-y-2">
                 {filteredPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => handlePromptClick(prompt)}
-                    className="w-full text-left px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-white transition-colors"
+                    className="w-full text-left px-4 py-3 bg-atlas-navy-2 hover:bg-atlas-surface rounded-lg text-white transition-colors"
                   >
                     {prompt}
                   </button>
@@ -131,27 +134,27 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
                   setSelectedPrompt(null);
                   setTypedAnswer('');
                 }}
-                className="text-cyan-400 text-sm mb-4 hover:text-cyan-300 transition-colors"
+                className="text-atlas-cyan text-sm mb-4 hover:text-atlas-cyan-soft transition-colors"
               >
                 ← Back to questions
               </button>
-              <div className="bg-black/30 rounded-xl p-4 border border-gray-700">
-                <p className="text-gray-400 text-sm mb-2">{selectedPrompt}</p>
+              <div className="bg-black/30 rounded-xl p-4 border border-white/10">
+                <p className="text-white/50 text-sm mb-2">{selectedPrompt}</p>
                 <p className="text-white whitespace-pre-line font-mono text-sm">
                   {typedAnswer}
                 </p>
-                {isTyping && <span className="inline-block w-2 h-4 bg-cyan-400 ml-1 animate-pulse" />}
+                {isTyping && <span className="inline-block w-2 h-4 bg-atlas-cyan ml-1 animate-pulse" />}
               </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-gray-700 flex items-center justify-between text-gray-400 text-sm">
+        <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between text-white/50 text-sm">
           <div className="flex items-center space-x-4">
-            <span><kbd className="px-2 py-1 bg-gray-800 rounded text-xs">↑↓</kbd> Navigate</span>
-            <span><kbd className="px-2 py-1 bg-gray-800 rounded text-xs">↵</kbd> Select</span>
-            <span><kbd className="px-2 py-1 bg-gray-800 rounded text-xs">ESC</kbd> Close</span>
+            <span><kbd className="px-2 py-1 bg-atlas-navy-2 rounded text-xs">↑↓</kbd> Navigate</span>
+            <span><kbd className="px-2 py-1 bg-atlas-navy-2 rounded text-xs">↵</kbd> Select</span>
+            <span><kbd className="px-2 py-1 bg-atlas-navy-2 rounded text-xs">ESC</kbd> Close</span>
           </div>
           <span>Atlas Intelligence</span>
         </div>

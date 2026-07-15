@@ -459,7 +459,7 @@ export default function SupplementDetailPage() {
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                   aria-label="Select new status"
                 >
                   <option value="">Select status...</option>
@@ -477,7 +477,7 @@ export default function SupplementDetailPage() {
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                   rows={3}
                   placeholder="Enter reason for status change..."
                 />
@@ -542,7 +542,7 @@ export default function SupplementDetailPage() {
                           type="text"
                           value={item.description}
                           onChange={(e) => updateLineItem(index, 'description', e.target.value)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           placeholder="Description"
                           aria-label={`Line item ${index + 1} description`}
                         />
@@ -551,7 +551,7 @@ export default function SupplementDetailPage() {
                         <select
                           value={item.category}
                           onChange={(e) => updateLineItem(index, 'category', e.target.value)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           aria-label={`Line item ${index + 1} category`}
                         >
                           {LINE_ITEM_CATEGORIES.map((cat) => (
@@ -564,7 +564,7 @@ export default function SupplementDetailPage() {
                           type="number"
                           value={item.quantity}
                           onChange={(e) => updateLineItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           min="0"
                           placeholder="Qty"
                           aria-label={`Line item ${index + 1} quantity`}
@@ -574,7 +574,7 @@ export default function SupplementDetailPage() {
                         <select
                           value={item.unit}
                           onChange={(e) => updateLineItem(index, 'unit', e.target.value)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           aria-label={`Line item ${index + 1} unit`}
                         >
                           {LINE_ITEM_UNITS.map((unit) => (
@@ -587,7 +587,7 @@ export default function SupplementDetailPage() {
                           type="number"
                           value={item.unitPrice}
                           onChange={(e) => updateLineItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           min="0"
                           step="0.01"
                           placeholder="Price"
@@ -599,7 +599,7 @@ export default function SupplementDetailPage() {
                           type="number"
                           value={item.tax}
                           onChange={(e) => updateLineItem(index, 'tax', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           min="0"
                           max="100"
                           step="0.1"
@@ -612,7 +612,7 @@ export default function SupplementDetailPage() {
                           type="number"
                           value={item.depreciation}
                           onChange={(e) => updateLineItem(index, 'depreciation', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 border rounded text-sm"
+                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
                           min="0"
                           max="100"
                           step="0.1"
