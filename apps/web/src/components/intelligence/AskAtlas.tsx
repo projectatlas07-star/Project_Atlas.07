@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useSupabase } from "@/providers/SupabaseProvider";
 import { apiFetch } from "@/lib/api";
+import { routeQuestion, type QueryResult } from "@/lib/ask-atlas/orchestrator";
 import { Button, Input } from "@project-atlas/ui";
 import {
   Mic,
@@ -27,21 +28,6 @@ import {
   AlertCircle,
   Plus,
 } from "lucide-react";
-
-interface QueryResult {
-  answer: string;
-  reasoning: string;
-  statistics: Record<string, number | string>;
-  supportingRecords: Array<{
-    id: string;
-    type: string;
-    description: string;
-    value?: number;
-  }>;
-  recommendedActions: string[];
-  confidence: number;
-  dataSources: string[];
-}
 
 interface Message {
   role: "user" | "assistant";
@@ -295,12 +281,7 @@ export default function AskAtlas() {
     setLoading(true);
 
     try {
-      const response = await apiFetch("/intelligence/query", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: userMessage.content }),
-      });
-      const result = response as QueryResult;
+      const result = await routeQuestion(userMessage.content);
       const assistantMessage: Message = {
         role: "assistant",
         content: result.answer,
