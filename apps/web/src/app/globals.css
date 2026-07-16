@@ -3,45 +3,46 @@
 /* Project Atlas Brand Design Tokens */
 :root {
   /* Brand Colors */
-  --brand-cyan: #00D4FF;
+  --brand-cyan: #006EFF;
   --brand-cyan-light: #5CE1FF;
-  --brand-cyan-dark: #00A8CC;
-  --brand-purple: #7C3AED;
-  --brand-purple-light: #A78BFA;
-  --brand-purple-dark: #5B21B6;
-  --brand-navy: #0A1628;
-  --brand-navy-light: #1A2D4A;
-  --brand-navy-dark: #050D1A;
-  
-  /* Neutral Colors */
-  --neutral-gray-50: #F9FAFB;
-  --neutral-gray-100: #F3F4F6;
-  --neutral-gray-200: #E5E7EB;
-  --neutral-gray-300: #D1D5DB;
-  --neutral-gray-400: #9CA3AF;
-  --neutral-gray-500: #6B7280;
-  --neutral-gray-600: #4B5563;
-  --neutral-gray-700: #374151;
-  --neutral-gray-800: #1F2937;
-  --neutral-gray-900: #111827;
-  
+  --brand-cyan-dark: #0050CC;
+  --brand-purple: #AB55F7;
+  --brand-purple-light: #C98AFF;
+  --brand-purple-dark: #7A2BC4;
+  --brand-navy: #0B1220;
+  --brand-navy-light: #0F172A;
+  --brand-navy-dark: #050A12;
+
+  /* Neutral Colors - inverted for the dark UI so 50=dark and 900=light */
+  --neutral-gray-50: #111827;
+  --neutral-gray-100: #1F2937;
+  --neutral-gray-200: #374151;
+  --neutral-gray-300: #4B5563;
+  --neutral-gray-400: #6B7280;
+  --neutral-gray-500: #9CA3AF;
+  --neutral-gray-600: #D1D5DB;
+  --neutral-gray-700: #E5E7EB;
+  --neutral-gray-800: #F3F4F6;
+  --neutral-gray-900: #F9FAFB;
+
   /* Semantic Colors */
-  --color-success: #10B981;
+  --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
   --color-info: #3B82F6;
-  
-  /* Background & Foreground */
-  --background: #ffffff;
-  --foreground: #171717;
-  --background-alt: var(--neutral-gray-50);
-  --surface: #ffffff;
-  --surface-alt: var(--neutral-gray-100);
-  
+
+  /* Background & Foreground - Dark theme */
+  --background: var(--brand-navy);
+  --foreground: #ededed;
+  --background-alt: var(--brand-navy-light);
+  --surface: var(--brand-navy-light);
+  --surface-alt: var(--brand-navy-dark);
+  --border: var(--neutral-gray-100);
+
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
-  
+
   /* Spacing Scale */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -50,27 +51,28 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
   --spacing-3xl: 4rem;
-  
+
   /* Border Radius */
+  --radius: 0.75rem;
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-brand: 0 4px 20px rgba(0, 212, 255, 0.15);
-  
+  --shadow-brand: 0 4px 20px color-mix(in oklab, var(--brand-cyan) 15%, transparent);
+
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 300ms ease-in-out;
   --transition-slow: 500ms ease-in-out;
-  
+
   /* Z-Index Scale */
   --z-dropdown: 1000;
   --z-sticky: 1020;
@@ -84,22 +86,198 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-background-alt: var(--background-alt);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+
   --color-brand-cyan: var(--brand-cyan);
+  --color-brand-cyan-light: var(--brand-cyan-light);
+  --color-brand-cyan-dark: var(--brand-cyan-dark);
   --color-brand-purple: var(--brand-purple);
+  --color-brand-purple-light: var(--brand-purple-light);
+  --color-brand-purple-dark: var(--brand-purple-dark);
   --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-light: var(--brand-navy-light);
+  --color-brand-navy-dark: var(--brand-navy-dark);
+
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --color-info: var(--color-info);
+
+  --color-neutral-gray-50: var(--neutral-gray-50);
+  --color-neutral-gray-100: var(--neutral-gray-100);
+  --color-neutral-gray-200: var(--neutral-gray-200);
+  --color-neutral-gray-300: var(--neutral-gray-300);
+  --color-neutral-gray-400: var(--neutral-gray-400);
+  --color-neutral-gray-500: var(--neutral-gray-500);
+  --color-neutral-gray-600: var(--neutral-gray-600);
+  --color-neutral-gray-700: var(--neutral-gray-700);
+  --color-neutral-gray-800: var(--neutral-gray-800);
+  --color-neutral-gray-900: var(--neutral-gray-900);
+
+  --color-gray-50: var(--neutral-gray-50);
+  --color-gray-100: var(--neutral-gray-100);
+  --color-gray-200: var(--neutral-gray-200);
+  --color-gray-300: var(--neutral-gray-300);
+  --color-gray-400: var(--neutral-gray-400);
+  --color-gray-500: var(--neutral-gray-500);
+  --color-gray-600: var(--neutral-gray-600);
+  --color-gray-700: var(--neutral-gray-700);
+  --color-gray-800: var(--neutral-gray-800);
+  --color-gray-900: var(--neutral-gray-900);
+
+  --color-blue-50: color-mix(in oklab, var(--brand-cyan) 5%, transparent);
+  --color-blue-100: color-mix(in oklab, var(--brand-cyan) 15%, transparent);
+  --color-blue-200: color-mix(in oklab, var(--brand-cyan) 30%, transparent);
+  --color-blue-300: color-mix(in oklab, var(--brand-cyan) 45%, transparent);
+  --color-blue-400: color-mix(in oklab, var(--brand-cyan) 60%, transparent);
+  --color-blue-500: var(--color-info);
+  --color-blue-600: var(--brand-cyan-light);
+  --color-blue-700: var(--brand-cyan-light);
+  --color-blue-800: var(--brand-cyan-light);
+  --color-blue-900: var(--brand-cyan-light);
+
+  --color-cyan-50: color-mix(in oklab, var(--brand-cyan) 5%, transparent);
+  --color-cyan-100: color-mix(in oklab, var(--brand-cyan) 15%, transparent);
+  --color-cyan-200: color-mix(in oklab, var(--brand-cyan) 30%, transparent);
+  --color-cyan-300: color-mix(in oklab, var(--brand-cyan) 45%, transparent);
+  --color-cyan-400: color-mix(in oklab, var(--brand-cyan) 60%, transparent);
+  --color-cyan-500: var(--brand-cyan);
+  --color-cyan-600: var(--brand-cyan-light);
+  --color-cyan-700: var(--brand-cyan-light);
+  --color-cyan-800: var(--brand-cyan-light);
+  --color-cyan-900: var(--brand-cyan-light);
+
+  --color-indigo-50: color-mix(in oklab, var(--brand-purple) 5%, transparent);
+  --color-indigo-100: color-mix(in oklab, var(--brand-purple) 15%, transparent);
+  --color-indigo-200: color-mix(in oklab, var(--brand-purple) 30%, transparent);
+  --color-indigo-300: color-mix(in oklab, var(--brand-purple) 45%, transparent);
+  --color-indigo-400: color-mix(in oklab, var(--brand-purple) 60%, transparent);
+  --color-indigo-500: var(--brand-purple);
+  --color-indigo-600: var(--brand-purple-light);
+  --color-indigo-700: var(--brand-purple-light);
+  --color-indigo-800: var(--brand-purple-light);
+  --color-indigo-900: var(--brand-purple-light);
+
+  --color-purple-50: color-mix(in oklab, var(--brand-purple) 5%, transparent);
+  --color-purple-100: color-mix(in oklab, var(--brand-purple) 15%, transparent);
+  --color-purple-200: color-mix(in oklab, var(--brand-purple) 30%, transparent);
+  --color-purple-300: color-mix(in oklab, var(--brand-purple) 45%, transparent);
+  --color-purple-400: color-mix(in oklab, var(--brand-purple) 60%, transparent);
+  --color-purple-500: var(--brand-purple);
+  --color-purple-600: var(--brand-purple-light);
+  --color-purple-700: var(--brand-purple-light);
+  --color-purple-800: var(--brand-purple-light);
+  --color-purple-900: var(--brand-purple-light);
+
+  --color-pink-50: color-mix(in oklab, var(--brand-purple) 5%, transparent);
+  --color-pink-100: color-mix(in oklab, var(--brand-purple) 15%, transparent);
+  --color-pink-200: color-mix(in oklab, var(--brand-purple) 30%, transparent);
+  --color-pink-300: color-mix(in oklab, var(--brand-purple) 45%, transparent);
+  --color-pink-400: color-mix(in oklab, var(--brand-purple) 60%, transparent);
+  --color-pink-500: var(--brand-purple);
+  --color-pink-600: var(--brand-purple-light);
+  --color-pink-700: var(--brand-purple-light);
+  --color-pink-800: var(--brand-purple-light);
+  --color-pink-900: var(--brand-purple-light);
+
+  --color-green-50: color-mix(in oklab, var(--color-success) 5%, transparent);
+  --color-green-100: color-mix(in oklab, var(--color-success) 15%, transparent);
+  --color-green-200: color-mix(in oklab, var(--color-success) 30%, transparent);
+  --color-green-300: color-mix(in oklab, var(--color-success) 45%, transparent);
+  --color-green-400: color-mix(in oklab, var(--color-success) 60%, transparent);
+  --color-green-500: var(--color-success);
+  --color-green-600: var(--color-success);
+  --color-green-700: var(--color-success);
+  --color-green-800: var(--color-success);
+  --color-green-900: var(--color-success);
+
+  --color-teal-50: color-mix(in oklab, #14B8A6 5%, transparent);
+  --color-teal-100: color-mix(in oklab, #14B8A6 15%, transparent);
+  --color-teal-200: color-mix(in oklab, #14B8A6 30%, transparent);
+  --color-teal-300: color-mix(in oklab, #14B8A6 45%, transparent);
+  --color-teal-400: color-mix(in oklab, #14B8A6 60%, transparent);
+  --color-teal-500: #14B8A6;
+  --color-teal-600: #2DD4BF;
+  --color-teal-700: #2DD4BF;
+  --color-teal-800: #2DD4BF;
+  --color-teal-900: #2DD4BF;
+
+  --color-orange-50: color-mix(in oklab, #F59E0B 5%, transparent);
+  --color-orange-100: color-mix(in oklab, #F59E0B 15%, transparent);
+  --color-orange-200: color-mix(in oklab, #F59E0B 30%, transparent);
+  --color-orange-300: color-mix(in oklab, #F59E0B 45%, transparent);
+  --color-orange-400: color-mix(in oklab, #F59E0B 60%, transparent);
+  --color-orange-500: #F59E0B;
+  --color-orange-600: #FCD34D;
+  --color-orange-700: #FCD34D;
+  --color-orange-800: #FCD34D;
+  --color-orange-900: #FCD34D;
+
+  --color-yellow-50: color-mix(in oklab, #F59E0B 5%, transparent);
+  --color-yellow-100: color-mix(in oklab, #F59E0B 15%, transparent);
+  --color-yellow-200: color-mix(in oklab, #F59E0B 30%, transparent);
+  --color-yellow-300: color-mix(in oklab, #F59E0B 45%, transparent);
+  --color-yellow-400: color-mix(in oklab, #F59E0B 60%, transparent);
+  --color-yellow-500: #F59E0B;
+  --color-yellow-600: #FCD34D;
+  --color-yellow-700: #FCD34D;
+  --color-yellow-800: #FCD34D;
+  --color-yellow-900: #FCD34D;
+
+  --color-red-50: color-mix(in oklab, var(--color-error) 5%, transparent);
+  --color-red-100: color-mix(in oklab, var(--color-error) 15%, transparent);
+  --color-red-200: #FCA5A5;
+  --color-red-300: color-mix(in oklab, var(--color-error) 45%, transparent);
+  --color-red-400: color-mix(in oklab, var(--color-error) 60%, transparent);
+  --color-red-500: var(--color-error);
+  --color-red-600: var(--color-error);
+  --color-red-700: var(--color-error);
+  --color-red-800: var(--color-error);
+  --color-red-900: var(--color-error);
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-border: var(--border);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-full: var(--radius-full);
+
+  /* shadcn / Lovable theme tokens */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-atlas-void: var(--atlas-void);
+  --color-atlas-navy: var(--atlas-navy);
+  --color-atlas-navy-2: var(--atlas-navy-2);
+  --color-atlas-surface: var(--atlas-surface);
+  --color-atlas-cyan: var(--atlas-cyan);
+  --color-atlas-cyan-soft: var(--atlas-cyan-soft);
+  --color-atlas-violet: var(--atlas-violet);
+  --color-atlas-violet-soft: var(--atlas-violet-soft);
+  --color-atlas-hairline: var(--atlas-hairline);
+  --color-atlas-signal: var(--atlas-signal);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--brand-navy);
-    --foreground: #ededed;
-    --background-alt: var(--brand-navy-light);
-    --surface: var(--brand-navy-light);
-    --surface-alt: var(--brand-navy-dark);
-  }
-}
 
 body {
   background: var(--background);
@@ -113,6 +291,7 @@ body {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 /* Focus styles for accessibility */
@@ -178,6 +357,13 @@ html {
   background: linear-gradient(135deg, var(--brand-navy-light), var(--brand-navy));
 }
 
+.text-gradient {
+  background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Animation delays */
 .animate-delay-0 {
   animation-delay: 0ms;
@@ -189,4 +375,295 @@ html {
 
 .animate-delay-300 {
   animation-delay: 300ms;
+}
+
+/* Cinematic motion */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-scan {
+  animation: scan 3s linear infinite;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Cinematic data path animation */
+@keyframes data-flow {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-data-flow {
+  stroke-dasharray: 1000;
+  animation: data-flow 3s linear infinite;
+}
+
+/* Product interface depth */
+.atlas-interface {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.atlas-interface-elevated {
+  background: linear-gradient(135deg, var(--surface-alt) 0%, var(--brand-navy-dark) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 30px 60px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Cinematic lighting effects */
+.cinematic-glow-cyan {
+  box-shadow: 0 0 60px color-mix(in oklab, var(--brand-cyan) 30%, transparent), 0 0 120px color-mix(in oklab, var(--brand-cyan) 10%, transparent);
+}
+
+.cinematic-glow-purple {
+  box-shadow: 0 0 60px color-mix(in oklab, var(--brand-purple) 30%, transparent), 0 0 120px color-mix(in oklab, var(--brand-purple) 10%, transparent);
+}
+
+/* Dramatic text reveal */
+@keyframes text-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-text-reveal {
+  animation: text-reveal 1s ease-out forwards;
+}
+
+/* Utility for subtle glassy panels */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Lovable design tokens & utilities */
+:root {
+  --radius: 0.75rem;
+
+  /* Atlas cinematic palette */
+  --atlas-void: oklch(0.12 0.03 265);
+  --atlas-navy: oklch(0.16 0.045 265);
+  --atlas-navy-2: oklch(0.20 0.05 265);
+  --atlas-surface: oklch(0.22 0.055 265);
+  --atlas-hairline: oklch(1 0 0 / 0.08);
+  --atlas-cyan: oklch(0.82 0.16 210);
+  --atlas-cyan-soft: oklch(0.72 0.14 215);
+  --atlas-violet: oklch(0.68 0.20 295);
+  --atlas-violet-soft: oklch(0.62 0.16 295);
+  --atlas-signal: oklch(0.80 0.18 155);
+
+  /* Shadcn tokens mapped to Atlas dark theme */
+  --background: var(--atlas-void);
+  --foreground: oklch(0.97 0.008 250);
+  --card: var(--atlas-navy);
+  --card-foreground: oklch(0.97 0.008 250);
+  --popover: var(--atlas-navy);
+  --popover-foreground: oklch(0.97 0.008 250);
+  --primary: var(--atlas-cyan);
+  --primary-foreground: oklch(0.14 0.03 265);
+  --secondary: var(--atlas-navy-2);
+  --secondary-foreground: oklch(0.97 0.008 250);
+  --muted: var(--atlas-navy-2);
+  --muted-foreground: oklch(0.68 0.03 250);
+  --accent: var(--atlas-violet);
+  --accent-foreground: oklch(0.97 0.008 250);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.97 0 0);
+  --border: var(--atlas-hairline);
+  --input: oklch(1 0 0 / 0.10);
+  --ring: var(--atlas-cyan);
+
+  /* Atlas brand token mapping */
+  --brand-cyan: var(--atlas-cyan);
+  --brand-cyan-light: var(--atlas-cyan-soft);
+  --brand-cyan-dark: color-mix(in oklab, var(--atlas-cyan), black 25%);
+  --brand-purple: var(--atlas-violet);
+  --brand-purple-light: var(--atlas-violet-soft);
+  --brand-purple-dark: color-mix(in oklab, var(--atlas-violet), black 25%);
+  --brand-navy: var(--atlas-void);
+  --brand-navy-light: var(--atlas-navy-2);
+  --brand-navy-dark: var(--atlas-void);
+  --surface: var(--atlas-navy-2);
+  --surface-alt: var(--atlas-navy);
+}
+
+@utility text-gradient-atlas {
+  background-image: linear-gradient(100deg, var(--atlas-cyan) 0%, oklch(0.90 0.08 240) 45%, var(--atlas-violet) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility bg-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in oklab, var(--atlas-cyan) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, color-mix(in oklab, var(--atlas-violet) 12%, transparent) 0%, transparent 55%),
+    var(--atlas-void);
+}
+
+@utility bg-grid-atlas {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--atlas-cyan) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--atlas-cyan) 6%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility glow-cyan {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--atlas-cyan) 25%, transparent),
+    0 20px 80px -20px color-mix(in oklab, var(--atlas-cyan) 40%, transparent),
+    0 0 120px -30px color-mix(in oklab, var(--atlas-violet) 30%, transparent);
+}
+
+@utility glow-violet {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--atlas-violet) 25%, transparent),
+    0 20px 80px -20px color-mix(in oklab, var(--atlas-violet) 40%, transparent);
+}
+
+@utility hairline {
+  border: 1px solid var(--atlas-hairline);
+}
+
+@utility panel-atlas {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--atlas-navy) 90%, transparent) 0%, color-mix(in oklab, var(--atlas-void) 92%, transparent) 100%);
+  border: 1px solid var(--atlas-hairline);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+@utility mask-fade-b {
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+@utility animate-drift {
+  animation: atlas-drift 8s ease-in-out infinite;
+}
+
+@utility animate-pulse-glow {
+  animation: atlas-pulse 3.5s ease-in-out infinite;
+}
+
+@utility animate-scan {
+  animation: atlas-scan 3s ease-in-out infinite;
+}
+
+@utility animate-reveal {
+  animation: atlas-reveal 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes atlas-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+@keyframes atlas-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes atlas-scan {
+  0% { transform: translateY(-100%); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(200%); opacity: 0; }
+}
+
+@keyframes atlas-flow {
+  0% { stroke-dashoffset: 200; opacity: 0; }
+  20% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.3; }
+}
+
+@keyframes atlas-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes atlas-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--atlas-void);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: color-mix(in oklab, var(--atlas-cyan) 40%, transparent); color: white; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift, .animate-pulse-glow, .animate-scan, .animate-reveal {
+    animation: none !important;
+  }
 }

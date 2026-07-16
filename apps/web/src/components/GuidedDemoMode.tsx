@@ -122,7 +122,7 @@ export default function GuidedDemoMode() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+        <div className="mb-4 p-3 bg-red-50 border border-[var(--color-error)]/30 rounded-lg text-[var(--color-error)] text-sm">
           {error}
         </div>
       )}
@@ -141,11 +141,7 @@ export default function GuidedDemoMode() {
                   <h3 className="font-semibold text-[var(--foreground)] group-hover:text-[var(--brand-cyan)] transition-colors">
                     {scenario.title}
                   </h3>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    scenario.workflow === 'A' 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-purple-100 text-purple-800'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${ scenario.workflow === 'A' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }`}>
                     Workflow {scenario.workflow}
                   </span>
                 </div>
@@ -173,13 +169,13 @@ export default function GuidedDemoMode() {
         <h4 className="text-sm font-medium text-[var(--foreground)] mb-2">Workflow Types</h4>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 bg-blue-100 rounded-full"></span>
+            <span className="w-3 h-3 bg-[var(--color-info)]/10 rounded-full"></span>
             <span className="text-[var(--neutral-gray-600)]">
               <strong>Workflow A:</strong> Insurance claim already exists
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 bg-purple-100 rounded-full"></span>
+            <span className="w-3 h-3 bg-[var(--brand-purple)]/10 rounded-full"></span>
             <span className="text-[var(--neutral-gray-600)]">
               <strong>Workflow B:</strong> Contractor finds damage first
             </span>

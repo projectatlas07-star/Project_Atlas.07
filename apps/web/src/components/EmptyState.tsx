@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import { Button } from '@project-atlas/ui';
+import { Inbox } from 'lucide-react';
 
 interface EmptyStateProps {
-  icon?: string;
+  icon?: React.ReactNode;
   title: string;
   description: string;
   action?: {
@@ -18,7 +18,7 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({
-  icon = '📭',
+  icon = <Inbox className="h-12 w-12" />,
   title,
   description,
   action,
@@ -36,8 +36,8 @@ export default function EmptyState({
 
       {/* Content */}
       <div className="text-center max-w-md space-y-4">
-        <h3 className="text-xl font-semibold text-[var(--foreground)]">{title}</h3>
-        <p className="text-[var(--neutral-gray-500)]">{description}</p>
+        <h3 className="text-xl font-semibold text-foreground">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
 
         {/* Actions */}
         {(action || secondaryAction) && (
@@ -45,7 +45,7 @@ export default function EmptyState({
             {action && (
               <Button
                 onClick={action.onClick}
-                className="bg-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-light)] text-[var(--brand-navy)] font-medium"
+                variant="primary"
               >
                 {action.label}
               </Button>
@@ -53,7 +53,7 @@ export default function EmptyState({
             {secondaryAction && (
               <Button
                 onClick={secondaryAction.onClick}
-                className="border border-[var(--brand-purple)] text-[var(--brand-purple)] hover:bg-[var(--brand-purple)]/10 bg-transparent"
+                variant="outline"
               >
                 {secondaryAction.label}
               </Button>

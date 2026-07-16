@@ -50,17 +50,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--brand-navy)] via-[var(--brand-navy-light)] to-[var(--brand-purple)] p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:40px_40px]" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-atmosphere">
 
       <div className="relative w-full max-w-md">
         {/* Glassmorphism Card */}
         <form
           onSubmit={handleLogin}
-          className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl space-y-6"
+          className="panel-atlas rounded-2xl p-8 shadow-2xl space-y-6"
         >
           {/* Full Logo */}
           <div className="flex justify-center mb-6">
@@ -77,51 +73,51 @@ export default function LoginPage() {
 
           {/* Welcome Message */}
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold text-white">Welcome to Project Atlas</h1>
-            <p className="text-[var(--brand-cyan-light)] text-sm">AI Operating System for Insurance Restoration</p>
+            <h1 className="text-2xl font-bold text-gradient-atlas">Welcome to Project Atlas</h1>
+            <p className="text-[var(--atlas-cyan-soft)] text-sm">AI Operating System for Insurance Restoration</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3">
-              <p className="text-sm text-red-200 text-center">{error}</p>
+            <div className="bg-destructive/20 border border-destructive/50 rounded-lg p-3">
+              <p className="text-sm text-destructive text-center">{error}</p>
             </div>
           )}
 
           {/* Form Fields */}
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block mb-2 text-sm font-medium text-white">Email</label>
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-[var(--foreground)]">Email</label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-white/10 border-white/20 text-white placeholder-white/50"
+                className="w-full"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">Password</label>
+              <label htmlFor="password" className="block mb-2 text-sm font-medium text-[var(--foreground)]">Password</label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-white/10 border-white/20 text-white placeholder-white/50"
+                className="w-full"
               />
             </div>
           </div>
 
           {/* Remember Me & Forgot Password */}
           <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center space-x-2 text-white/80 cursor-pointer">
+            <label className="flex items-center space-x-2 text-[var(--foreground)]/80 cursor-pointer">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="rounded border-white/20 bg-white/10 text-[var(--brand-cyan)] focus:ring-[var(--brand-cyan)]"
+                className="rounded border-white/20 bg-white/10 text-[var(--primary)] focus:ring-[var(--primary)]"
               />
               <span>Remember me</span>
             </label>
@@ -137,24 +133,25 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-light)] text-[var(--brand-navy)] font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+            variant="primary" size="lg" className="w-full"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
 
           {/* Magic Link */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={handleMagicLink}
             disabled={loading}
-            className="w-full text-sm text-white/70 hover:text-white transition-colors"
+            className="w-full text-sm"
           >
             Or sign in with magic link
-          </button>
+          </Button>
 
           {/* Sign Up Link */}
           <p className="text-center text-sm text-white/70">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{''}
             <a href="/auth/signup" className="text-[var(--brand-cyan)] hover:text-[var(--brand-cyan-light)] transition-colors font-medium">
               Sign Up
             </a>

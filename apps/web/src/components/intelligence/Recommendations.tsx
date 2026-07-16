@@ -58,7 +58,7 @@ export default function Recommendations() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'border-red-500 bg-red-50';
+      case 'high': return 'border-[var(--color-error)] bg-red-50';
       case 'medium': return 'border-yellow-500 bg-yellow-50';
       default: return 'border-blue-500 bg-blue-50';
     }
@@ -98,11 +98,7 @@ export default function Recommendations() {
           <button
             key={priority}
             onClick={() => setFilter(priority)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === priority
-                ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)]'
-                : 'bg-[var(--background-alt)] text-[var(--foreground)] hover:bg-[var(--neutral-gray-100)]'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${ filter === priority ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)]' : 'bg-[var(--background-alt)] text-[var(--foreground)] hover:bg-[var(--neutral-gray-100)]' }`}
           >
             {priority === 'all' ? 'All' : priority.charAt(0).toUpperCase() + priority.slice(1)}
           </button>

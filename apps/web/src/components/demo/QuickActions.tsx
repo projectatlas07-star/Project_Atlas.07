@@ -98,14 +98,14 @@ export default function QuickActions() {
       icon: '🔄',
       onClick: resetDemoData,
       disabled: !status?.hasData || loading,
-      color: 'bg-[var(--brand-purple)] hover:bg-[var(--brand-purple-light)] text-white'
+      color: 'bg-[var(--brand-purple)] hover:bg-[var(--brand-purple-light)] text-[var(--foreground)]'
     },
     {
       label: 'Clear Demo',
       icon: '🗑️',
       onClick: clearDemoData,
       disabled: !status?.hasData || loading,
-      color: 'bg-red-500 hover:bg-red-600 text-white'
+      color: 'bg-[var(--color-error)] hover:bg-red-600 text-[var(--foreground)]'
     },
     {
       label: 'Toggle Demo Mode',
@@ -113,8 +113,8 @@ export default function QuickActions() {
       onClick: toggleDemoMode,
       disabled: loading,
       color: status?.enabled 
-        ? 'bg-gray-500 hover:bg-gray-600 text-white'
-        : 'bg-green-500 hover:bg-green-600 text-white'
+        ? 'bg-[var(--neutral-gray-500)] hover:bg-gray-600 text-[var(--foreground)]'
+        : 'bg-[var(--color-success)] hover:bg-green-600 text-[var(--foreground)]'
     },
     {
       label: 'Open Dashboard',
@@ -162,11 +162,7 @@ export default function QuickActions() {
             key={index}
             onClick={action.onClick}
             disabled={action.disabled}
-            className={`flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-200 ${
-              action.disabled
-                ? 'opacity-50 cursor-not-allowed bg-[var(--neutral-gray-100)]'
-                : action.color
-            }`}
+            className={`flex flex-col items-center justify-center p-4 rounded-lg transition-all duration-200 ${ action.disabled ? 'opacity-50 cursor-not-allowed bg-[var(--neutral-gray-100)]' : action.color }`}
           >
             <span className="text-2xl mb-2">{action.icon}</span>
             <span className="text-sm font-medium text-center">{action.label}</span>

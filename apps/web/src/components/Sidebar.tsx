@@ -1,33 +1,53 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
+import {
+  LayoutDashboard,
+  Brain,
+  FileText,
+  MessageSquare,
+  DollarSign,
+  FolderOpen,
+  HardHat,
+  Building,
+  Home,
+  Users,
+  FileEdit,
+  UserCog,
+  Settings,
+  BarChart3,
+  HeartPulse,
+  ChevronLeft,
+  ChevronRight,
+  Target,
+} from 'lucide-react';
 
 interface NavItem {
   href: string;
   label: string;
-  icon: string;
+  icon: ReactNode;
 }
 
 const navItems: NavItem[] = [
-  { href: '/admin', label: 'Dashboard', icon: '📊' },
-  { href: '/admin/intelligence', label: 'Intelligence', icon: '🧠' },
-  { href: '/admin/claims', label: 'Claims', icon: '📋' },
-  { href: '/admin/interviews', label: 'Interviews', icon: '💬' },
-  { href: '/admin/supplements', label: 'Supplements', icon: '💰' },
-  { href: '/admin/documents', label: 'Documents', icon: '📁' },
-  { href: '/admin/adjusters', label: 'Adjusters', icon: '👷' },
-  { href: '/admin/companies', label: 'Companies', icon: '🏢' },
-  { href: '/admin/properties', label: 'Properties', icon: '🏠' },
-  { href: '/admin/contacts', label: 'Contacts', icon: '👥' },
-  { href: '/admin/notes', label: 'Notes', icon: '📝' },
-  { href: '/admin/users', label: 'Users', icon: '👤' },
-  { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
-  { href: '/admin/activity', label: 'Activity', icon: '📈' },
-  { href: '/admin/system-health', label: 'System Health', icon: '🏥' },
+  { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+  { href: '/admin/intelligence', label: 'Intelligence', icon: <Brain className="h-4 w-4" /> },
+  { href: '/admin/claims', label: 'Claims', icon: <FileText className="h-4 w-4" /> },
+  { href: '/admin/interviews', label: 'Interviews', icon: <MessageSquare className="h-4 w-4" /> },
+  { href: '/admin/supplements', label: 'Supplements', icon: <DollarSign className="h-4 w-4" /> },
+  { href: '/admin/documents', label: 'Documents', icon: <FolderOpen className="h-4 w-4" /> },
+  { href: '/admin/adjusters', label: 'Adjusters', icon: <HardHat className="h-4 w-4" /> },
+  { href: '/admin/companies', label: 'Companies', icon: <Building className="h-4 w-4" /> },
+  { href: '/admin/properties', label: 'Properties', icon: <Home className="h-4 w-4" /> },
+  { href: '/admin/contacts', label: 'Contacts', icon: <Users className="h-4 w-4" /> },
+  { href: '/admin/notes', label: 'Notes', icon: <FileEdit className="h-4 w-4" /> },
+  { href: '/admin/users', label: 'Users', icon: <UserCog className="h-4 w-4" /> },
+  { href: '/admin/settings', label: 'Settings', icon: <Settings className="h-4 w-4" /> },
+  { href: '/admin/activity', label: 'Activity', icon: <BarChart3 className="h-4 w-4" /> },
+  { href: '/admin/system-health', label: 'System Health', icon: <HeartPulse className="h-4 w-4" /> },
 ];
 
 interface SidebarProps {
@@ -88,12 +108,10 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
       )}
 
       <aside
-        className={`fixed left-0 top-0 h-full bg-[var(--brand-navy)] border-r border-white/10 transition-all duration-300 z-50 ${
-          collapsed ? 'w-16' : 'w-64'
-        } ${isMobile && !mobileOpen ? '-translate-x-full' : ''}`}
+        className={`fixed left-0 top-0 h-full bg-surface border-r border-[var(--border)] text-foreground transition-all duration-300 z-50 ${collapsed ? 'w-16' : 'w-64'} ${isMobile && !mobileOpen ? '-translate-x-full' : ''}`}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
           {!collapsed && (
             <div className="relative w-40 h-12">
               <Image
@@ -119,10 +137,10 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
               setCollapsed(!collapsed);
               if (isMobile && onMobileClose) onMobileClose();
             }}
-            className="p-1 rounded hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+            className="p-1 rounded hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {collapsed ? '→' : '←'}
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
         </div>
 
@@ -135,14 +153,10 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
                 key={item.href}
                 href={item.href}
                 onClick={() => isMobile && onMobileClose && onMobileClose()}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)] font-medium'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${isActive ? 'bg-primary text-primary-foreground font-medium' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}`}
                 title={collapsed ? item.label : undefined}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span className="h-4 w-4 flex items-center justify-center">{item.icon}</span>
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             );
@@ -151,12 +165,12 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
 
         {/* Demo Badge */}
         {demoStatus?.enabled && !collapsed && (
-          <div className="mx-2 p-3 bg-gradient-to-r from-[var(--brand-cyan)] to-[var(--brand-purple)] rounded-lg">
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="text-lg">🎯</span>
-              <span className="text-white font-semibold text-sm">Demo Mode Active</span>
+          <div className="mx-2 p-3 rounded-lg bg-gradient-to-r from-primary to-accent">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="h-4 w-4" />
+              <span className="text-foreground font-semibold text-sm">Demo Mode Active</span>
             </div>
-            <div className="space-y-1 text-xs text-white/80">
+            <div className="space-y-1 text-xs text-foreground/80">
               <div className="flex justify-between">
                 <span>Seed:</span>
                 <span className="font-mono">42</span>
@@ -176,10 +190,10 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
               setCollapsed(!collapsed);
               if (isMobile && onMobileClose) onMobileClose();
             }}
-            className="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            <span>{collapsed ? '→' : '←'}</span>
+            <span>{collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}</span>
             {!collapsed && <span>Collapse</span>}
           </button>
         </div>

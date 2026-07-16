@@ -3,15 +3,15 @@
 /* Project Atlas Brand Design Tokens - Exact values from apps/web */
 :root {
   /* Brand Colors */
-  --brand-cyan: #00D4FF;
+  --brand-cyan: #006EFF;
   --brand-cyan-light: #5CE1FF;
-  --brand-cyan-dark: #00A8CC;
-  --brand-purple: #7C3AED;
-  --brand-purple-light: #A78BFA;
-  --brand-purple-dark: #5B21B6;
-  --brand-navy: #0A1628;
-  --brand-navy-light: #1A2D4A;
-  --brand-navy-dark: #050D1A;
+  --brand-cyan-dark: #0050CC;
+  --brand-purple: #AB55F7;
+  --brand-purple-light: #C98AFF;
+  --brand-purple-dark: #7A2BC4;
+  --brand-navy: #0B1220;
+  --brand-navy-light: #0F172A;
+  --brand-navy-dark: #050A12;
   
   /* Neutral Colors */
   --neutral-gray-50: #F9FAFB;
@@ -26,7 +26,7 @@
   --neutral-gray-900: #111827;
   
   /* Semantic Colors */
-  --color-success: #10B981;
+  --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
   --color-info: #3B82F6;
@@ -64,7 +64,7 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-brand: 0 4px 20px rgba(0, 212, 255, 0.15);
+  --shadow-brand: 0 4px 20px color-mix(in oklab, var(--brand-cyan) 15%, transparent);
   
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
@@ -261,11 +261,11 @@ html {
 
 /* Cinematic lighting effects */
 .cinematic-glow-cyan {
-  box-shadow: 0 0 60px rgba(0, 212, 255, 0.3), 0 0 120px rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 60px color-mix(in oklab, var(--brand-cyan) 30%, transparent), 0 0 120px color-mix(in oklab, var(--brand-cyan) 10%, transparent);
 }
 
 .cinematic-glow-purple {
-  box-shadow: 0 0 60px rgba(124, 58, 237, 0.3), 0 0 120px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 60px color-mix(in oklab, var(--brand-purple) 30%, transparent), 0 0 120px color-mix(in oklab, var(--brand-purple) 10%, transparent);
 }
 
 /* Dramatic text reveal */

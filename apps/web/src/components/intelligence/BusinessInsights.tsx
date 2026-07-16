@@ -58,17 +58,17 @@ export default function BusinessInsights() {
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
-      case 'up': return 'text-green-600';
-      case 'down': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'up': return 'text-[var(--color-success)]';
+      case 'down': return 'text-[var(--color-error)]';
+      default: return 'text-[var(--neutral-gray-600)]';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high': return 'bg-[var(--color-error)]/10 text-[var(--color-error)]';
+      case 'medium': return 'bg-[var(--color-warning)]/10 text-[var(--color-warning)]';
+      default: return 'bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-800)]';
     }
   };
 
@@ -98,11 +98,7 @@ export default function BusinessInsights() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              selectedCategory === category.id
-                ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)]'
-                : 'bg-[var(--background-alt)] text-[var(--foreground)] hover:bg-[var(--neutral-gray-100)]'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${ selectedCategory === category.id ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)]' : 'bg-[var(--background-alt)] text-[var(--foreground)] hover:bg-[var(--neutral-gray-100)]' }`}
           >
             {category.label}
           </button>

@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { apiFetch } from '@/lib/api';
-import { useSupabase } from '@/providers/SupabaseProvider';
-import { useRouter } from 'next/navigation';
-import { STATUS_LABELS, STATUS_COLORS, ClaimStatus } from '@/lib/claims-workflow';
+import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
+import { useSupabase } from "@/providers/SupabaseProvider";
+import { useRouter } from "next/navigation";
+import {
+  STATUS_LABELS,
+  STATUS_COLORS,
+  ClaimStatus,
+} from "@/lib/claims-workflow";
 
 interface Claim {
   id: string;
@@ -46,22 +50,22 @@ export default function ClaimsPage() {
   const [adjusters, setAdjusters] = useState<Adjuster[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    claimNumber: '',
-    status: 'new',
-    dateOfLoss: '',
-    insuranceCompany: '',
-    customerName: '',
-    customerEmail: '',
-    customerPhone: '',
-    description: '',
-    adjusterId: '',
+    claimNumber: "",
+    status: "new",
+    dateOfLoss: "",
+    insuranceCompany: "",
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    description: "",
+    adjusterId: "",
   });
-  const [status, setStatus] = useState('');
-  
+  const [status, setStatus] = useState("");
+
   // Filters
-  const [statusFilter, setStatusFilter] = useState('');
-  const [adjusterFilter, setAdjusterFilter] = useState('');
-  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
+  const [adjusterFilter, setAdjusterFilter] = useState("");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -72,7 +76,7 @@ export default function ClaimsPage() {
 
   useEffect(() => {
     if (!session) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
     loadClaims();
@@ -82,13 +86,15 @@ export default function ClaimsPage() {
   const loadClaims = async () => {
     try {
       const params = new URLSearchParams();
-      if (statusFilter) params.append('status', statusFilter);
-      if (adjusterFilter) params.append('adjusterId', adjusterFilter);
-      if (search) params.append('search', search);
-      params.append('page', page.toString());
-      params.append('limit', '20');
+      if (statusFilter) params.append("status", statusFilter);
+      if (adjusterFilter) params.append("adjusterId", adjusterFilter);
+      if (search) params.append("search", search);
+      params.append("page", page.toString());
+      params.append("limit", "20");
 
-      const data = await apiFetch<ClaimsResponse>(`/claims?${params.toString()}`);
+      const data = await apiFetch<ClaimsResponse>(
+        `/claims?${params.toString()}`,
+      );
       setClaims(data.data);
       setPagination(data.pagination);
     } catch (e: any) {
@@ -98,10 +104,10 @@ export default function ClaimsPage() {
 
   const loadAdjusters = async () => {
     try {
-      const data = await apiFetch<Adjuster[]>('/adjusters');
+      const data = await apiFetch<Adjuster[]>("/adjusters");
       setAdjusters(data);
     } catch (e: any) {
-      console.error('Error loading adjusters:', e);
+      console.error("Error loading adjusters:", e);
     }
   };
 
@@ -112,22 +118,22 @@ export default function ClaimsPage() {
         ...formData,
         adjusterId: formData.adjusterId || null,
       };
-      await apiFetch<Claim>('/claims', {
-        method: 'POST',
+      await apiFetch<Claim>("/claims", {
+        method: "POST",
         body: JSON.stringify(payload),
       });
-      setStatus('Claim created');
+      setStatus("Claim created");
       setShowForm(false);
-      setFormData({ 
-        claimNumber: '', 
-        status: 'new', 
-        dateOfLoss: '', 
-        insuranceCompany: '',
-        customerName: '',
-        customerEmail: '',
-        customerPhone: '',
-        description: '', 
-        adjusterId: '' 
+      setFormData({
+        claimNumber: "",
+        status: "new",
+        dateOfLoss: "",
+        insuranceCompany: "",
+        customerName: "",
+        customerEmail: "",
+        customerPhone: "",
+        description: "",
+        adjusterId: "",
       });
       loadClaims();
     } catch (e: any) {
@@ -138,10 +144,10 @@ export default function ClaimsPage() {
   const handleAssignAdjuster = async (claimId: string, adjusterId: string) => {
     try {
       await apiFetch(`/claims/${claimId}`, {
-        method: 'PUT',
+        method: "PUT",
         body: JSON.stringify({ adjusterId: adjusterId || null }),
       });
-      setStatus('Adjuster assigned');
+      setStatus("Adjuster assigned");
       loadClaims();
     } catch (e: any) {
       setStatus(`Error: ${e.message}`);
@@ -149,10 +155,10 @@ export default function ClaimsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this claim?')) return;
+    if (!confirm("Are you sure you want to delete this claim?")) return;
     try {
-      await apiFetch(`/claims/${id}`, { method: 'DELETE' });
-      setStatus('Claim deleted');
+      await apiFetch(`/claims/${id}`, { method: "DELETE" });
+      setStatus("Claim deleted");
       loadClaims();
     } catch (e: any) {
       setStatus(`Error: ${e.message}`);
@@ -160,9 +166,9 @@ export default function ClaimsPage() {
   };
 
   const clearFilters = () => {
-    setStatusFilter('');
-    setAdjusterFilter('');
-    setSearch('');
+    setStatusFilter("");
+    setAdjusterFilter("");
+    setSearch("");
     setPage(1);
   };
 
@@ -172,22 +178,27 @@ export default function ClaimsPage() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[var(--foreground)]">Claims</h1>
+        <h1 className="text-2xl font-bold text-foreground">Claims</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-light)] text-[var(--brand-navy)] rounded-lg font-medium transition-colors"
+          className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors"
         >
-          {showForm ? 'Cancel' : 'Add Claim'}
+          {showForm ? "Cancel" : "Add Claim"}
         </button>
       </div>
 
-      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
+      {status && <p className="mb-4 text-sm text-muted-foreground">{status}</p>}
 
       {/* Filters */}
-      <div className="mb-6 bg-[var(--surface)] p-4 rounded-xl shadow-lg border border-[var(--neutral-gray-200)]">
+      <div className="mb-6 bg-surface p-4 rounded-xl shadow-lg border">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label htmlFor="statusFilter" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Status</label>
+            <label
+              htmlFor="statusFilter"
+              className="block mb-1 text-sm font-medium text-foreground"
+            >
+              Status
+            </label>
             <select
               id="statusFilter"
               value={statusFilter}
@@ -195,16 +206,23 @@ export default function ClaimsPage() {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+              className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
             >
               <option value="">All Statuses</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
+                <option key={value} value={value}>
+                  {label}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="adjusterFilter" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Adjuster</label>
+            <label
+              htmlFor="adjusterFilter"
+              className="block mb-1 text-sm font-medium text-foreground"
+            >
+              Adjuster
+            </label>
             <select
               id="adjusterFilter"
               value={adjusterFilter}
@@ -212,16 +230,23 @@ export default function ClaimsPage() {
                 setAdjusterFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+              className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
             >
               <option value="">All Adjusters</option>
               {adjusters.map((adjuster) => (
-                <option key={adjuster.id} value={adjuster.id}>{adjuster.fullName}</option>
+                <option key={adjuster.id} value={adjuster.id}>
+                  {adjuster.fullName}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="search" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Search</label>
+            <label
+              htmlFor="search"
+              className="block mb-1 text-sm font-medium text-foreground"
+            >
+              Search
+            </label>
             <input
               id="search"
               type="text"
@@ -231,13 +256,13 @@ export default function ClaimsPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] placeholder-[var(--neutral-gray-400)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+              className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
             />
           </div>
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="w-full px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded-lg hover:bg-[var(--neutral-gray-300)] transition-colors"
+              className="w-full px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-accent transition-colors"
             >
               Clear Filters
             </button>
@@ -246,90 +271,153 @@ export default function ClaimsPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-[var(--surface)] p-6 rounded-xl shadow-lg border border-[var(--neutral-gray-200)]">
-          <h3 className="text-lg font-semibold mb-4 text-[var(--foreground)]">Create New Claim</h3>
+        <form
+          onSubmit={handleSubmit}
+          className="mb-6 bg-surface p-6 rounded-xl shadow-lg border"
+        >
+          <h3 className="text-lg font-semibold mb-4 text-foreground">
+            Create New Claim
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="claimNumber" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Claim Number</label>
+              <label
+                htmlFor="claimNumber"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Claim Number
+              </label>
               <input
                 id="claimNumber"
                 type="text"
                 value={formData.claimNumber}
-                onChange={(e) => setFormData({ ...formData, claimNumber: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, claimNumber: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                 required
               />
             </div>
             <div>
-              <label htmlFor="status" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Status</label>
+              <label
+                htmlFor="status"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Status
+              </label>
               <select
                 id="status"
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               >
                 {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label htmlFor="dateOfLoss" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Date of Loss</label>
+              <label
+                htmlFor="dateOfLoss"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Date of Loss
+              </label>
               <input
                 id="dateOfLoss"
                 type="date"
                 value={formData.dateOfLoss}
-                onChange={(e) => setFormData({ ...formData, dateOfLoss: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, dateOfLoss: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               />
             </div>
             <div>
-              <label htmlFor="insuranceCompany" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Insurance Company</label>
+              <label
+                htmlFor="insuranceCompany"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Insurance Company
+              </label>
               <input
                 id="insuranceCompany"
                 type="text"
                 value={formData.insuranceCompany}
-                onChange={(e) => setFormData({ ...formData, insuranceCompany: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, insuranceCompany: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               />
             </div>
             <div>
-              <label htmlFor="customerName" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Customer Name</label>
+              <label
+                htmlFor="customerName"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Customer Name
+              </label>
               <input
                 id="customerName"
                 type="text"
                 value={formData.customerName}
-                onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, customerName: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               />
             </div>
             <div>
-              <label htmlFor="customerEmail" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Customer Email</label>
+              <label
+                htmlFor="customerEmail"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Customer Email
+              </label>
               <input
                 id="customerEmail"
                 type="email"
                 value={formData.customerEmail}
-                onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, customerEmail: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               />
             </div>
             <div>
-              <label htmlFor="customerPhone" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Customer Phone</label>
+              <label
+                htmlFor="customerPhone"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Customer Phone
+              </label>
               <input
                 id="customerPhone"
                 type="text"
                 value={formData.customerPhone}
-                onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, customerPhone: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               />
             </div>
             <div>
-              <label htmlFor="adjuster" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Assign Adjuster</label>
+              <label
+                htmlFor="adjuster"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Assign Adjuster
+              </label>
               <select
                 id="adjuster"
                 value={formData.adjusterId}
-                onChange={(e) => setFormData({ ...formData, adjusterId: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, adjusterId: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               >
                 <option value="">No adjuster assigned</option>
                 {adjusters.map((adjuster) => (
@@ -340,58 +428,90 @@ export default function ClaimsPage() {
               </select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="description" className="block mb-1 text-sm font-medium text-[var(--foreground)]">Description</label>
+              <label
+                htmlFor="description"
+                className="block mb-1 text-sm font-medium text-foreground"
+              >
+                Description
+              </label>
               <textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full p-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                className="w-full p-2 bg-muted dark:bg-card border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                 rows={3}
               />
             </div>
           </div>
           <button
             type="submit"
-            className="mt-4 px-4 py-2 bg-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-light)] text-[var(--brand-navy)] rounded-lg font-medium transition-colors"
+            className="mt-4 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors"
           >
             Save Claim
           </button>
         </form>
       )}
 
-      <div className="bg-[var(--surface)] rounded-xl shadow-lg overflow-hidden border border-[var(--neutral-gray-200)]">
-        <table className="min-w-full divide-y divide-[var(--neutral-gray-200)]">
-          <thead className="bg-[var(--background-alt)]">
+      <div className="bg-surface rounded-xl shadow-lg overflow-hidden border">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Claim #</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Insurance</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Adjuster</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Date of Loss</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Claim #
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Customer
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Insurance
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Adjuster
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Date of Loss
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody className="bg-[var(--surface)] divide-y divide-[var(--neutral-gray-200)]">
+          <tbody className="bg-surface divide-y divide-border">
             {claims.map((claim) => (
-              <tr key={claim.id} className="hover:bg-[var(--background-alt)] transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
-                  <a href={`/admin/claims/${claim.id}`} className="text-[var(--brand-cyan)] hover:text-[var(--brand-cyan-light)] font-medium transition-colors">
+              <tr key={claim.id} className="hover:bg-muted transition-colors">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                  <a
+                    href={`/admin/claims/${claim.id}`}
+                    className="text-primary hover:text-primary/90 font-medium transition-colors"
+                  >
                     {claim.claimNumber}
                   </a>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
-                  <span className={`px-2 py-1 rounded text-xs ${STATUS_COLORS[claim.status]}`}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${STATUS_COLORS[claim.status]}`}
+                  >
                     {STATUS_LABELS[claim.status]}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{claim.customerName || '-'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{claim.insuranceCompany || '-'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                  {claim.customerName || "-"}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                  {claim.insuranceCompany || "-"}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   <select
-                    value={claim.adjusterId || ''}
-                    onChange={(e) => handleAssignAdjuster(claim.id, e.target.value)}
-                    className="p-1 border border-[var(--neutral-gray-300)] rounded text-sm bg-[var(--background)] text-[var(--foreground)] focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-transparent"
+                    value={claim.adjusterId || ""}
+                    onChange={(e) =>
+                      handleAssignAdjuster(claim.id, e.target.value)
+                    }
+                    className="p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                     aria-label="Assign adjuster"
                   >
                     <option value="">Unassigned</option>
@@ -402,13 +522,15 @@ export default function ClaimsPage() {
                     ))}
                   </select>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
-                  {claim.dateOfLoss ? new Date(claim.dateOfLoss).toLocaleDateString() : '-'}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                  {claim.dateOfLoss
+                    ? new Date(claim.dateOfLoss).toLocaleDateString()
+                    : "-"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleDelete(claim.id)}
-                    className="text-[var(--color-error)] hover:text-red-700 transition-colors"
+                    className="text-destructive hover:text-destructive-foreground transition-colors"
                   >
                     Delete
                   </button>
@@ -417,7 +539,10 @@ export default function ClaimsPage() {
             ))}
             {claims.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-4 text-center text-sm text-[var(--neutral-gray-500)]">
+                <td
+                  colSpan={7}
+                  className="px-6 py-4 text-center text-sm text-muted-foreground"
+                >
                   No claims found
                 </td>
               </tr>
@@ -432,17 +557,17 @@ export default function ClaimsPage() {
           <button
             onClick={() => setPage(Math.max(1, page - 1))}
             disabled={page === 1}
-            className="px-4 py-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--background-alt)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 border rounded-lg bg-surface text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Previous
           </button>
-          <span className="px-4 py-2 text-[var(--foreground)]">
+          <span className="px-4 py-2 text-foreground">
             Page {page} of {pagination.totalPages} ({pagination.total} total)
           </span>
           <button
             onClick={() => setPage(Math.min(pagination.totalPages, page + 1))}
             disabled={page === pagination.totalPages}
-            className="px-4 py-2 border border-[var(--neutral-gray-300)] rounded-lg bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--background-alt)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 border rounded-lg bg-surface text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Next
           </button>

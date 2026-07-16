@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { apiFetch } from '@/lib/api';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import DemoMetrics from '@/components/demo/DemoMetrics';
-import PersonaCards from '@/components/demo/PersonaCards';
-import GuidedWalkthroughs from '@/components/demo/GuidedWalkthroughs';
-import QuickActions from '@/components/demo/QuickActions';
+import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import DemoMetrics from "@/components/demo/DemoMetrics";
+import PersonaCards from "@/components/demo/PersonaCards";
+import GuidedWalkthroughs from "@/components/demo/GuidedWalkthroughs";
+import QuickActions from "@/components/demo/QuickActions";
 
 interface DemoStatus {
   enabled: boolean;
@@ -26,17 +26,17 @@ export default function DemoExperiencePage() {
 
   const checkDemoStatus = async () => {
     try {
-      const response = await apiFetch('/demo/status');
+      const response = await apiFetch("/demo/status");
       setStatus(response as DemoStatus);
-      
+
       // If demo mode is not enabled, redirect to normal dashboard
       if (!(response as DemoStatus).enabled) {
-        router.push('/admin');
+        router.push("/admin");
         return;
       }
     } catch (error) {
-      console.error('Error checking demo status:', error);
-      router.push('/admin');
+      console.error("Error checking demo status:", error);
+      router.push("/admin");
     } finally {
       setLoading(false);
     }
@@ -46,9 +46,9 @@ export default function DemoExperiencePage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex space-x-2">
-          <div className="w-3 h-3 bg-[var(--brand-cyan)] rounded-full animate-bounce animate-delay-0" />
-          <div className="w-3 h-3 bg-[var(--brand-purple)] rounded-full animate-bounce animate-delay-150" />
-          <div className="w-3 h-3 bg-[var(--brand-cyan)] rounded-full animate-bounce animate-delay-300" />
+          <div className="w-3 h-3 bg-primary rounded-full animate-bounce animate-delay-0" />
+          <div className="w-3 h-3 bg-accent rounded-full animate-bounce animate-delay-150" />
+          <div className="w-3 h-3 bg-primary rounded-full animate-bounce animate-delay-300" />
         </div>
       </div>
     );
@@ -70,14 +70,15 @@ export default function DemoExperiencePage() {
             className="object-contain"
           />
         </div>
-        <h1 className="text-4xl font-bold text-[var(--foreground)]">
+        <h1 className="text-4xl font-bold text-foreground">
           Welcome to Project Atlas
         </h1>
-        <p className="text-xl text-[var(--brand-cyan)] font-medium">
+        <p className="text-xl text-primary font-medium">
           AI Operating System for Insurance Restoration
         </p>
-        <p className="text-[var(--neutral-gray-500)] max-w-2xl mx-auto">
-          Choose a scenario below to experience how Atlas manages restoration projects from first contact through claim completion.
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Choose a scenario below to experience how Atlas manages restoration
+          projects from first contact through claim completion.
         </p>
       </div>
 

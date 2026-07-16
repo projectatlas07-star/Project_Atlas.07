@@ -109,13 +109,7 @@ export default function PersonaCards() {
                 <h3 className="text-lg font-semibold text-[var(--foreground)] group-hover:text-[var(--brand-cyan)] transition-colors">
                   {persona.customerName}
                 </h3>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  persona.status === 'approved' || persona.status === 'paid'
-                    ? 'bg-green-100 text-green-800'
-                    : persona.status === 'denied'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${ persona.status === 'approved' || persona.status === 'paid' ? 'bg-green-100 text-green-800' : persona.status === 'denied' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }`}>
                   {persona.status}
                 </span>
               </div>
@@ -132,11 +126,7 @@ export default function PersonaCards() {
 
               {/* Workflow Badge */}
               <div className="flex items-center gap-2">
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  persona.workflow === 'A'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-purple-100 text-purple-800'
-                }`}>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${ persona.workflow === 'A' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }`}>
                   {getWorkflowLabel(persona.workflow)}
                 </span>
                 <span className="text-xs text-[var(--neutral-gray-500)]">

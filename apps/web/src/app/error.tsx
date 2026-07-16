@@ -31,7 +31,7 @@ export default function Error({
 
         {/* Error Icon */}
         <div className="relative w-32 h-32 mx-auto mb-6">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-full animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-error)]/20 to-[var(--color-error)]/20 rounded-full animate-pulse" />
           <div className="absolute inset-0 flex items-center justify-center text-6xl">
             ⚠️
           </div>
