@@ -163,7 +163,7 @@ export default function DocumentsPage() {
                 id="claim"
                 value={selectedClaimId}
                 onChange={(e) => setSelectedClaimId(e.target.value)}
-                className="w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
+                className="w-full p-2 bg-muted dark:bg-card border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
               >
                 <option value="">No claim selected</option>
                 {claims.map((claim) => (
@@ -184,7 +184,7 @@ export default function DocumentsPage() {
                 id="file"
                 type="file"
                 onChange={handleFileChange}
-                className="w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
+                className="w-full p-2 bg-muted dark:bg-card border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                 required
               />
             </div>
@@ -200,7 +200,7 @@ export default function DocumentsPage() {
       )}
 
       <div className="bg-surface rounded shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-border">
           <thead className="bg-muted">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -223,7 +223,7 @@ export default function DocumentsPage() {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-surface divide-y divide-gray-200">
+          <tbody className="bg-surface divide-y divide-border">
             {documents.map((document) => (
               <tr key={document.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
