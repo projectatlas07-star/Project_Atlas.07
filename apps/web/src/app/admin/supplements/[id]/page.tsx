@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { apiFetch } from '@/lib/api';
-import { useSupabase } from '@/providers/SupabaseProvider';
-import { useRouter, useParams } from 'next/navigation';
-import { 
-  STATUS_LABELS, 
-  STATUS_COLORS, 
-  SupplementStatus, 
+import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
+import { useSupabase } from "@/providers/SupabaseProvider";
+import { useRouter, useParams } from "next/navigation";
+import {
+  STATUS_LABELS,
+  STATUS_COLORS,
+  SupplementStatus,
   LineItem,
   LINE_ITEM_CATEGORIES,
-  LINE_ITEM_UNITS 
-} from '@/lib/supplements-workflow';
+  LINE_ITEM_UNITS,
+} from "@/lib/supplements-workflow";
 
 interface Supplement {
   id: string;
@@ -54,11 +54,13 @@ export default function SupplementDetailPage() {
   const id = params.id as string;
 
   const [supplement, setSupplement] = useState<Supplement | null>(null);
-  const [transitions, setTransitions] = useState<TransitionsResponse | null>(null);
+  const [transitions, setTransitions] = useState<TransitionsResponse | null>(
+    null,
+  );
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showLineItemEditor, setShowLineItemEditor] = useState(false);
-  const [status, setStatus] = useState('');
-  const [reason, setReason] = useState('');
+  const [status, setStatus] = useState("");
+  const [reason, setReason] = useState("");
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAIDialog, setShowAIDialog] = useState(false);
@@ -66,7 +68,7 @@ export default function SupplementDetailPage() {
 
   useEffect(() => {
     if (!session) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
     loadSupplement();
@@ -85,23 +87,25 @@ export default function SupplementDetailPage() {
 
   const loadTransitions = async () => {
     try {
-      const data = await apiFetch<TransitionsResponse>(`/supplements/${id}/transitions`);
+      const data = await apiFetch<TransitionsResponse>(
+        `/supplements/${id}/transitions`,
+      );
       setTransitions(data);
     } catch (e: any) {
-      console.error('Error loading transitions:', e);
+      console.error("Error loading transitions:", e);
     }
   };
 
   const handleStatusChange = async () => {
     try {
       await apiFetch(`/supplements/${id}/status`, {
-        method: 'PUT',
+        method: "PUT",
         body: JSON.stringify({ status, reason }),
       });
-      setStatus('Status updated');
+      setStatus("Status updated");
       setShowStatusDialog(false);
-      setStatus('');
-      setReason('');
+      setStatus("");
+      setReason("");
       loadSupplement();
       loadTransitions();
     } catch (e: any) {
@@ -121,7 +125,7 @@ export default function SupplementDetailPage() {
     let tax = 0;
     let depreciation = 0;
 
-    lineItems.forEach(item => {
+    lineItems.forEach((item) => {
       const itemSubtotal = item.quantity * item.unitPrice;
       subtotal += itemSubtotal;
       tax += itemSubtotal * (item.tax / 100);
@@ -142,13 +146,13 @@ export default function SupplementDetailPage() {
     try {
       const totals = calculateTotals();
       await apiFetch(`/supplements/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: JSON.stringify({
           lineItems,
           requestedAmount: totals.requestedAmount,
         }),
       });
-      setStatus('Line items saved');
+      setStatus("Line items saved");
       setShowLineItemEditor(false);
       loadSupplement();
     } catch (e: any) {
@@ -161,10 +165,10 @@ export default function SupplementDetailPage() {
       ...lineItems,
       {
         id: crypto.randomUUID(),
-        description: '',
-        category: 'Other',
+        description: "",
+        category: "Other",
         quantity: 1,
-        unit: 'Each',
+        unit: "Each",
         unitPrice: 0,
         total: 0,
         depreciation: 0,
@@ -176,12 +180,17 @@ export default function SupplementDetailPage() {
   const updateLineItem = (index: number, field: keyof LineItem, value: any) => {
     const updated = [...lineItems];
     updated[index] = { ...updated[index], [field]: value };
-    
+
     // Recalculate total
-    if (field === 'quantity' || field === 'unitPrice' || field === 'tax' || field === 'depreciation') {
+    if (
+      field === "quantity" ||
+      field === "unitPrice" ||
+      field === "tax" ||
+      field === "depreciation"
+    ) {
       updated[index].total = calculateLineItemTotal(updated[index]);
     }
-    
+
     setLineItems(updated);
   };
 
@@ -192,10 +201,13 @@ export default function SupplementDetailPage() {
   const handleGenerateAISupplement = async () => {
     try {
       setIsGenerating(true);
-      const data = await apiFetch<{ recommendations: any; draft: any }>('/ai-supplements/generate', {
-        method: 'POST',
-        body: JSON.stringify({ supplementId: id }),
-      });
+      const data = await apiFetch<{ recommendations: any; draft: any }>(
+        "/ai-supplements/generate",
+        {
+          method: "POST",
+          body: JSON.stringify({ supplementId: id }),
+        },
+      );
       if (data && data.recommendations) {
         setAiRecommendations(data.recommendations);
         setShowAIDialog(true);
@@ -210,21 +222,23 @@ export default function SupplementDetailPage() {
   const handleAcceptAIRecommendations = async () => {
     try {
       // Convert AI recommendations to line items
-      const newLineItems = aiRecommendations.recommendedLineItems.map((item: any) => ({
-        id: crypto.randomUUID(),
-        description: item.description,
-        category: item.category,
-        quantity: item.suggestedQuantity,
-        unit: item.suggestedUnit,
-        unitPrice: item.suggestedUnitPrice,
-        total: item.suggestedTotalPrice,
-        depreciation: 0,
-        tax: 0,
-      }));
+      const newLineItems = aiRecommendations.recommendedLineItems.map(
+        (item: any) => ({
+          id: crypto.randomUUID(),
+          description: item.description,
+          category: item.category,
+          quantity: item.suggestedQuantity,
+          unit: item.suggestedUnit,
+          unitPrice: item.suggestedUnitPrice,
+          total: item.suggestedTotalPrice,
+          depreciation: 0,
+          tax: 0,
+        }),
+      );
 
       setLineItems(newLineItems);
       setShowAIDialog(false);
-      setStatus('AI recommendations applied. Review and save.');
+      setStatus("AI recommendations applied. Review and save.");
     } catch (e: any) {
       setStatus(`Error applying recommendations: ${e.message}`);
     }
@@ -240,10 +254,10 @@ export default function SupplementDetailPage() {
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--foreground)]">
+          <h1 className="text-2xl font-bold text-foreground">
             {supplement.supplementNumber} (v{supplement.version})
           </h1>
-          <p className="text-sm text-[var(--neutral-gray-600)]">
+          <p className="text-sm text-muted-foreground">
             Created: {new Date(supplement.createdAt).toLocaleDateString()}
           </p>
         </div>
@@ -251,44 +265,48 @@ export default function SupplementDetailPage() {
           <button
             onClick={handleGenerateAISupplement}
             disabled={isGenerating}
-            className="px-4 py-2 bg-[var(--brand-purple)] text-[var(--foreground)] rounded hover:bg-[var(--brand-purple)] disabled:opacity-50"
+            className="px-4 py-2 bg-accent text-foreground rounded hover:bg-accent disabled:opacity-50"
           >
-            {isGenerating ? 'Generating...' : 'Generate AI Supplement'}
+            {isGenerating ? "Generating..." : "Generate AI Supplement"}
           </button>
           <button
             onClick={() => setShowLineItemEditor(true)}
-            className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
+            className="px-4 py-2 bg-info text-foreground rounded hover:bg-info"
           >
             Edit Line Items
           </button>
           <button
             onClick={() => setShowStatusDialog(true)}
-            className="px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
+            className="px-4 py-2 bg-success text-foreground rounded hover:bg-success"
           >
             Change Status
           </button>
         </div>
       </div>
 
-      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
+      {status && <p className="mb-4 text-sm text-muted-foreground">{status}</p>}
 
       {/* Status and Carrier */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="bg-surface rounded shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Status</h2>
-          <span className={`px-3 py-2 rounded text-sm font-medium ${STATUS_COLORS[supplement.status]}`}>
+          <span
+            className={`px-3 py-2 rounded text-sm font-medium ${STATUS_COLORS[supplement.status]}`}
+          >
             {STATUS_LABELS[supplement.status]}
           </span>
         </div>
         <div className="bg-surface rounded shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Carrier</h2>
-          <p className="text-[var(--foreground)]">{supplement.carrier || 'Not specified'}</p>
+          <p className="text-foreground">
+            {supplement.carrier || "Not specified"}
+          </p>
         </div>
         <div className="bg-surface rounded shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Claim ID</h2>
-          <a 
+          <a
             href={`/admin/claims/${supplement.claimId}`}
-            className="text-[var(--color-info)] hover:text-blue-800"
+            className="text-info hover:text-blue-800"
           >
             {supplement.claimId}
           </a>
@@ -300,37 +318,51 @@ export default function SupplementDetailPage() {
         <h2 className="text-lg font-semibold mb-4">Financial Summary</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Subtotal</p>
+            <p className="text-sm text-muted-foreground">Subtotal</p>
             <p className="text-xl font-bold">${totals.subtotal.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Tax</p>
+            <p className="text-sm text-muted-foreground">Tax</p>
             <p className="text-xl font-bold">${totals.tax.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Depreciation</p>
-            <p className="text-xl font-bold text-[var(--color-error)]">-${totals.depreciation.toFixed(2)}</p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Requested Amount</p>
-            <p className="text-xl font-bold text-[var(--color-success)]">${totals.requestedAmount.toFixed(2)}</p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Approved Amount</p>
-            <p className="text-xl font-bold">${supplement.approvedAmount?.toFixed(2) || '0.00'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Difference</p>
-            <p className={`text-xl font-bold ${supplement.difference && supplement.difference > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ${supplement.difference?.toFixed(2) || '0.00'}
+            <p className="text-sm text-muted-foreground">Depreciation</p>
+            <p className="text-xl font-bold text-destructive">
+              -${totals.depreciation.toFixed(2)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Outstanding</p>
-            <p className="text-xl font-bold text-[var(--color-warning)]">
-              ${(supplement.requestedAmount || 0) - (supplement.approvedAmount || 0) > 0 
-                ? ((supplement.requestedAmount || 0) - (supplement.approvedAmount || 0)).toFixed(2)
-                : '0.00'}
+            <p className="text-sm text-muted-foreground">Requested Amount</p>
+            <p className="text-xl font-bold text-success">
+              ${totals.requestedAmount.toFixed(2)}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Approved Amount</p>
+            <p className="text-xl font-bold">
+              ${supplement.approvedAmount?.toFixed(2) || "0.00"}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Difference</p>
+            <p
+              className={`text-xl font-bold ${supplement.difference && supplement.difference > 0 ? "text-success" : "text-destructive"}`}
+            >
+              ${supplement.difference?.toFixed(2) || "0.00"}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Outstanding</p>
+            <p className="text-xl font-bold text-warning">
+              $
+              {(supplement.requestedAmount || 0) -
+                (supplement.approvedAmount || 0) >
+              0
+                ? (
+                    (supplement.requestedAmount || 0) -
+                    (supplement.approvedAmount || 0)
+                  ).toFixed(2)
+                : "0.00"}
             </p>
           </div>
         </div>
@@ -341,68 +373,108 @@ export default function SupplementDetailPage() {
         <h2 className="text-lg font-semibold mb-4">Important Dates</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Submission Date</p>
-            <p className="text-[var(--foreground)]">
-              {supplement.submissionDate ? new Date(supplement.submissionDate).toLocaleDateString() : 'Not submitted'}
+            <p className="text-sm text-muted-foreground">Submission Date</p>
+            <p className="text-foreground">
+              {supplement.submissionDate
+                ? new Date(supplement.submissionDate).toLocaleDateString()
+                : "Not submitted"}
             </p>
           </div>
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Response Date</p>
-            <p className="text-[var(--foreground)]">
-              {supplement.responseDate ? new Date(supplement.responseDate).toLocaleDateString() : 'Pending'}
+            <p className="text-sm text-muted-foreground">Response Date</p>
+            <p className="text-foreground">
+              {supplement.responseDate
+                ? new Date(supplement.responseDate).toLocaleDateString()
+                : "Pending"}
             </p>
           </div>
           <div>
-            <p className="text-sm text-[var(--neutral-gray-600)]">Approval Date</p>
-            <p className="text-[var(--foreground)]">
-              {supplement.approvalDate ? new Date(supplement.approvalDate).toLocaleDateString() : 'Not approved'}
+            <p className="text-sm text-muted-foreground">Approval Date</p>
+            <p className="text-foreground">
+              {supplement.approvalDate
+                ? new Date(supplement.approvalDate).toLocaleDateString()
+                : "Not approved"}
             </p>
           </div>
         </div>
         {supplement.denialReason && (
           <div className="mt-4">
-            <p className="text-sm text-[var(--neutral-gray-600)]">Denial Reason</p>
-            <p className="text-[var(--color-error)]">{supplement.denialReason}</p>
+            <p className="text-sm text-muted-foreground">Denial Reason</p>
+            <p className="text-destructive">{supplement.denialReason}</p>
           </div>
         )}
       </div>
 
       {/* Line Items */}
       <div className="bg-surface rounded shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">Line Items ({lineItems.length})</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Line Items ({lineItems.length})
+        </h2>
         {lineItems.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-[var(--background-alt)]">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Description</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Category</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Qty</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Unit</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Unit Price</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Tax %</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Depr %</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Total</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Description
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Category
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Qty
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Unit
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Unit Price
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Tax %
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Depr %
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Total
+                  </th>
                 </tr>
               </thead>
-              <tbody className="bg-surface divide-y divide-gray-200">
+              <tbody className="bg-surface divide-y divide-border">
                 {lineItems.map((item, index) => (
                   <tr key={item.id || index}>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">{item.description}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">{item.category}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">{item.quantity}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">{item.unit}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">${item.unitPrice.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">{item.tax}%</td>
-                    <td className="px-4 py-3 text-sm text-[var(--foreground)]">{item.depreciation}%</td>
-                    <td className="px-4 py-3 text-sm font-medium text-[var(--foreground)]">${item.total.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.description}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.category}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.quantity}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.unit}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      ${item.unitPrice.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.tax}%
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.depreciation}%
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium text-foreground">
+                      ${item.total.toFixed(2)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <p className="text-[var(--neutral-gray-500)]">No line items added yet</p>
+          <p className="text-muted-foreground">No line items added yet</p>
         )}
       </div>
 
@@ -412,37 +484,46 @@ export default function SupplementDetailPage() {
         {supplement.statusHistory && supplement.statusHistory.length > 0 ? (
           <div className="space-y-3">
             {supplement.statusHistory.map((entry: any, index: number) => (
-              <div key={index} className="flex items-start space-x-3 p-3 bg-[var(--background-alt)] rounded">
-                <div className="flex-shrink-0 w-2 h-2 mt-2 bg-[var(--color-info)] rounded-full"></div>
+              <div
+                key={index}
+                className="flex items-start space-x-3 p-3 bg-muted rounded"
+              >
+                <div className="flex-shrink-0 w-2 h-2 mt-2 bg-info rounded-full"></div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[entry.status as SupplementStatus]}`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[entry.status as SupplementStatus]}`}
+                    >
                       {STATUS_LABELS[entry.status as SupplementStatus]}
                     </span>
-                    <span className="text-xs text-[var(--neutral-gray-500)]">
+                    <span className="text-xs text-muted-foreground">
                       {new Date(entry.timestamp).toLocaleString()}
                     </span>
                   </div>
                   {entry.userName && (
-                    <p className="text-xs text-[var(--neutral-gray-600)] mt-1">by {entry.userName}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      by {entry.userName}
+                    </p>
                   )}
                   {entry.reason && (
-                    <p className="text-xs text-[var(--neutral-gray-600)] mt-1">Reason: {entry.reason}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Reason: {entry.reason}
+                    </p>
                   )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-[var(--neutral-gray-500)]">No status history available</p>
+          <p className="text-muted-foreground">No status history available</p>
         )}
       </div>
 
       {/* Internal Notes */}
       <div className="bg-surface rounded shadow p-6 mb-6">
         <h2 className="text-lg font-semibold mb-4">Internal Notes</h2>
-        <p className="text-[var(--foreground)] whitespace-pre-wrap">
-          {supplement.internalNotes || 'No internal notes'}
+        <p className="text-foreground whitespace-pre-wrap">
+          {supplement.internalNotes || "No internal notes"}
         </p>
       </div>
 
@@ -453,13 +534,13 @@ export default function SupplementDetailPage() {
             <h3 className="text-lg font-semibold mb-4">Change Status</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)] mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   New Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                  className="w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                   aria-label="Select new status"
                 >
                   <option value="">Select status...</option>
@@ -471,13 +552,13 @@ export default function SupplementDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)] mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Reason (optional)
                 </label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                  className="w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                   rows={3}
                   placeholder="Enter reason for status change..."
                 />
@@ -486,17 +567,17 @@ export default function SupplementDetailPage() {
                 <button
                   onClick={() => {
                     setShowStatusDialog(false);
-                    setStatus('');
-                    setReason('');
+                    setStatus("");
+                    setReason("");
                   }}
-                  className="px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
+                  className="px-4 py-2 bg-muted text-foreground rounded hover:bg-accent"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleStatusChange}
                   disabled={!status}
-                  className="px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)] disabled:opacity-50"
+                  className="px-4 py-2 bg-success text-foreground rounded hover:bg-success disabled:opacity-50"
                 >
                   Change Status
                 </button>
@@ -514,35 +595,55 @@ export default function SupplementDetailPage() {
             <div className="mb-4">
               <button
                 onClick={addLineItem}
-                className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
+                className="px-4 py-2 bg-info text-foreground rounded hover:bg-info"
               >
                 Add Line Item
               </button>
             </div>
             <div className="overflow-x-auto mb-4 max-h-96">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-[var(--background-alt)] sticky top-0">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted sticky top-0">
                   <tr>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Description</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Category</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Qty</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Unit</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Unit Price</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Tax %</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Depr %</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Total</th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Actions</th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Description
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Category
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Qty
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Unit
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Unit Price
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Tax %
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Depr %
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Total
+                    </th>
+                    <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="bg-surface divide-y divide-gray-200">
+                <tbody className="bg-surface divide-y divide-border">
                   {lineItems.map((item, index) => (
                     <tr key={item.id || index}>
                       <td className="px-2 py-2">
                         <input
                           type="text"
                           value={item.description}
-                          onChange={(e) => updateLineItem(index, 'description', e.target.value)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(index, "description", e.target.value)
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           placeholder="Description"
                           aria-label={`Line item ${index + 1} description`}
                         />
@@ -550,12 +651,16 @@ export default function SupplementDetailPage() {
                       <td className="px-2 py-2">
                         <select
                           value={item.category}
-                          onChange={(e) => updateLineItem(index, 'category', e.target.value)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(index, "category", e.target.value)
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           aria-label={`Line item ${index + 1} category`}
                         >
                           {LINE_ITEM_CATEGORIES.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
                           ))}
                         </select>
                       </td>
@@ -563,8 +668,14 @@ export default function SupplementDetailPage() {
                         <input
                           type="number"
                           value={item.quantity}
-                          onChange={(e) => updateLineItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(
+                              index,
+                              "quantity",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           min="0"
                           placeholder="Qty"
                           aria-label={`Line item ${index + 1} quantity`}
@@ -573,12 +684,16 @@ export default function SupplementDetailPage() {
                       <td className="px-2 py-2">
                         <select
                           value={item.unit}
-                          onChange={(e) => updateLineItem(index, 'unit', e.target.value)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(index, "unit", e.target.value)
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           aria-label={`Line item ${index + 1} unit`}
                         >
                           {LINE_ITEM_UNITS.map((unit) => (
-                            <option key={unit} value={unit}>{unit}</option>
+                            <option key={unit} value={unit}>
+                              {unit}
+                            </option>
                           ))}
                         </select>
                       </td>
@@ -586,8 +701,14 @@ export default function SupplementDetailPage() {
                         <input
                           type="number"
                           value={item.unitPrice}
-                          onChange={(e) => updateLineItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(
+                              index,
+                              "unitPrice",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           min="0"
                           step="0.01"
                           placeholder="Price"
@@ -598,8 +719,14 @@ export default function SupplementDetailPage() {
                         <input
                           type="number"
                           value={item.tax}
-                          onChange={(e) => updateLineItem(index, 'tax', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(
+                              index,
+                              "tax",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           min="0"
                           max="100"
                           step="0.1"
@@ -611,8 +738,14 @@ export default function SupplementDetailPage() {
                         <input
                           type="number"
                           value={item.depreciation}
-                          onChange={(e) => updateLineItem(index, 'depreciation', parseFloat(e.target.value) || 0)}
-                          className="w-full p-1 text-sm bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                          onChange={(e) =>
+                            updateLineItem(
+                              index,
+                              "depreciation",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
+                          className="w-full p-1 text-sm bg-muted dark:bg-card border border-input rounded text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 transition-colors hover:border-primary"
                           min="0"
                           max="100"
                           step="0.1"
@@ -626,7 +759,7 @@ export default function SupplementDetailPage() {
                       <td className="px-2 py-2">
                         <button
                           onClick={() => removeLineItem(index)}
-                          className="text-[var(--color-error)] hover:text-red-900 text-sm"
+                          className="text-destructive hover:text-red-900 text-sm"
                         >
                           Remove
                         </button>
@@ -636,23 +769,27 @@ export default function SupplementDetailPage() {
                 </tbody>
               </table>
             </div>
-            <div className="bg-[var(--background-alt)] p-4 rounded mb-4">
+            <div className="bg-muted p-4 rounded mb-4">
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm text-[var(--neutral-gray-600)]">Subtotal</p>
+                  <p className="text-sm text-muted-foreground">Subtotal</p>
                   <p className="font-bold">${totals.subtotal.toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--neutral-gray-600)]">Tax</p>
+                  <p className="text-sm text-muted-foreground">Tax</p>
                   <p className="font-bold">${totals.tax.toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--neutral-gray-600)]">Depreciation</p>
-                  <p className="font-bold text-[var(--color-error)]">-${totals.depreciation.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">Depreciation</p>
+                  <p className="font-bold text-destructive">
+                    -${totals.depreciation.toFixed(2)}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--neutral-gray-600)]">Total</p>
-                  <p className="font-bold text-[var(--color-success)]">${totals.requestedAmount.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="font-bold text-success">
+                    ${totals.requestedAmount.toFixed(2)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -662,13 +799,13 @@ export default function SupplementDetailPage() {
                   setShowLineItemEditor(false);
                   setLineItems(supplement.lineItems || []);
                 }}
-                className="px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
+                className="px-4 py-2 bg-muted text-foreground rounded hover:bg-accent"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveLineItems}
-                className="px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
+                className="px-4 py-2 bg-success text-foreground rounded hover:bg-success"
               >
                 Save Line Items
               </button>
@@ -682,10 +819,12 @@ export default function SupplementDetailPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-surface rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">AI Supplement Recommendations</h2>
+              <h2 className="text-xl font-bold">
+                AI Supplement Recommendations
+              </h2>
               <button
                 onClick={() => setShowAIDialog(false)}
-                className="text-[var(--neutral-gray-500)] hover:text-gray-700"
+                className="text-muted-foreground hover:text-foreground"
               >
                 ✕
               </button>
@@ -693,15 +832,17 @@ export default function SupplementDetailPage() {
 
             {/* Confidence and Risk Scores */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-blue-50 p-4 rounded">
-                <p className="text-sm text-[var(--neutral-gray-600)]">Confidence Score</p>
-                <p className="text-2xl font-bold text-[var(--color-info)]">
+              <div className="bg-info/10 p-4 rounded">
+                <p className="text-sm text-muted-foreground">
+                  Confidence Score
+                </p>
+                <p className="text-2xl font-bold text-info">
                   {Math.round(aiRecommendations.confidenceScore * 100)}%
                 </p>
               </div>
-              <div className="bg-orange-50 p-4 rounded">
-                <p className="text-sm text-[var(--neutral-gray-600)]">Risk Score</p>
-                <p className="text-2xl font-bold text-[var(--color-warning)]">
+              <div className="bg-warning/10 p-4 rounded">
+                <p className="text-sm text-muted-foreground">Risk Score</p>
+                <p className="text-2xl font-bold text-warning">
                   {Math.round(aiRecommendations.riskScore * 100)}%
                 </p>
               </div>
@@ -709,42 +850,76 @@ export default function SupplementDetailPage() {
 
             {/* Supporting Justification */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2">Supporting Justification</h3>
-              <p className="text-[var(--neutral-gray-700)]">{aiRecommendations.supportingJustification}</p>
+              <h3 className="text-lg font-semibold mb-2">
+                Supporting Justification
+              </h3>
+              <p className="text-foreground">
+                {aiRecommendations.supportingJustification}
+              </p>
             </div>
 
             {/* Recommended Line Items */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2">Recommended Line Items</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Recommended Line Items
+              </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-[var(--background-alt)]">
+                <table className="min-w-full divide-y divide-border">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Description</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Category</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Quantity</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Unit</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Unit Price</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Total</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase">Confidence</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Description
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Category
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Quantity
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Unit
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Unit Price
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Total
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Confidence
+                      </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-surface divide-y divide-gray-200">
-                    {aiRecommendations.recommendedLineItems.map((item: any, index: number) => (
-                      <tr key={index}>
-                        <td className="px-4 py-2 text-sm">{item.description}</td>
-                        <td className="px-4 py-2 text-sm">{item.category}</td>
-                        <td className="px-4 py-2 text-sm">{item.suggestedQuantity}</td>
-                        <td className="px-4 py-2 text-sm">{item.suggestedUnit}</td>
-                        <td className="px-4 py-2 text-sm">${item.suggestedUnitPrice.toFixed(2)}</td>
-                        <td className="px-4 py-2 text-sm font-medium">${item.suggestedTotalPrice.toFixed(2)}</td>
-                        <td className="px-4 py-2 text-sm">
-                          <span className={`px-2 py-1 rounded text-xs ${ item.confidence > 0.8 ? 'bg-green-100 text-green-800' : item.confidence > 0.5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' }`}>
-                            {Math.round(item.confidence * 100)}%
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                  <tbody className="bg-surface divide-y divide-border">
+                    {aiRecommendations.recommendedLineItems.map(
+                      (item: any, index: number) => (
+                        <tr key={index}>
+                          <td className="px-4 py-2 text-sm">
+                            {item.description}
+                          </td>
+                          <td className="px-4 py-2 text-sm">{item.category}</td>
+                          <td className="px-4 py-2 text-sm">
+                            {item.suggestedQuantity}
+                          </td>
+                          <td className="px-4 py-2 text-sm">
+                            {item.suggestedUnit}
+                          </td>
+                          <td className="px-4 py-2 text-sm">
+                            ${item.suggestedUnitPrice.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-2 text-sm font-medium">
+                            ${item.suggestedTotalPrice.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-2 text-sm">
+                            <span
+                              className={`px-2 py-1 rounded text-xs ${item.confidence > 0.8 ? "bg-success/10 text-green-800" : item.confidence > 0.5 ? "bg-warning/10 text-yellow-800" : "bg-destructive/10 text-destructive-foreground"}`}
+                            >
+                              {Math.round(item.confidence * 100)}%
+                            </span>
+                          </td>
+                        </tr>
+                      ),
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -753,15 +928,24 @@ export default function SupplementDetailPage() {
             {/* Missing Damage Observations */}
             {aiRecommendations.missingDamageObservations.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Missing Damage Observations</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Missing Damage Observations
+                </h3>
                 <ul className="space-y-2">
-                  {aiRecommendations.missingDamageObservations.map((obs: any, index: number) => (
-                    <li key={index} className="bg-[var(--background-alt)] p-3 rounded">
-                      <p className="font-medium">{obs.location}</p>
-                      <p className="text-sm text-[var(--neutral-gray-600)]">{obs.description}</p>
-                      <p className="text-xs text-[var(--neutral-gray-500)]">Severity: {obs.severity} | Confidence: {Math.round(obs.confidence * 100)}%</p>
-                    </li>
-                  ))}
+                  {aiRecommendations.missingDamageObservations.map(
+                    (obs: any, index: number) => (
+                      <li key={index} className="bg-muted p-3 rounded">
+                        <p className="font-medium">{obs.location}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {obs.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Severity: {obs.severity} | Confidence:{" "}
+                          {Math.round(obs.confidence * 100)}%
+                        </p>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             )}
@@ -769,14 +953,20 @@ export default function SupplementDetailPage() {
             {/* Missing Information */}
             {aiRecommendations.missingInformation.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Missing Information</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Missing Information
+                </h3>
                 <ul className="space-y-2">
-                  {aiRecommendations.missingInformation.map((item: any, index: number) => (
-                    <li key={index} className="bg-yellow-50 p-3 rounded">
-                      <p className="font-medium">{item.description}</p>
-                      <p className="text-sm text-[var(--neutral-gray-600)]">Impact: {item.impact} | Source: {item.source}</p>
-                    </li>
-                  ))}
+                  {aiRecommendations.missingInformation.map(
+                    (item: any, index: number) => (
+                      <li key={index} className="bg-warning/10 p-3 rounded">
+                        <p className="font-medium">{item.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Impact: {item.impact} | Source: {item.source}
+                        </p>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             )}
@@ -784,15 +974,23 @@ export default function SupplementDetailPage() {
             {/* Documentation Checklist */}
             {aiRecommendations.documentationChecklist.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Documentation Checklist</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Documentation Checklist
+                </h3>
                 <ul className="space-y-2">
-                  {aiRecommendations.documentationChecklist.map((item: any, index: number) => (
-                    <li key={index} className="bg-[var(--background-alt)] p-3 rounded">
-                      <p className="font-medium">{item.description}</p>
-                      <p className="text-sm text-[var(--neutral-gray-600)]">Type: {item.type} | Status: {item.status}</p>
-                      <p className="text-xs text-[var(--neutral-gray-500)]">{item.reason}</p>
-                    </li>
-                  ))}
+                  {aiRecommendations.documentationChecklist.map(
+                    (item: any, index: number) => (
+                      <li key={index} className="bg-muted p-3 rounded">
+                        <p className="font-medium">{item.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Type: {item.type} | Status: {item.status}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.reason}
+                        </p>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             )}
@@ -802,11 +1000,16 @@ export default function SupplementDetailPage() {
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Warnings</h3>
                 <ul className="space-y-2">
-                  {aiRecommendations.warnings.map((warning: string, index: number) => (
-                    <li key={index} className="bg-red-50 p-3 rounded text-[var(--color-error)]">
-                      ⚠️ {warning}
-                    </li>
-                  ))}
+                  {aiRecommendations.warnings.map(
+                    (warning: string, index: number) => (
+                      <li
+                        key={index}
+                        className="bg-destructive/10 p-3 rounded text-destructive"
+                      >
+                        ⚠️ {warning}
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             )}
@@ -814,12 +1017,29 @@ export default function SupplementDetailPage() {
             {/* AI Explanation */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-2">AI Explanation</h3>
-              <div className="bg-[var(--background-alt)] p-4 rounded">
-                <p className="mb-2"><strong>Overall Approach:</strong> {aiRecommendations.aiExplanation.overallApproach}</p>
-                <p className="mb-2"><strong>Data Sources Analyzed:</strong> {aiRecommendations.aiExplanation.dataSourcesAnalyzed.join(',')}</p>
-                <p className="mb-2"><strong>Confidence Factors:</strong> {aiRecommendations.aiExplanation.confidenceFactors.join(',')}</p>
-                <p className="mb-2"><strong>Limitations:</strong> {aiRecommendations.aiExplanation.limitations.join(',')}</p>
-                <p><strong>Recommendations:</strong> {aiRecommendations.aiExplanation.recommendations.join(',')}</p>
+              <div className="bg-muted p-4 rounded">
+                <p className="mb-2">
+                  <strong>Overall Approach:</strong>{" "}
+                  {aiRecommendations.aiExplanation.overallApproach}
+                </p>
+                <p className="mb-2">
+                  <strong>Data Sources Analyzed:</strong>{" "}
+                  {aiRecommendations.aiExplanation.dataSourcesAnalyzed.join(
+                    ",",
+                  )}
+                </p>
+                <p className="mb-2">
+                  <strong>Confidence Factors:</strong>{" "}
+                  {aiRecommendations.aiExplanation.confidenceFactors.join(",")}
+                </p>
+                <p className="mb-2">
+                  <strong>Limitations:</strong>{" "}
+                  {aiRecommendations.aiExplanation.limitations.join(",")}
+                </p>
+                <p>
+                  <strong>Recommendations:</strong>{" "}
+                  {aiRecommendations.aiExplanation.recommendations.join(",")}
+                </p>
               </div>
             </div>
 
@@ -827,13 +1047,13 @@ export default function SupplementDetailPage() {
             <div className="flex justify-end gap-2 mt-6">
               <button
                 onClick={() => setShowAIDialog(false)}
-                className="px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
+                className="px-4 py-2 bg-muted text-foreground rounded hover:bg-accent"
               >
                 Reject
               </button>
               <button
                 onClick={handleAcceptAIRecommendations}
-                className="px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
+                className="px-4 py-2 bg-success text-foreground rounded hover:bg-success"
               >
                 Accept & Apply
               </button>
