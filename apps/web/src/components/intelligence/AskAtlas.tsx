@@ -7,6 +7,8 @@ import { routeQuestion, type QueryResult } from "@/lib/ask-atlas/orchestrator";
 import { Button, Input } from "@project-atlas/ui";
 import {
   Mic,
+  Volume2,
+  VolumeOff,
   Send,
   ArrowRight,
   Clock,
@@ -195,7 +197,11 @@ export default function AskAtlas() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [micActive, setMicActive] = useState(false);
+  const [voiceOutput, setVoiceOutput] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const finalTranscriptRef = useRef("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastSpokenRef = useRef("");
 
   const greeting = useMemo(() => getGreeting(), []);
   const displayName = useMemo(() => formatName(session), [session]);
@@ -269,13 +275,49 @@ export default function AskAtlas() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!question.trim() || loading) return;
+  useEffect(() => {
+    if (!voiceOutput || typeof window === "undefined") return;
+    const last = messages.at(-1);
+    if (
+      last &&
+      last.role === "assistant" &&
+      last.content !== lastSpokenRef.current
+    ) {
+      const synth = (window as any).speechSynthesis;
+      const Utterance = (window as any).SpeechSynthesisUtterance;
+      if (!synth || !Utterance) return;
+      synth.cancel();
+      const utterance = new Utterance(last.content);
+      utterance.lang = "en-US";
+      synth.speak(utterance);
+      lastSpokenRef.current = last.content;
+    }
+  }, [messages, voiceOutput]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!voiceOutput) {
+      (window as any).speechSynthesis?.cancel();
+    }
+  }, [voiceOutput]);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  const handleSubmit = async (
+    e?: React.FormEvent,
+    overrideQuestion?: string,
+  ) => {
+    e?.preventDefault();
+    const userQuestion = (overrideQuestion || question).trim();
+    if (!userQuestion || loading) return;
 
     const userMessage: Message = {
       role: "user",
-      content: question.trim(),
+      content: userQuestion,
       timestamp: Date.now(),
     };
 
@@ -289,7 +331,7 @@ export default function AskAtlas() {
       setConversations((prev) => [
         {
           id: newId,
-          title: question.trim().slice(0, 40),
+          title: userQuestion.slice(0, 40),
           preview: "",
           timestamp: Date.now(),
           messages: currentMessages,
@@ -378,9 +420,59 @@ export default function AskAtlas() {
   };
 
   const handleMicClick = () => {
+    if (micActive) {
+      recognitionRef.current?.stop();
+      setMicActive(false);
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError("Voice input is not supported in this browser.");
+      return;
+    }
+
+    setVoiceOutput(true);
+    finalTranscriptRef.current = "";
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognition.onresult = (event: any) => {
+      let final = "";
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      if (final) {
+        finalTranscriptRef.current += final;
+      }
+      setQuestion(finalTranscriptRef.current + interim);
+    };
+    recognition.onend = () => {
+      setMicActive(false);
+      if (finalTranscriptRef.current.trim()) {
+        handleSubmit(undefined, finalTranscriptRef.current.trim());
+      }
+    };
+    recognition.onerror = (event: any) => {
+      setMicActive(false);
+      setError(
+        event.error === "not-allowed"
+          ? "Microphone access denied. Please allow microphone access."
+          : "Voice input failed. Please try again.",
+      );
+    };
+    recognitionRef.current = recognition;
     setMicActive(true);
-    setTimeout(() => setMicActive(false), 800);
-    // Voice integration placeholder
+    recognition.start();
   };
 
   const isInConversation = messages.length > 0;
@@ -426,6 +518,22 @@ export default function AskAtlas() {
             className={`shrink-0 rounded-full ${micActive ? "ring-2 ring-primary" : ""}`}
           >
             <Mic className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setVoiceOutput((v) => !v)}
+            aria-label={
+              voiceOutput ? "Disable voice output" : "Enable voice output"
+            }
+            className={`shrink-0 rounded-full ${voiceOutput ? "text-primary" : "text-muted-foreground"}`}
+          >
+            {voiceOutput ? (
+              <Volume2 className="h-4 w-4" />
+            ) : (
+              <VolumeOff className="h-4 w-4" />
+            )}
           </Button>
           <Input
             type="text"
