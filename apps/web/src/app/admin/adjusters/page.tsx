@@ -160,7 +160,7 @@ export default function AdjustersPage() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Adjusters</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">Adjusters</h1>
         <button
           onClick={() => {
             setEditingId(null);
@@ -176,16 +176,16 @@ export default function AdjustersPage() {
             });
             setShowForm(!showForm);
           }}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
         >
           {showForm ? 'Cancel' : 'Add Adjuster'}
         </button>
       </div>
 
-      {status && <p className="mb-4 text-sm text-gray-600">{status}</p>}
+      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
 
       {/* Search and Filters */}
-      <div className="mb-6 bg-white p-4 rounded shadow flex gap-4 flex-wrap">
+      <div className="mb-6 bg-surface p-4 rounded shadow flex gap-4 flex-wrap">
         <div className="flex-1 min-w-[200px]">
           <input
             type="text"
@@ -216,13 +216,13 @@ export default function AdjustersPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-white p-6 rounded shadow">
+        <form onSubmit={handleSubmit} className="mb-6 bg-surface p-6 rounded shadow">
           <h2 className="text-lg font-semibold mb-4">
             {editingId ? 'Edit Adjuster' : 'New Adjuster'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="fullName" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="fullName" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Full Name *
               </label>
               <input
@@ -235,7 +235,7 @@ export default function AdjustersPage() {
               />
             </div>
             <div>
-              <label htmlFor="insuranceCompany" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="insuranceCompany" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Insurance Company
               </label>
               <input
@@ -247,7 +247,7 @@ export default function AdjustersPage() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Email
               </label>
               <input
@@ -259,7 +259,7 @@ export default function AdjustersPage() {
               />
             </div>
             <div>
-              <label htmlFor="phone" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="phone" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Phone
               </label>
               <input
@@ -271,7 +271,7 @@ export default function AdjustersPage() {
               />
             </div>
             <div>
-              <label htmlFor="office" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="office" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Office
               </label>
               <input
@@ -283,7 +283,7 @@ export default function AdjustersPage() {
               />
             </div>
             <div>
-              <label htmlFor="territory" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="territory" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Territory / Region
               </label>
               <input
@@ -295,7 +295,7 @@ export default function AdjustersPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="notes" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="notes" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Notes
               </label>
               <textarea
@@ -314,71 +314,67 @@ export default function AdjustersPage() {
                   onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                   className="mr-2"
                 />
-                <span className="text-sm font-medium text-gray-700">Active</span>
+                <span className="text-sm font-medium text-[var(--neutral-gray-700)]">Active</span>
               </label>
             </div>
           </div>
           <button
             type="submit"
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mt-4 px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
           >
             {editingId ? 'Update Adjuster' : 'Create Adjuster'}
           </button>
         </form>
       )}
 
-      <div className="bg-white rounded shadow overflow-hidden">
+      <div className="bg-surface rounded shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-[var(--background-alt)]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Insurance Company
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Phone
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Territory
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-surface divide-y divide-gray-200">
             {adjusters.map((adjuster) => (
               <tr key={adjuster.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)] font-medium">
                   {adjuster.fullName}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {adjuster.insuranceCompany || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {adjuster.email || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {adjuster.phone || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {adjuster.territory || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      adjuster.active
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
+                    className={`px-2 py-1 rounded text-xs ${ adjuster.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }`}
                   >
                     {adjuster.active ? 'Active' : 'Inactive'}
                   </span>
@@ -386,19 +382,19 @@ export default function AdjustersPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleEdit(adjuster)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
+                    className="text-[var(--color-info)] hover:text-blue-900 mr-3"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleToggleActive(adjuster)}
-                    className="text-yellow-600 hover:text-yellow-900 mr-3"
+                    className="text-[var(--color-warning)] hover:text-yellow-900 mr-3"
                   >
                     {adjuster.active ? 'Deactivate' : 'Activate'}
                   </button>
                   <button
                     onClick={() => handleDelete(adjuster.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-[var(--color-error)] hover:text-red-900"
                   >
                     Delete
                   </button>
@@ -407,7 +403,7 @@ export default function AdjustersPage() {
             ))}
             {adjusters.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={7} className="px-6 py-4 text-center text-sm text-[var(--neutral-gray-500)]">
                   No adjusters found
                 </td>
               </tr>

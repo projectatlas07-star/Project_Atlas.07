@@ -156,22 +156,22 @@ export default function SupplementsPage() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Supplements</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">Supplements</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
         >
           {showForm ? 'Cancel' : 'Add Supplement'}
         </button>
       </div>
 
-      {status && <p className="mb-4 text-sm text-gray-600">{status}</p>}
+      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
 
       {/* Filters */}
-      <div className="mb-6 bg-white p-4 rounded shadow">
+      <div className="mb-6 bg-surface p-4 rounded shadow">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
-            <label htmlFor="statusFilter" className="block mb-1 text-sm font-medium text-gray-700">Status</label>
+            <label htmlFor="statusFilter" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Status</label>
             <select
               id="statusFilter"
               value={statusFilter}
@@ -188,7 +188,7 @@ export default function SupplementsPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="adjusterFilter" className="block mb-1 text-sm font-medium text-gray-700">Adjuster</label>
+            <label htmlFor="adjusterFilter" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Adjuster</label>
             <select
               id="adjusterFilter"
               value={adjusterFilter}
@@ -205,7 +205,7 @@ export default function SupplementsPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="carrierFilter" className="block mb-1 text-sm font-medium text-gray-700">Carrier</label>
+            <label htmlFor="carrierFilter" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Carrier</label>
             <input
               id="carrierFilter"
               type="text"
@@ -219,7 +219,7 @@ export default function SupplementsPage() {
             />
           </div>
           <div>
-            <label htmlFor="search" className="block mb-1 text-sm font-medium text-gray-700">Search</label>
+            <label htmlFor="search" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Search</label>
             <input
               id="search"
               type="text"
@@ -235,7 +235,7 @@ export default function SupplementsPage() {
           <div className="flex items-end">
             <button
               onClick={clearFilters}
-              className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              className="w-full px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
             >
               Clear Filters
             </button>
@@ -244,11 +244,11 @@ export default function SupplementsPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-white p-6 rounded shadow">
+        <form onSubmit={handleSubmit} className="mb-6 bg-surface p-6 rounded shadow">
           <h3 className="text-lg font-semibold mb-4">Create New Supplement</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="claimId" className="block mb-1 text-sm font-medium text-gray-700">Claim ID</label>
+              <label htmlFor="claimId" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Claim ID</label>
               <input
                 id="claimId"
                 type="text"
@@ -259,7 +259,7 @@ export default function SupplementsPage() {
               />
             </div>
             <div>
-              <label htmlFor="supplementNumber" className="block mb-1 text-sm font-medium text-gray-700">Supplement Number</label>
+              <label htmlFor="supplementNumber" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Supplement Number</label>
               <input
                 id="supplementNumber"
                 type="text"
@@ -270,7 +270,7 @@ export default function SupplementsPage() {
               />
             </div>
             <div>
-              <label htmlFor="carrier" className="block mb-1 text-sm font-medium text-gray-700">Carrier</label>
+              <label htmlFor="carrier" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Carrier</label>
               <input
                 id="carrier"
                 type="text"
@@ -280,7 +280,7 @@ export default function SupplementsPage() {
               />
             </div>
             <div>
-              <label htmlFor="status" className="block mb-1 text-sm font-medium text-gray-700">Status</label>
+              <label htmlFor="status" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Status</label>
               <select
                 id="status"
                 value={formData.status}
@@ -293,7 +293,7 @@ export default function SupplementsPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="adjuster" className="block mb-1 text-sm font-medium text-gray-700">Assign Adjuster</label>
+              <label htmlFor="adjuster" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Assign Adjuster</label>
               <select
                 id="adjuster"
                 value={formData.adjusterId}
@@ -311,63 +311,63 @@ export default function SupplementsPage() {
           </div>
           <button
             type="submit"
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mt-4 px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
           >
             Save Supplement
           </button>
         </form>
       )}
 
-      <div className="bg-white rounded shadow overflow-hidden">
+      <div className="bg-surface rounded shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-[var(--background-alt)]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplement #</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claim</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carrier</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adjuster</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Supplement #</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Version</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Claim</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Carrier</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Adjuster</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Requested</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Approved</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-surface divide-y divide-gray-200">
             {supplements.map((supplement) => (
               <tr key={supplement.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <a href={`/admin/supplements/${supplement.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
+                  <a href={`/admin/supplements/${supplement.id}`} className="text-[var(--color-info)] hover:text-blue-800 font-medium">
                     {supplement.supplementNumber}
                   </a>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   v{supplement.version}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   <span className={`px-2 py-1 rounded text-xs ${STATUS_COLORS[supplement.status]}`}>
                     {STATUS_LABELS[supplement.status]}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {supplement.claimNumber || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {supplement.carrier || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {supplement.adjusterName || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   ${supplement.requestedAmount?.toFixed(2) || '0.00'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   ${supplement.approvedAmount?.toFixed(2) || '0.00'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleDelete(supplement.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-[var(--color-error)] hover:text-red-900"
                   >
                     Delete
                   </button>
@@ -376,7 +376,7 @@ export default function SupplementsPage() {
             ))}
             {supplements.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={9} className="px-6 py-4 text-center text-sm text-[var(--neutral-gray-500)]">
                   No supplements found
                 </td>
               </tr>

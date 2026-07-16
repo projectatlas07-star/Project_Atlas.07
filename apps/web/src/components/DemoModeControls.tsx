@@ -94,17 +94,13 @@ export default function DemoModeControls() {
             Generate and manage demo data for testing and demonstrations
           </p>
         </div>
-        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-          status?.enabled 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-gray-100 text-gray-800'
-        }`}>
+        <div className={`px-3 py-1 rounded-full text-sm font-medium ${ status?.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }`}>
           {status?.enabled ? 'Enabled' : 'Disabled'}
         </div>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+        <div className="mb-4 p-3 bg-red-50 border border-[var(--color-error)]/30 rounded-lg text-[var(--color-error)] text-sm">
           {error}
         </div>
       )}
@@ -173,7 +169,7 @@ export default function DemoModeControls() {
             <button
               onClick={clearDemoData}
               disabled={loading}
-              className="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border border-[var(--color-error)] text-[var(--color-error)] hover:bg-red-50 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Clearing...' : 'Clear Demo Data'}
             </button>

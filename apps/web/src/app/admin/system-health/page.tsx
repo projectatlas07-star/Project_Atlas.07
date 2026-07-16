@@ -134,19 +134,19 @@ export default function SystemHealthPage() {
 
   const getHealthStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'bg-green-100 text-green-800';
-      case 'degraded': return 'bg-yellow-100 text-yellow-800';
-      case 'unhealthy': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'healthy': return 'bg-[var(--color-success)]/10 text-green-800';
+      case 'degraded': return 'bg-[var(--color-warning)]/10 text-[var(--color-warning)]';
+      case 'unhealthy': return 'bg-[var(--color-error)]/10 text-[var(--color-error)]';
+      default: return 'bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-800)]';
     }
   };
 
   const getCheckStatusColor = (status: string) => {
     switch (status) {
-      case 'pass': return 'text-green-600';
-      case 'fail': return 'text-red-600';
-      case 'warn': return 'text-yellow-600';
-      default: return 'text-gray-600';
+      case 'pass': return 'text-[var(--color-success)]';
+      case 'fail': return 'text-[var(--color-error)]';
+      case 'warn': return 'text-[var(--color-warning)]';
+      default: return 'text-[var(--neutral-gray-600)]';
     }
   };
 
@@ -213,11 +213,7 @@ export default function SystemHealthPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'text-[var(--brand-cyan)] border-b-2 border-[var(--brand-cyan)]'
-                : 'text-[var(--neutral-gray-500)] hover:text-[var(--foreground)]'
-            }`}
+            className={`px-4 py-3 font-medium transition-colors ${ activeTab === tab.id ? 'text-[var(--brand-cyan)] border-b-2 border-[var(--brand-cyan)]' : 'text-[var(--neutral-gray-500)] hover:text-[var(--foreground)]' }`}
           >
             {tab.label}
           </button>
@@ -284,11 +280,11 @@ export default function SystemHealthPage() {
 
           {/* Health Warnings */}
           {diagnostics.healthWarnings.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <h3 className="font-semibold text-yellow-800 mb-2">Health Warnings</h3>
+            <div className="bg-yellow-50 border border-[var(--color-warning)]/30 rounded-xl p-4">
+              <h3 className="font-semibold text-[var(--color-warning)] mb-2">Health Warnings</h3>
               <ul className="space-y-1">
                 {diagnostics.healthWarnings.map((warning, index) => (
-                  <li key={index} className="text-yellow-700 text-sm">⚠️ {warning}</li>
+                  <li key={index} className="text-[var(--color-warning)] text-sm">⚠️ {warning}</li>
                 ))}
               </ul>
             </div>
@@ -357,7 +353,7 @@ export default function SystemHealthPage() {
                   <div className="flex items-center space-x-3">
                     <span className="text-xl">{value ? '✅' : '❌'}</span>
                     <p className="font-medium text-[var(--foreground)] capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
+                      {key.replace(/([A-Z])/g, '$1').trim()}
                     </p>
                   </div>
                   <span className={`text-sm font-medium ${value ? 'text-green-600' : 'text-red-600'}`}>

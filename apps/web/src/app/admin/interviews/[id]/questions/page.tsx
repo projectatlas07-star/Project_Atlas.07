@@ -62,17 +62,17 @@ export default function InterviewQuestionsPage() {
   if (!session) return <p>Please sign in to manage interview questions.</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-800 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Interview Questions</h1>
+    <div className="max-w-3xl mx-auto p-6 bg-surface dark:bg-gray-800 rounded shadow">
+      <h1 className="text-2xl font-bold mb-4 text-[var(--foreground)] dark:text-gray-100">Interview Questions</h1>
       <ul className="space-y-4">
         {questions.map((q) => (
           <li key={q.id} className="border-b pb-2">
-            <p className="font-medium text-gray-800 dark:text-gray-200">{q.question}</p>
+            <p className="font-medium text-[var(--neutral-gray-800)] dark:text-gray-200">{q.question}</p>
             {q.answer && (
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Answer: {q.answer}</p>
+              <p className="mt-1 text-sm text-[var(--neutral-gray-600)] dark:text-gray-400">Answer: {q.answer}</p>
             )}
             <button
-              className="mt-2 px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              className="mt-2 px-3 py-1 bg-[var(--brand-purple)] text-[var(--foreground)] rounded hover:bg-indigo-700"
               onClick={() => generateAnswer(q.id)}
             >
               Generate AI Answer
@@ -89,13 +89,13 @@ export default function InterviewQuestionsPage() {
           className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
         />
         <button
-          className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          className="mt-2 px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
           onClick={addQuestion}
         >
           Add Question
         </button>
       </div>
-      {status && <p className="mt-4 text-sm text-gray-700 dark:text-gray-200">{status}</p>}
+      {status && <p className="mt-4 text-sm text-[var(--neutral-gray-700)] dark:text-gray-200">{status}</p>}
     </div>
   );
 }

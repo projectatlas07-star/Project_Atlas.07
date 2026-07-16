@@ -17,7 +17,7 @@ export default function Breadcrumbs() {
     const label = segment
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .join('');
     
     return { href, label };
   });
@@ -26,19 +26,19 @@ export default function Breadcrumbs() {
     <nav className="flex items-center space-x-2 text-sm mb-4" aria-label="Breadcrumb">
       <Link 
         href="/admin" 
-        className="text-gray-500 hover:text-gray-700 transition-colors"
+        className="text-[var(--neutral-gray-500)] hover:text-gray-700 transition-colors"
       >
         Dashboard
       </Link>
       {breadcrumbs.map((breadcrumb, index) => (
         <div key={breadcrumb.href} className="flex items-center space-x-2">
-          <span className="text-gray-400">/</span>
+          <span className="text-[var(--neutral-gray-400)]">/</span>
           {index === breadcrumbs.length - 1 ? (
-            <span className="text-gray-900 font-medium">{breadcrumb.label}</span>
+            <span className="text-[var(--foreground)] font-medium">{breadcrumb.label}</span>
           ) : (
             <Link 
               href={breadcrumb.href}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-[var(--neutral-gray-500)] hover:text-gray-700 transition-colors"
             >
               {breadcrumb.label}
             </Link>

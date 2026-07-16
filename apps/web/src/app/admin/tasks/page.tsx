@@ -89,22 +89,22 @@ export default function TasksPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">Tasks</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
         >
           {showForm ? 'Cancel' : 'Add Task'}
         </button>
       </div>
 
-      {status && <p className="mb-4 text-sm text-gray-600">{status}</p>}
+      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-white p-6 rounded shadow">
+        <form onSubmit={handleSubmit} className="mb-6 bg-surface p-6 rounded shadow">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label htmlFor="title" className="block mb-1 text-sm font-medium text-gray-700">Title</label>
+              <label htmlFor="title" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Title</label>
               <input
                 id="title"
                 type="text"
@@ -115,7 +115,7 @@ export default function TasksPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-700">Description</label>
+              <label htmlFor="description" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Description</label>
               <textarea
                 id="description"
                 value={formData.description}
@@ -125,7 +125,7 @@ export default function TasksPage() {
               />
             </div>
             <div>
-              <label htmlFor="status" className="block mb-1 text-sm font-medium text-gray-700">Status</label>
+              <label htmlFor="status" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Status</label>
               <select
                 id="status"
                 value={formData.status}
@@ -138,7 +138,7 @@ export default function TasksPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="dueDate" className="block mb-1 text-sm font-medium text-gray-700">Due Date</label>
+              <label htmlFor="dueDate" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Due Date</label>
               <input
                 id="dueDate"
                 type="date"
@@ -150,29 +150,29 @@ export default function TasksPage() {
           </div>
           <button
             type="submit"
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mt-4 px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
           >
             Save Task
           </button>
         </form>
       )}
 
-      <div className="bg-white rounded shadow overflow-hidden">
+      <div className="bg-surface rounded shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-[var(--background-alt)]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Title</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Due Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Description</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-surface divide-y divide-gray-200">
             {tasks.map((task) => (
               <tr key={task.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{task.title}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   <select
                     aria-label={`Task status for ${task.title}`}
                     value={task.status}
@@ -184,12 +184,12 @@ export default function TasksPage() {
                     <option value="done">Done</option>
                   </select>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{task.dueDate || '-'}</td>
-                <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">{task.description || '-'}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{task.dueDate || '-'}</td>
+                <td className="px-6 py-4 text-sm text-[var(--foreground)] max-w-xs truncate">{task.description || '-'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleDelete(task.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-[var(--color-error)] hover:text-red-900"
                   >
                     Delete
                   </button>
@@ -198,7 +198,7 @@ export default function TasksPage() {
             ))}
             {tasks.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={5} className="px-6 py-4 text-center text-sm text-[var(--neutral-gray-500)]">
                   No tasks found
                 </td>
               </tr>

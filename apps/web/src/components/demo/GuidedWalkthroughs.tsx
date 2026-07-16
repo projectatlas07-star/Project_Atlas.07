@@ -113,7 +113,7 @@ export default function GuidedWalkthroughs() {
               className="text-left bg-gradient-to-br bg-[var(--background-alt)] hover:bg-[var(--neutral-gray-100)] rounded-xl border border-[var(--neutral-gray-200)] hover:border-[var(--brand-cyan)] transition-all duration-300 hover:shadow-lg group p-5"
             >
               <div className="flex items-start gap-4">
-                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${walkthrough.color} flex items-center justify-center text-white text-2xl shadow-md`}>
+                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${walkthrough.color} flex items-center justify-center text-[var(--foreground)] text-2xl shadow-md`}>
                   {walkthrough.icon}
                 </div>
                 <div className="flex-1">

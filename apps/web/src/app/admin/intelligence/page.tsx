@@ -34,11 +34,7 @@ export default function IntelligencePage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center space-x-2 px-4 py-3 font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'text-[var(--brand-cyan)] border-b-2 border-[var(--brand-cyan)]'
-                : 'text-[var(--neutral-gray-500)] hover:text-[var(--foreground)]'
-            }`}
+            className={`flex items-center space-x-2 px-4 py-3 font-medium transition-colors ${ activeTab === tab.id ? 'text-[var(--brand-cyan)] border-b-2 border-[var(--brand-cyan)]' : 'text-[var(--neutral-gray-500)] hover:text-[var(--foreground)]' }`}
           >
             <span>{tab.icon}</span>
             <span>{tab.label}</span>

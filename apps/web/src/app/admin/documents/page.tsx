@@ -124,9 +124,9 @@ export default function DocumentsPage() {
 
   const formatFileSize = (bytes: number) => {
     if (!bytes) return '-';
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    if (bytes < 1024) return bytes + 'B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
   };
 
   if (loading) return <p>Loading...</p>;
@@ -135,22 +135,22 @@ export default function DocumentsPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">Documents</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
         >
           {showForm ? 'Cancel' : 'Upload Document'}
         </button>
       </div>
 
-      {status && <p className="mb-4 text-sm text-gray-600">{status}</p>}
+      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-white p-6 rounded shadow">
+        <form onSubmit={handleSubmit} className="mb-6 bg-surface p-6 rounded shadow">
           <div className="space-y-4">
             <div>
-              <label htmlFor="claim" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="claim" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 Link to Claim (Optional)
               </label>
               <select
@@ -168,7 +168,7 @@ export default function DocumentsPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="file" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="file" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
                 File
               </label>
               <input
@@ -182,7 +182,7 @@ export default function DocumentsPage() {
             <button
               type="submit"
               disabled={uploading}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
+              className="px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)] disabled:bg-gray-400"
             >
               {uploading ? 'Uploading...' : 'Upload Document'}
             </button>
@@ -190,64 +190,64 @@ export default function DocumentsPage() {
         </form>
       )}
 
-      <div className="bg-white rounded shadow overflow-hidden">
+      <div className="bg-surface rounded shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-[var(--background-alt)]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 File Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Size
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Claim
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Uploaded
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-surface divide-y divide-gray-200">
             {documents.map((document) => (
               <tr key={document.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {document.fileName}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {document.mimeType || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {formatFileSize(document.sizeBytes)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {document.claimId ? (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                    <span className="px-2 py-1 bg-[var(--color-info)]/10 text-blue-800 rounded text-xs">
                       Linked
                     </span>
                   ) : (
                     '-'
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">
                   {new Date(document.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleDownload(document)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
+                    className="text-[var(--color-info)] hover:text-blue-900 mr-3"
                   >
                     Download
                   </button>
                   <button
                     onClick={() => handleDelete(document.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-[var(--color-error)] hover:text-red-900"
                   >
                     Delete
                   </button>
@@ -256,7 +256,7 @@ export default function DocumentsPage() {
             ))}
             {documents.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={6} className="px-6 py-4 text-center text-sm text-[var(--neutral-gray-500)]">
                   No documents found
                 </td>
               </tr>

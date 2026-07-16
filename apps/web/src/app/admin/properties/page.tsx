@@ -78,22 +78,22 @@ export default function PropertiesPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">Properties</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
         >
           {showForm ? 'Cancel' : 'Add Property'}
         </button>
       </div>
 
-      {status && <p className="mb-4 text-sm text-gray-600">{status}</p>}
+      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-white p-6 rounded shadow">
+        <form onSubmit={handleSubmit} className="mb-6 bg-surface p-6 rounded shadow">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="address" className="block mb-1 text-sm font-medium text-gray-700">Address</label>
+              <label htmlFor="address" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Address</label>
               <input
                 id="address"
                 type="text"
@@ -104,7 +104,7 @@ export default function PropertiesPage() {
               />
             </div>
             <div>
-              <label htmlFor="city" className="block mb-1 text-sm font-medium text-gray-700">City</label>
+              <label htmlFor="city" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">City</label>
               <input
                 id="city"
                 type="text"
@@ -115,7 +115,7 @@ export default function PropertiesPage() {
               />
             </div>
             <div>
-              <label htmlFor="state" className="block mb-1 text-sm font-medium text-gray-700">State</label>
+              <label htmlFor="state" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">State</label>
               <input
                 id="state"
                 type="text"
@@ -126,7 +126,7 @@ export default function PropertiesPage() {
               />
             </div>
             <div>
-              <label htmlFor="zip" className="block mb-1 text-sm font-medium text-gray-700">ZIP</label>
+              <label htmlFor="zip" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">ZIP</label>
               <input
                 id="zip"
                 type="text"
@@ -137,7 +137,7 @@ export default function PropertiesPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="ownerName" className="block mb-1 text-sm font-medium text-gray-700">Owner Name</label>
+              <label htmlFor="ownerName" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">Owner Name</label>
               <input
                 id="ownerName"
                 type="text"
@@ -150,37 +150,37 @@ export default function PropertiesPage() {
           </div>
           <button
             type="submit"
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mt-4 px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
           >
             Save Property
           </button>
         </form>
       )}
 
-      <div className="bg-white rounded shadow overflow-hidden">
+      <div className="bg-surface rounded shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-[var(--background-alt)]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ZIP</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Address</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">City</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">State</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">ZIP</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Owner</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-[var(--neutral-gray-500)] uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-surface divide-y divide-gray-200">
             {properties.map((property) => (
               <tr key={property.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{property.address}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{property.city}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{property.state}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{property.zip}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{property.ownerName}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{property.address}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{property.city}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{property.state}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{property.zip}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--foreground)]">{property.ownerName}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleDelete(property.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-[var(--color-error)] hover:text-red-900"
                   >
                     Delete
                   </button>
@@ -189,7 +189,7 @@ export default function PropertiesPage() {
             ))}
             {properties.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={6} className="px-6 py-4 text-center text-sm text-[var(--neutral-gray-500)]">
                   No properties found
                 </td>
               </tr>

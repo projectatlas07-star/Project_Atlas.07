@@ -102,15 +102,15 @@ export default function LearningStats() {
           </div>
           <div className="bg-[var(--surface)] rounded-xl border border-[var(--neutral-gray-200)] p-4">
             <p className="text-xs text-[var(--neutral-gray-500)]">Acceptance Rate</p>
-            <p className="text-2xl font-bold text-green-600">{Math.round(stats.acceptanceRate * 100)}%</p>
+            <p className="text-2xl font-bold text-[var(--color-success)]">{Math.round(stats.acceptanceRate * 100)}%</p>
           </div>
           <div className="bg-[var(--surface)] rounded-xl border border-[var(--neutral-gray-200)] p-4">
             <p className="text-xs text-[var(--neutral-gray-500)]">Rejection Rate</p>
-            <p className="text-2xl font-bold text-red-600">{Math.round(stats.rejectionRate * 100)}%</p>
+            <p className="text-2xl font-bold text-[var(--color-error)]">{Math.round(stats.rejectionRate * 100)}%</p>
           </div>
           <div className="bg-[var(--surface)] rounded-xl border border-[var(--neutral-gray-200)] p-4">
             <p className="text-xs text-[var(--neutral-gray-500)]">Edit Rate</p>
-            <p className="text-2xl font-bold text-yellow-600">{Math.round(stats.editRate * 100)}%</p>
+            <p className="text-2xl font-bold text-[var(--color-warning)]">{Math.round(stats.editRate * 100)}%</p>
           </div>
           <div className="bg-[var(--surface)] rounded-xl border border-[var(--neutral-gray-200)] p-4">
             <p className="text-xs text-[var(--neutral-gray-500)]">Patterns Identified</p>
@@ -125,11 +125,7 @@ export default function LearningStats() {
           <button
             key={type.id}
             onClick={() => handlePatternTypeChange(type.id)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              selectedPatternType === type.id
-                ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)]'
-                : 'bg-[var(--background-alt)] text-[var(--foreground)] hover:bg-[var(--neutral-gray-100)]'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${ selectedPatternType === type.id ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)]' : 'bg-[var(--background-alt)] text-[var(--foreground)] hover:bg-[var(--neutral-gray-100)]' }`}
           >
             {type.label}
           </button>
@@ -147,7 +143,7 @@ export default function LearningStats() {
               <div>
                 <h3 className="font-semibold text-[var(--foreground)]">{pattern.pattern}</h3>
                 <span className="text-xs text-[var(--neutral-gray-500)] capitalize">
-                  {pattern.patternType.replace('_', ' ')}
+                  {pattern.patternType.replace('_', '')}
                 </span>
               </div>
               <div className="text-right">

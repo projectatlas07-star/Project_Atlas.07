@@ -180,7 +180,7 @@ export default function DashboardPage() {
             <div className="relative">
               <div className="text-4xl mb-2">{card.icon}</div>
               <p className="text-[var(--neutral-gray-400)] text-sm font-medium">{card.title}</p>
-              <p className="text-3xl font-bold text-white mt-1">{card.value}</p>
+              <p className="text-3xl font-bold text-[var(--foreground)] mt-1">{card.value}</p>
             </div>
           </a>
         ))}
@@ -242,7 +242,7 @@ export default function DashboardPage() {
           </a>
           <a
             href="/admin/supplements"
-            className="flex items-center space-x-3 p-4 rounded-lg bg-green-500/10 hover:bg-green-500/20 transition-colors border border-green-500/30"
+            className="flex items-center space-x-3 p-4 rounded-lg bg-[var(--color-success)]/10 hover:bg-green-500/20 transition-colors border border-[var(--color-success)]/30"
           >
             <span className="text-2xl">💰</span>
             <span className="font-medium text-[var(--foreground)]">Generate Supplement</span>

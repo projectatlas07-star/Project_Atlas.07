@@ -61,15 +61,15 @@ export default function GlobalSearch() {
         onClick={() => setIsOpen(true)}
         className="flex items-center space-x-2 px-3 py-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded-lg hover:bg-[var(--neutral-gray-200)] dark:hover:bg-[var(--surface)] transition-colors text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)]"
       >
-        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-[var(--neutral-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
-        <span className="text-sm text-gray-600">Search...</span>
-        <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 border border-gray-300 rounded">⌘K</kbd>
+        <span className="text-sm text-[var(--neutral-gray-600)]">Search...</span>
+        <kbd className="px-1.5 py-0.5 text-xs bg-[var(--neutral-gray-100)] border border-[var(--neutral-gray-300)] rounded">⌘K</kbd>
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+        <div className="absolute top-full right-0 mt-2 w-96 bg-surface rounded-lg shadow-xl border border-[var(--neutral-gray-200)] z-50">
           <div className="p-3">
             <input
               type="text"
@@ -81,9 +81,9 @@ export default function GlobalSearch() {
             />
           </div>
 
-          <div className="border-t border-gray-200">
+          <div className="border-t border-[var(--neutral-gray-200)]">
             {results.length === 0 ? (
-              <div className="p-4 text-center text-gray-500 text-sm">
+              <div className="p-4 text-center text-[var(--neutral-gray-500)] text-sm">
                 {query.length < 2 ? 'Type at least 2 characters to search' : 'No results found'}
               </div>
             ) : (
@@ -96,10 +96,10 @@ export default function GlobalSearch() {
                     onClick={() => setIsOpen(false)}
                   >
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{result.title}</div>
-                      <div className="text-xs text-gray-500">{result.type}</div>
+                      <div className="text-sm font-medium text-[var(--foreground)]">{result.title}</div>
+                      <div className="text-xs text-[var(--neutral-gray-500)]">{result.type}</div>
                     </div>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[var(--neutral-gray-400)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </a>
@@ -108,11 +108,11 @@ export default function GlobalSearch() {
             )}
           </div>
 
-          <div className="border-t border-gray-200 p-2">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span><kbd className="px-1 py-0.5 bg-gray-100 rounded">↑↓</kbd> Navigate</span>
-              <span><kbd className="px-1 py-0.5 bg-gray-100 rounded">↵</kbd> Select</span>
-              <span><kbd className="px-1 py-0.5 bg-gray-100 rounded">ESC</kbd> Close</span>
+          <div className="border-t border-[var(--neutral-gray-200)] p-2">
+            <div className="flex items-center justify-between text-xs text-[var(--neutral-gray-500)]">
+              <span><kbd className="px-1 py-0.5 bg-[var(--neutral-gray-100)] rounded">↑↓</kbd> Navigate</span>
+              <span><kbd className="px-1 py-0.5 bg-[var(--neutral-gray-100)] rounded">↵</kbd> Select</span>
+              <span><kbd className="px-1 py-0.5 bg-[var(--neutral-gray-100)] rounded">ESC</kbd> Close</span>
             </div>
           </div>
         </div>

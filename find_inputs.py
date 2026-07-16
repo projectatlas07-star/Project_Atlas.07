@@ -42,3 +42,4 @@ for cls, locs in sorted(patterns.items(), key=lambda x: -len(x[1])):
     for loc in sorted(set(locs)):
         print(f"    {loc}")
     print()
+    

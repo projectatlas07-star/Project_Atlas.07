@@ -83,8 +83,8 @@ export default function LoginPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3">
-              <p className="text-sm text-red-200 text-center">{error}</p>
+            <div className="bg-[var(--color-error)]/20 border border-[var(--color-error)]/50 rounded-lg p-3">
+              <p className="text-sm text-[var(--color-error)] text-center">{error}</p>
             </div>
           )}
 
@@ -154,7 +154,7 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <p className="text-center text-sm text-white/70">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{''}
             <a href="/auth/signup" className="text-[var(--brand-cyan)] hover:text-[var(--brand-cyan-light)] transition-colors font-medium">
               Sign Up
             </a>

@@ -190,7 +190,7 @@ export default function InterviewDetailPage() {
       case 'currency':
         return (
           <div className="relative">
-            <span className="absolute left-3 top-2 text-gray-500">$</span>
+            <span className="absolute left-3 top-2 text-[var(--neutral-gray-500)]">$</span>
             <input
               type="number"
               value={value || ''}
@@ -328,7 +328,7 @@ export default function InterviewDetailPage() {
         );
 
       default:
-        return <p className="text-gray-500">Unsupported question type</p>;
+        return <p className="text-[var(--neutral-gray-500)]">Unsupported question type</p>;
     }
   };
 
@@ -358,24 +358,24 @@ export default function InterviewDetailPage() {
         <div>
           <button
             onClick={() => router.push('/admin/interviews')}
-            className="text-sm text-gray-600 hover:text-gray-800 mb-2"
+            className="text-sm text-[var(--neutral-gray-600)] hover:text-gray-800 mb-2"
           >
             ← Back to Interviews
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">{interview.interviewNumber}</h1>
-          <p className="text-sm text-gray-600">{template.name}</p>
+          <h1 className="text-2xl font-bold text-[var(--foreground)]">{interview.interviewNumber}</h1>
+          <p className="text-sm text-[var(--neutral-gray-600)]">{template.name}</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setShowStatusDialog(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
           >
             Change Status
           </button>
           {interview.status === 'completed' && (
             <button
               onClick={generateClaim}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="px-4 py-2 bg-[var(--color-success)] text-[var(--foreground)] rounded hover:bg-[var(--color-success)]"
             >
               Generate Claim
             </button>
@@ -383,13 +383,13 @@ export default function InterviewDetailPage() {
         </div>
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-[var(--color-error)]">{error}</p>}
 
       {/* Status Banner */}
-      <div className="mb-6 p-4 bg-white rounded shadow">
+      <div className="mb-6 p-4 bg-surface rounded shadow">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-sm text-gray-600">Status</span>
+            <span className="text-sm text-[var(--neutral-gray-600)]">Status</span>
             <div className="mt-1">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[interview.status]}`}>
                 {STATUS_LABELS[interview.status]}
@@ -397,7 +397,7 @@ export default function InterviewDetailPage() {
             </div>
           </div>
           <div className="text-right">
-            <span className="text-sm text-gray-600">Progress</span>
+            <span className="text-sm text-[var(--neutral-gray-600)]">Progress</span>
             <div className="mt-1 text-sm font-medium">{Math.round(interview.progress)}%</div>
           </div>
         </div>
@@ -407,7 +407,7 @@ export default function InterviewDetailPage() {
       {template.settings.showProgress && (
         <div className="mb-6">
           <div
-            className="w-full bg-gray-200 rounded-full h-2"
+            className="w-full bg-[var(--neutral-gray-200)] rounded-full h-2"
             role="progressbar"
             aria-label="Interview progress"
             aria-valuenow={Math.round(interview.progress)}
@@ -415,7 +415,7 @@ export default function InterviewDetailPage() {
             aria-valuemax={100}
           >
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
+              className="bg-[var(--color-info)] h-2 rounded-full transition-all"
               style={{ width: `${interview.progress}%` }} /* eslint-disable-line react/no-inline-styles */
               role="presentation"
             ></div>
@@ -425,18 +425,14 @@ export default function InterviewDetailPage() {
 
       {/* Section Navigation */}
       {template.settings.showSectionNavigation && (
-        <div className="mb-6 p-4 bg-white rounded shadow">
+        <div className="mb-6 p-4 bg-surface rounded shadow">
           <h2 className="text-lg font-semibold mb-4">Sections</h2>
           <div className="flex flex-wrap gap-2">
             {template.sections.map((section, index) => (
               <button
                 key={section.id}
                 onClick={() => setCurrentSectionIndex(index)}
-                className={`px-4 py-2 rounded ${
-                  currentSectionIndex === index
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`px-4 py-2 rounded ${ currentSectionIndex === index ? 'bg-blue-600 text-white' : 'bg-gray-100 text-[var(--neutral-gray-700)] hover:bg-gray-200' }`}
               >
                 {section.title}
               </button>
@@ -446,22 +442,22 @@ export default function InterviewDetailPage() {
       )}
 
       {/* Question Runner */}
-      <div className="bg-white rounded shadow p-6">
+      <div className="bg-surface rounded shadow p-6">
         <h2 className="text-lg font-semibold mb-2">{currentSection.title}</h2>
         {currentSection.description && (
-          <p className="text-sm text-gray-600 mb-6">{currentSection.description}</p>
+          <p className="text-sm text-[var(--neutral-gray-600)] mb-6">{currentSection.description}</p>
         )}
 
         <div className="space-y-6">
           {visibleQuestions.map((question) => (
-            <div key={question.id} className="border-b border-gray-200 pb-6">
+            <div key={question.id} className="border-b border-[var(--neutral-gray-200)] pb-6">
               <div className="mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">
                   {question.label}
-                  {question.required && <span className="text-red-500 ml-1">*</span>}
+                  {question.required && <span className="text-[var(--color-error)] ml-1">*</span>}
                 </label>
                 {question.description && (
-                  <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                  <p className="text-sm text-[var(--neutral-gray-500)] mt-1">{question.description}</p>
                 )}
               </div>
               {renderQuestionInput(question, responses[question.id], currentSection.id)}
@@ -474,14 +470,14 @@ export default function InterviewDetailPage() {
           <button
             onClick={() => setCurrentSectionIndex(Math.max(0, currentSectionIndex - 1))}
             disabled={currentSectionIndex === 0}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300 disabled:opacity-50"
           >
             Previous Section
           </button>
           <button
             onClick={() => setCurrentSectionIndex(Math.min(template.sections.length - 1, currentSectionIndex + 1))}
             disabled={currentSectionIndex === template.sections.length - 1}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)] disabled:opacity-50"
           >
             Next Section
           </button>
@@ -491,7 +487,7 @@ export default function InterviewDetailPage() {
       {/* Status Change Dialog */}
       {showStatusDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded p-6 max-w-md w-full">
+          <div className="bg-surface rounded p-6 max-w-md w-full">
             <h2 className="text-lg font-semibold mb-4">Change Status</h2>
             <select
               value={newStatus}
@@ -507,13 +503,13 @@ export default function InterviewDetailPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleStatusChange}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="flex-1 px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
               >
                 Save
               </button>
               <button
                 onClick={() => setShowStatusDialog(false)}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                className="flex-1 px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
               >
                 Cancel
               </button>

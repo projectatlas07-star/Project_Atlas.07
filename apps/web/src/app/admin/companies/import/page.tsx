@@ -32,21 +32,21 @@ export default function CompaniesImport() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Import Companies (CSV)</h1>
+    <div className="max-w-2xl mx-auto p-6 bg-surface dark:bg-gray-800 rounded shadow">
+      <h1 className="text-2xl font-bold mb-4 text-[var(--foreground)] dark:text-gray-100">Import Companies (CSV)</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="csvFile" className="block mb-1 font-medium text-gray-700 dark:text-gray-200">CSV File</label>
+          <label htmlFor="csvFile" className="block mb-1 font-medium text-[var(--neutral-gray-700)] dark:text-gray-200">CSV File</label>
           <input
             id="csvFile"
             type="file"
             accept=".csv"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
+            className="block w-full text-sm text-[var(--neutral-gray-500)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
           />
         </div>
         <div>
-          <label htmlFor="columnMapping" className="block mb-1 font-medium text-gray-700 dark:text-gray-200">Column Mapping (JSON)</label>
+          <label htmlFor="columnMapping" className="block mb-1 font-medium text-[var(--neutral-gray-700)] dark:text-gray-200">Column Mapping (JSON)</label>
           <textarea
             id="columnMapping"
             rows={4}
@@ -54,17 +54,17 @@ export default function CompaniesImport() {
             onChange={(e) => setMapping(e.target.value)}
             className="block w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
           />
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-[var(--neutral-gray-500)] dark:text-gray-400">
             Example: {`{"Company Name":"name","Email":"email"}`}
           </p>
         </div>
         <button
           type="submit"
-          className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+          className="px-4 py-2 bg-[var(--brand-purple)] text-[var(--foreground)] rounded hover:bg-indigo-700"
         >
           Import
         </button>
-        {status && <p className="mt-2 text-sm text-gray-700 dark:text-gray-200">{status}</p>}
+        {status && <p className="mt-2 text-sm text-[var(--neutral-gray-700)] dark:text-gray-200">{status}</p>}
       </form>
     </div>
   );

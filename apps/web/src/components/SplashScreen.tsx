@@ -21,9 +21,7 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--brand-navy)] transition-opacity duration-500 ${
-        fading ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--brand-navy)] transition-opacity duration-500 ${ fading ? 'opacity-0' : 'opacity-100' }`}
       role="status"
       aria-label="Loading Project Atlas"
     >

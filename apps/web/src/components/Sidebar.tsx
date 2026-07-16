@@ -88,9 +88,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
       )}
 
       <aside
-        className={`fixed left-0 top-0 h-full bg-[var(--brand-navy)] border-r border-white/10 transition-all duration-300 z-50 ${
-          collapsed ? 'w-16' : 'w-64'
-        } ${isMobile && !mobileOpen ? '-translate-x-full' : ''}`}
+        className={`fixed left-0 top-0 h-full bg-[var(--brand-navy)] border-r border-white/10 transition-all duration-300 z-50 ${ collapsed ? 'w-16' : 'w-64' } ${isMobile && !mobileOpen ? '-translate-x-full' : ''}`}
       >
         {/* Logo */}
         <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -135,11 +133,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
                 key={item.href}
                 href={item.href}
                 onClick={() => isMobile && onMobileClose && onMobileClose()}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)] font-medium'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${ isActive ? 'bg-[var(--brand-cyan)] text-[var(--brand-navy)] font-medium' : 'text-white/70 hover:bg-white/10 hover:text-white' }`}
                 title={collapsed ? item.label : undefined}
               >
                 <span className="text-lg">{item.icon}</span>

@@ -20,16 +20,16 @@ export default function SettingsPage() {
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-gray-600">Manage your account settings</p>
+        <p className="text-[var(--neutral-gray-600)]">Manage your account settings</p>
       </div>
 
       <div className="space-y-6">
         {/* General Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-surface rounded-lg border border-[var(--neutral-gray-200)] p-6">
           <h2 className="text-lg font-semibold mb-4">General Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--neutral-gray-700)] mb-1">
                 Company Name
               </label>
               <input
@@ -41,7 +41,7 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--neutral-gray-700)] mb-1">
                 Default Timezone
               </label>
               <select
@@ -60,42 +60,34 @@ export default function SettingsPage() {
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-surface rounded-lg border border-[var(--neutral-gray-200)] p-6">
           <h2 className="text-lg font-semibold mb-4">Notification Settings</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-900">Email Notifications</div>
-                <div className="text-sm text-gray-500">Receive email updates for important events</div>
+                <div className="text-sm font-medium text-[var(--foreground)]">Email Notifications</div>
+                <div className="text-sm text-[var(--neutral-gray-500)]">Receive email updates for important events</div>
               </div>
               <button
                 onClick={() => setSettings({ ...settings, emailNotifications: !settings.emailNotifications })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.emailNotifications ? 'bg-blue-600' : 'bg-gray-200'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${ settings.emailNotifications ? 'bg-blue-600' : 'bg-gray-200' }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.emailNotifications ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-surface transition-transform ${ settings.emailNotifications ? 'translate-x-6' : 'translate-x-1' }`}
                 />
               </button>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-900">Slack Integration</div>
-                <div className="text-sm text-gray-500">Send notifications to Slack channels</div>
+                <div className="text-sm font-medium text-[var(--foreground)]">Slack Integration</div>
+                <div className="text-sm text-[var(--neutral-gray-500)]">Send notifications to Slack channels</div>
               </div>
               <button
                 onClick={() => setSettings({ ...settings, slackIntegration: !settings.slackIntegration })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.slackIntegration ? 'bg-blue-600' : 'bg-gray-200'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${ settings.slackIntegration ? 'bg-blue-600' : 'bg-gray-200' }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.slackIntegration ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-surface transition-transform ${ settings.slackIntegration ? 'translate-x-6' : 'translate-x-1' }`}
                 />
               </button>
             </div>
@@ -103,24 +95,20 @@ export default function SettingsPage() {
         </div>
 
         {/* Data Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-surface rounded-lg border border-[var(--neutral-gray-200)] p-6">
           <h2 className="text-lg font-semibold mb-4">Data Settings</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-900">Auto Backup</div>
-                <div className="text-sm text-gray-500">Automatically backup data daily</div>
+                <div className="text-sm font-medium text-[var(--foreground)]">Auto Backup</div>
+                <div className="text-sm text-[var(--neutral-gray-500)]">Automatically backup data daily</div>
               </div>
               <button
                 onClick={() => setSettings({ ...settings, autoBackup: !settings.autoBackup })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.autoBackup ? 'bg-blue-600' : 'bg-gray-200'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${ settings.autoBackup ? 'bg-blue-600' : 'bg-gray-200' }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.autoBackup ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-surface transition-transform ${ settings.autoBackup ? 'translate-x-6' : 'translate-x-1' }`}
                 />
               </button>
             </div>
@@ -131,7 +119,7 @@ export default function SettingsPage() {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded-lg hover:bg-[var(--color-info)] transition-colors"
           >
             Save Settings
           </button>

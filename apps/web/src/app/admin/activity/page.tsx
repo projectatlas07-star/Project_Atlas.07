@@ -72,14 +72,14 @@ const getActivityIcon = (action: string, entityType: string) => {
 
 const getActivityColor = (action: string) => {
   const actionLower = action.toLowerCase();
-  if (actionLower === 'create') return 'bg-green-100 text-green-800';
-  if (actionLower === 'update') return 'bg-blue-100 text-blue-800';
-  if (actionLower === 'delete') return 'bg-red-100 text-red-800';
-  if (actionLower === 'upload') return 'bg-purple-100 text-purple-800';
-  if (actionLower === 'download') return 'bg-indigo-100 text-indigo-800';
-  if (actionLower === 'assignment') return 'bg-yellow-100 text-yellow-800';
-  if (actionLower === 'status_change') return 'bg-orange-100 text-orange-800';
-  return 'bg-gray-100 text-gray-800';
+  if (actionLower === 'create') return 'bg-[var(--color-success)]/10 text-green-800';
+  if (actionLower === 'update') return 'bg-[var(--color-info)]/10 text-blue-800';
+  if (actionLower === 'delete') return 'bg-[var(--color-error)]/10 text-[var(--color-error)]';
+  if (actionLower === 'upload') return 'bg-[var(--brand-purple)]/10 text-purple-800';
+  if (actionLower === 'download') return 'bg-[var(--brand-purple)]/10 text-indigo-800';
+  if (actionLower === 'assignment') return 'bg-[var(--color-warning)]/10 text-[var(--color-warning)]';
+  if (actionLower === 'status_change') return 'bg-[var(--color-warning)]/10 text-orange-800';
+  return 'bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-800)]';
 };
 
 const formatTimestamp = (timestamp: string) => {
@@ -189,16 +189,16 @@ export default function ActivityPage() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Activity Timeline</h1>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">Activity Timeline</h1>
       </div>
 
-      {status && <p className="mb-4 text-sm text-gray-600">{status}</p>}
+      {status && <p className="mb-4 text-sm text-[var(--neutral-gray-600)]">{status}</p>}
 
       {/* Filters */}
-      <div className="mb-6 bg-white p-4 rounded shadow">
+      <div className="mb-6 bg-surface p-4 rounded shadow">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
           <div>
-            <label htmlFor="user" className="block mb-1 text-sm font-medium text-gray-700">
+            <label htmlFor="user" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
               User
             </label>
             <select
@@ -219,7 +219,7 @@ export default function ActivityPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="entityType" className="block mb-1 text-sm font-medium text-gray-700">
+            <label htmlFor="entityType" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
               Entity Type
             </label>
             <select
@@ -240,7 +240,7 @@ export default function ActivityPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="action" className="block mb-1 text-sm font-medium text-gray-700">
+            <label htmlFor="action" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
               Action
             </label>
             <select
@@ -261,7 +261,7 @@ export default function ActivityPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="startDate" className="block mb-1 text-sm font-medium text-gray-700">
+            <label htmlFor="startDate" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
               Start Date
             </label>
             <input
@@ -276,7 +276,7 @@ export default function ActivityPage() {
             />
           </div>
           <div>
-            <label htmlFor="endDate" className="block mb-1 text-sm font-medium text-gray-700">
+            <label htmlFor="endDate" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
               End Date
             </label>
             <input
@@ -291,7 +291,7 @@ export default function ActivityPage() {
             />
           </div>
           <div>
-            <label htmlFor="search" className="block mb-1 text-sm font-medium text-gray-700">
+            <label htmlFor="search" className="block mb-1 text-sm font-medium text-[var(--neutral-gray-700)]">
               Search
             </label>
             <input
@@ -309,16 +309,16 @@ export default function ActivityPage() {
         </div>
         <button
           onClick={clearFilters}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          className="px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
         >
           Clear Filters
         </button>
       </div>
 
       {/* Activity Timeline */}
-      <div className="bg-white rounded shadow p-6">
+      <div className="bg-surface rounded shadow p-6">
         {activities.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">No activity found</p>
+          <p className="text-center text-[var(--neutral-gray-500)] py-8">No activity found</p>
         ) : (
           <div className="space-y-4">
             {activities.map((activity) => {
@@ -328,7 +328,7 @@ export default function ActivityPage() {
 
               return (
                 <div key={activity.id} className="flex items-start space-x-4 p-4 border rounded hover:bg-gray-50">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--neutral-gray-100)] flex items-center justify-center text-xl">
                     {icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -336,22 +336,22 @@ export default function ActivityPage() {
                       <span className={`px-2 py-1 rounded text-xs font-medium ${colorClass}`}>
                         {activity.action}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-[var(--neutral-gray-500)]">
                         {activity.entityType}
                       </span>
                       {entityLink && (
                         <a
                           href={entityLink}
-                          className="text-sm text-blue-600 hover:text-blue-800"
+                          className="text-sm text-[var(--color-info)] hover:text-blue-800"
                         >
                           View
                         </a>
                       )}
                     </div>
-                    <p className="text-sm text-gray-900 mb-1">
+                    <p className="text-sm text-[var(--foreground)] mb-1">
                       {activity.description || `${activity.action} ${activity.entityType}`}
                     </p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <div className="flex items-center space-x-4 text-xs text-[var(--neutral-gray-500)]">
                       <span>{activity.userName || 'Unknown user'}</span>
                       <span>•</span>
                       <span>{formatTimestamp(activity.createdAt)}</span>
@@ -363,7 +363,7 @@ export default function ActivityPage() {
                       )}
                     </div>
                     {activity.entityName && (
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-[var(--neutral-gray-600)] mt-1">
                         Entity: {activity.entityName}
                       </p>
                     )}
