@@ -201,6 +201,29 @@ export default function AskAtlas() {
   const displayName = useMemo(() => formatName(session), [session]);
   const currentDate = useMemo(() => formatDate(), []);
 
+  const revenueOpportunities = useMemo(
+    () => recommendations.filter((r) => r.type === "opportunity"),
+    [recommendations],
+  );
+  const claimRiskAlerts = useMemo(
+    () =>
+      recommendations.filter(
+        (r) => r.type === "warning" && r.relatedEntityType === "claim",
+      ),
+    [recommendations],
+  );
+  const taskRecommendations = useMemo(
+    () => recommendations.filter((r) => r.type === "action"),
+    [recommendations],
+  );
+  const suggestedFollowUps = useMemo(
+    () =>
+      recommendations.filter(
+        (r) => r.type === "warning" || r.type === "opportunity",
+      ),
+    [recommendations],
+  );
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -726,34 +749,111 @@ export default function AskAtlas() {
                 )}
               </div>
 
-              {recommendations.length > 0 && (
-                <div className="panel-atlas p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <h3 className="text-sm font-medium text-foreground">
-                      Recommended follow-ups
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {recommendations.map((rec) => (
-                      <div
-                        key={rec.id}
-                        className="flex items-start gap-2 p-3 rounded-lg bg-muted/50"
-                      >
-                        <Lightbulb className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium text-foreground">
-                            {rec.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {rec.reason}
-                          </p>
-                        </div>
+              <div className="panel-atlas p-4 rounded-xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <h3 className="text-sm font-medium text-foreground">
+                    Background intelligence
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg border bg-success/5">
+                    <h4 className="text-sm font-semibold text-success mb-2">
+                      Revenue opportunities
+                    </h4>
+                    {revenueOpportunities.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        No revenue opportunities right now.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {revenueOpportunities.slice(0, 3).map((rec) => (
+                          <div key={rec.id} className="text-sm">
+                            <p className="text-foreground font-medium">
+                              {rec.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {rec.reason}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
+                  </div>
+
+                  <div className="p-3 rounded-lg border bg-destructive/5">
+                    <h4 className="text-sm font-semibold text-destructive mb-2">
+                      Claim risk alerts
+                    </h4>
+                    {claimRiskAlerts.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        No claim risk alerts.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {claimRiskAlerts.slice(0, 3).map((rec) => (
+                          <div key={rec.id} className="text-sm">
+                            <p className="text-foreground font-medium">
+                              {rec.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {rec.reason}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-3 rounded-lg border bg-primary/5">
+                    <h4 className="text-sm font-semibold text-primary mb-2">
+                      Task recommendations
+                    </h4>
+                    {taskRecommendations.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        No task recommendations.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {taskRecommendations.slice(0, 3).map((rec) => (
+                          <div key={rec.id} className="text-sm">
+                            <p className="text-foreground font-medium">
+                              {rec.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {rec.reason}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-3 rounded-lg border bg-accent/5">
+                    <h4 className="text-sm font-semibold text-accent mb-2">
+                      Suggested follow-ups
+                    </h4>
+                    {suggestedFollowUps.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        No suggested follow-ups.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {suggestedFollowUps.slice(0, 3).map((rec) => (
+                          <div key={rec.id} className="text-sm">
+                            <p className="text-foreground font-medium">
+                              {rec.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {rec.reason}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
