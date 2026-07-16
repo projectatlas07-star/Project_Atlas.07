@@ -21,7 +21,7 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--brand-navy)] transition-opacity duration-500 ${ fading ? 'opacity-0' : 'opacity-100' }`}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-atlas-void transition-opacity duration-500 ${ fading ? 'opacity-0' : 'opacity-100' }`}
       role="status"
       aria-label="Loading Project Atlas"
     >
@@ -38,15 +38,15 @@ export default function SplashScreen() {
         </div>
 
         {/* Subtitle */}
-        <p className="text-[var(--brand-cyan)] text-lg font-medium tracking-wide">
+        <p className="text-primary text-lg font-medium tracking-wide">
           AI Operating System for Insurance Restoration
         </p>
 
         {/* Loading Animation */}
         <div className="flex space-x-2">
-          <div className="w-2 h-2 bg-[var(--brand-cyan)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 bg-[var(--brand-purple)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-[var(--brand-cyan)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>

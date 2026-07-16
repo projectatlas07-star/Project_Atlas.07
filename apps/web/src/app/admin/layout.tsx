@@ -8,7 +8,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--background-alt)]">
+    <div className="min-h-screen bg-atmosphere text-foreground">
       <Sidebar 
         mobileOpen={mobileMenuOpen} 
         onMobileClose={() => setMobileMenuOpen(false)} 

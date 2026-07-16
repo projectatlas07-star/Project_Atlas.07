@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { Button, Input } from '@project-atlas/ui';
+import { Search, Command, ChevronRight, ArrowUp, ArrowDown, CornerDownLeft } from 'lucide-react';
 
 interface SearchResult {
   type: string;
@@ -57,33 +59,35 @@ export default function GlobalSearch() {
 
   return (
     <div className="relative" ref={searchRef}>
-      <button
+      <Button
+        type="button"
+        variant="outline"
         onClick={() => setIsOpen(true)}
-        className="flex items-center space-x-2 px-3 py-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded-lg hover:bg-[var(--neutral-gray-200)] dark:hover:bg-[var(--surface)] transition-colors text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)]"
+        className="h-9 gap-2 text-muted-foreground"
       >
-        <svg className="w-4 h-4 text-[var(--neutral-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <span className="text-sm text-[var(--neutral-gray-600)]">Search...</span>
-        <kbd className="px-1.5 py-0.5 text-xs bg-[var(--neutral-gray-100)] border border-[var(--neutral-gray-300)] rounded">⌘K</kbd>
-      </button>
+        <Search className="h-4 w-4" />
+        <span className="text-sm">Search...</span>
+        <kbd className="ml-auto px-1.5 py-0.5 text-xs bg-muted border border-[var(--border)] rounded">
+          <Command className="h-3 w-3 inline" />K
+        </kbd>
+      </Button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 bg-surface rounded-lg shadow-xl border border-[var(--neutral-gray-200)] z-50">
+        <div className="absolute top-full right-0 mt-2 w-96 panel-atlas rounded-lg shadow-xl z-50">
           <div className="p-3">
-            <input
+            <Input
               type="text"
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search claims, documents, interviews..."
-              className="w-full px-3 py-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded-lg text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
               autoFocus
+              className="w-full"
             />
           </div>
 
-          <div className="border-t border-[var(--neutral-gray-200)]">
+          <div className="border-t border-[var(--border)]">
             {results.length === 0 ? (
-              <div className="p-4 text-center text-[var(--neutral-gray-500)] text-sm">
+              <div className="p-4 text-center text-muted-foreground text-sm">
                 {query.length < 2 ? 'Type at least 2 characters to search' : 'No results found'}
               </div>
             ) : (
@@ -92,27 +96,25 @@ export default function GlobalSearch() {
                   <a
                     key={index}
                     href={result.href}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-accent transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <div>
-                      <div className="text-sm font-medium text-[var(--foreground)]">{result.title}</div>
-                      <div className="text-xs text-[var(--neutral-gray-500)]">{result.type}</div>
+                      <div className="text-sm font-medium text-foreground">{result.title}</div>
+                      <div className="text-xs text-muted-foreground">{result.type}</div>
                     </div>
-                    <svg className="w-4 h-4 text-[var(--neutral-gray-400)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </a>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="border-t border-[var(--neutral-gray-200)] p-2">
-            <div className="flex items-center justify-between text-xs text-[var(--neutral-gray-500)]">
-              <span><kbd className="px-1 py-0.5 bg-[var(--neutral-gray-100)] rounded">↑↓</kbd> Navigate</span>
-              <span><kbd className="px-1 py-0.5 bg-[var(--neutral-gray-100)] rounded">↵</kbd> Select</span>
-              <span><kbd className="px-1 py-0.5 bg-[var(--neutral-gray-100)] rounded">ESC</kbd> Close</span>
+          <div className="border-t border-[var(--border)] p-2">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><kbd className="px-1 py-0.5 bg-muted rounded"><ArrowUp className="h-3 w-3 inline" /></kbd><kbd className="px-1 py-0.5 bg-muted rounded"><ArrowDown className="h-3 w-3 inline" /></kbd> Navigate</span>
+              <span className="flex items-center gap-1"><kbd className="px-1 py-0.5 bg-muted rounded"><CornerDownLeft className="h-3 w-3 inline" /></kbd> Select</span>
+              <span className="flex items-center gap-1"><kbd className="px-1 py-0.5 bg-muted rounded">ESC</kbd> Close</span>
             </div>
           </div>
         </div>
