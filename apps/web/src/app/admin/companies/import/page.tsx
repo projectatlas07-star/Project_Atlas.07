@@ -1,30 +1,30 @@
-'use client';
+"use client";
 
 // apps/web/src/app/admin/companies/import/page.tsx
-import { useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { useState } from "react";
+import { apiFetch } from "@/lib/api";
 
 export default function CompaniesImport() {
   const [file, setFile] = useState<File | null>(null);
-  const [mapping, setMapping] = useState<string>('{}');
-  const [status, setStatus] = useState<string>('');
+  const [mapping, setMapping] = useState<string>("{}");
+  const [status, setStatus] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      setStatus('Please select a CSV file');
+      setStatus("Please select a CSV file");
       return;
     }
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('mapping', mapping);
+      formData.append("file", file);
+      formData.append("mapping", mapping);
       const response = await fetch(`/companies/import-csv`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Import failed');
+      if (!response.ok) throw new Error(data.error || "Import failed");
       setStatus(`Imported ${data.insertedCount} companies`);
     } catch (err: any) {
       setStatus(`Error: ${err.message}`);
@@ -33,38 +33,54 @@ export default function CompaniesImport() {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-surface dark:bg-gray-800 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-[var(--foreground)] dark:text-gray-100">Import Companies (CSV)</h1>
+      <h1 className="text-2xl font-bold mb-4 text-foreground dark:text-gray-100">
+        Import Companies (CSV)
+      </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="csvFile" className="block mb-1 font-medium text-[var(--neutral-gray-700)] dark:text-gray-200">CSV File</label>
+          <label
+            htmlFor="csvFile"
+            className="block mb-1 font-medium text-foreground dark:text-gray-200"
+          >
+            CSV File
+          </label>
           <input
             id="csvFile"
             type="file"
             accept=".csv"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm text-[var(--neutral-gray-500)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
+            className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
           />
         </div>
         <div>
-          <label htmlFor="columnMapping" className="block mb-1 font-medium text-[var(--neutral-gray-700)] dark:text-gray-200">Column Mapping (JSON)</label>
+          <label
+            htmlFor="columnMapping"
+            className="block mb-1 font-medium text-foreground dark:text-gray-200"
+          >
+            Column Mapping (JSON)
+          </label>
           <textarea
             id="columnMapping"
             rows={4}
             value={mapping}
             onChange={(e) => setMapping(e.target.value)}
-            className="block w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+            className="block w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
           />
-          <p className="mt-1 text-sm text-[var(--neutral-gray-500)] dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
             Example: {`{"Company Name":"name","Email":"email"}`}
           </p>
         </div>
         <button
           type="submit"
-          className="px-4 py-2 bg-[var(--brand-purple)] text-[var(--foreground)] rounded hover:bg-indigo-700"
+          className="px-4 py-2 bg-accent text-foreground rounded hover:bg-indigo-700"
         >
           Import
         </button>
-        {status && <p className="mt-2 text-sm text-[var(--neutral-gray-700)] dark:text-gray-200">{status}</p>}
+        {status && (
+          <p className="mt-2 text-sm text-foreground dark:text-gray-200">
+            {status}
+          </p>
+        )}
       </form>
     </div>
   );

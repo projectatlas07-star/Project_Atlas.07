@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
-import { useSupabase } from '@/providers/SupabaseProvider';
-import { STATUS_LABELS, STATUS_COLORS, ClaimStatus } from '@/lib/claims-workflow';
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
+import { useSupabase } from "@/providers/SupabaseProvider";
+import {
+  STATUS_LABELS,
+  STATUS_COLORS,
+  ClaimStatus,
+} from "@/lib/claims-workflow";
 
 interface Claim {
   id: string;
@@ -78,19 +82,19 @@ interface TransitionResponse {
 }
 
 const formatCurrency = (value: number | null) => {
-  if (value === null) return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  if (value === null) return "N/A";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(value);
 };
 
 const formatDate = (date: string | null) => {
-  if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 };
 
@@ -101,18 +105,22 @@ export default function ClaimDetailPage() {
   const claimId = params.id as string;
 
   const [claim, setClaim] = useState<Claim | null>(null);
-  const [transitions, setTransitions] = useState<TransitionResponse | null>(null);
-  const [supplementsData, setSupplementsData] = useState<SupplementsResponse | null>(null);
-  const [interviewsData, setInterviewsData] = useState<InterviewsResponse | null>(null);
-  const [status, setStatus] = useState('');
-  const [reason, setReason] = useState('');
+  const [transitions, setTransitions] = useState<TransitionResponse | null>(
+    null,
+  );
+  const [supplementsData, setSupplementsData] =
+    useState<SupplementsResponse | null>(null);
+  const [interviewsData, setInterviewsData] =
+    useState<InterviewsResponse | null>(null);
+  const [status, setStatus] = useState("");
+  const [reason, setReason] = useState("");
   const [showStatusDialog, setShowStatusDialog] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loadingClaim, setLoadingClaim] = useState(true);
 
   useEffect(() => {
     if (!session) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
     loadClaim();
@@ -135,40 +143,46 @@ export default function ClaimDetailPage() {
 
   const loadTransitions = async () => {
     try {
-      const data = await apiFetch<TransitionResponse>(`/claims/${claimId}/transitions`);
+      const data = await apiFetch<TransitionResponse>(
+        `/claims/${claimId}/transitions`,
+      );
       setTransitions(data);
     } catch (e: any) {
-      console.error('Error loading transitions:', e);
+      console.error("Error loading transitions:", e);
     }
   };
 
   const loadSupplements = async () => {
     try {
-      const data = await apiFetch<SupplementsResponse>(`/claims/${claimId}/supplements`);
+      const data = await apiFetch<SupplementsResponse>(
+        `/claims/${claimId}/supplements`,
+      );
       setSupplementsData(data);
     } catch (e: any) {
-      console.error('Error loading supplements:', e);
+      console.error("Error loading supplements:", e);
     }
   };
 
   const loadInterviews = async () => {
     try {
-      const data = await apiFetch<InterviewsResponse>(`/claims/${claimId}/interviews`);
+      const data = await apiFetch<InterviewsResponse>(
+        `/claims/${claimId}/interviews`,
+      );
       setInterviewsData(data);
     } catch (e: any) {
-      console.error('Error loading interviews:', e);
+      console.error("Error loading interviews:", e);
     }
   };
 
   const handleStatusChange = async () => {
     try {
       await apiFetch(`/claims/${claimId}/status`, {
-        method: 'PUT',
+        method: "PUT",
         body: JSON.stringify({ status, reason }),
       });
       setShowStatusDialog(false);
-      setStatus('');
-      setReason('');
+      setStatus("");
+      setReason("");
       loadClaim();
       loadTransitions();
     } catch (e: any) {
@@ -185,37 +199,45 @@ export default function ClaimDetailPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <button
-            onClick={() => router.push('/admin/claims')}
-            className="text-sm text-[var(--neutral-gray-600)] hover:text-gray-800 mb-2"
+            onClick={() => router.push("/admin/claims")}
+            className="text-sm text-muted-foreground hover:text-foreground mb-2"
           >
             ← Back to Claims
           </button>
-          <h1 className="text-2xl font-bold text-[var(--foreground)]">{claim.claimNumber}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {claim.claimNumber}
+          </h1>
         </div>
         <button
           onClick={() => setShowStatusDialog(true)}
-          className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)]"
+          className="px-4 py-2 bg-info text-foreground rounded hover:bg-info"
         >
           Change Status
         </button>
       </div>
 
-      {error && <p className="mb-4 text-sm text-[var(--color-error)]">{error}</p>}
+      {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
       {/* Status Banner */}
       <div className="mb-6 p-4 bg-surface rounded shadow">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-sm text-[var(--neutral-gray-600)]">Current Status</span>
+            <span className="text-sm text-muted-foreground">
+              Current Status
+            </span>
             <div className="mt-1">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[claim.status]}`}>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[claim.status]}`}
+              >
                 {STATUS_LABELS[claim.status]}
               </span>
             </div>
           </div>
           <div className="text-right">
-            <span className="text-sm text-[var(--neutral-gray-600)]">Last Updated</span>
-            <div className="mt-1 text-sm font-medium">{formatDate(claim.updatedAt)}</div>
+            <span className="text-sm text-muted-foreground">Last Updated</span>
+            <div className="mt-1 text-sm font-medium">
+              {formatDate(claim.updatedAt)}
+            </div>
           </div>
         </div>
       </div>
@@ -228,24 +250,44 @@ export default function ClaimDetailPage() {
             <h2 className="text-lg font-semibold mb-4">Claim Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Date of Loss</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{formatDate(claim.dateOfLoss)}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Date of Loss
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatDate(claim.dateOfLoss)}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Date Reported</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{formatDate(claim.dateReported)}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Date Reported
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatDate(claim.dateReported)}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Insurance Company</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{claim.insuranceCompany || 'N/A'}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Insurance Company
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {claim.insuranceCompany || "N/A"}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Policy Number</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{claim.policyNumber || 'N/A'}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Policy Number
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {claim.policyNumber || "N/A"}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Description</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{claim.description || 'N/A'}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Description
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {claim.description || "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -255,16 +297,28 @@ export default function ClaimDetailPage() {
             <h2 className="text-lg font-semibold mb-4">Customer Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Name</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{claim.customerName || 'N/A'}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Name
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {claim.customerName || "N/A"}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Email</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{claim.customerEmail || 'N/A'}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Email
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {claim.customerEmail || "N/A"}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Phone</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{claim.customerPhone || 'N/A'}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Phone
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {claim.customerPhone || "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -274,20 +328,36 @@ export default function ClaimDetailPage() {
             <h2 className="text-lg font-semibold mb-4">Financial Summary</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Estimated Value</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(claim.estimatedValue)}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Estimated Value
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatCurrency(claim.estimatedValue)}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Approved Value</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(claim.approvedValue)}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Approved Value
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatCurrency(claim.approvedValue)}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Deductible</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(claim.deductible)}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Deductible
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatCurrency(claim.deductible)}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Net Approved</label>
-                <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(claim.financialSummary?.netApproved)}</p>
+                <label className="block text-sm font-medium text-foreground">
+                  Net Approved
+                </label>
+                <p className="mt-1 text-sm text-foreground">
+                  {formatCurrency(claim.financialSummary?.netApproved)}
+                </p>
               </div>
             </div>
           </div>
@@ -298,36 +368,62 @@ export default function ClaimDetailPage() {
             {supplementsData ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Supplement Count</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">{supplementsData.summary.count}</p>
+                  <label className="block text-sm font-medium text-foreground">
+                    Supplement Count
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {supplementsData.summary.count}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Latest Status</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">{supplementsData.summary.latestStatus || 'N/A'}</p>
+                  <label className="block text-sm font-medium text-foreground">
+                    Latest Status
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {supplementsData.summary.latestStatus || "N/A"}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Total Requested</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(supplementsData.summary.totalRequested)}</p>
+                  <label className="block text-sm font-medium text-foreground">
+                    Total Requested
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {formatCurrency(supplementsData.summary.totalRequested)}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Total Approved</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(supplementsData.summary.totalApproved)}</p>
+                  <label className="block text-sm font-medium text-foreground">
+                    Total Approved
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {formatCurrency(supplementsData.summary.totalApproved)}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Outstanding Amount</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">{formatCurrency(supplementsData.summary.totalOutstanding)}</p>
+                  <label className="block text-sm font-medium text-foreground">
+                    Outstanding Amount
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {formatCurrency(supplementsData.summary.totalOutstanding)}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Latest Carrier Response</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">
-                    {supplementsData.summary.latestCarrierResponse 
-                      ? formatDate(supplementsData.summary.latestCarrierResponse)
-                      : 'N/A'}
+                  <label className="block text-sm font-medium text-foreground">
+                    Latest Carrier Response
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {supplementsData.summary.latestCarrierResponse
+                      ? formatDate(
+                          supplementsData.summary.latestCarrierResponse,
+                        )
+                      : "N/A"}
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-[var(--neutral-gray-500)]">Loading supplements...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading supplements...
+              </p>
             )}
           </div>
 
@@ -337,36 +433,48 @@ export default function ClaimDetailPage() {
             {interviewsData ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Interview Count</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">{interviewsData.count}</p>
+                  <label className="block text-sm font-medium text-foreground">
+                    Interview Count
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {interviewsData.count}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Latest Interview</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">
-                    {interviewsData.interviews.length > 0 
+                  <label className="block text-sm font-medium text-foreground">
+                    Latest Interview
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {interviewsData.interviews.length > 0
                       ? interviewsData.interviews[0].interviewNumber
-                      : 'N/A'}
+                      : "N/A"}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Latest Status</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">
-                    {interviewsData.interviews.length > 0 
+                  <label className="block text-sm font-medium text-foreground">
+                    Latest Status
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {interviewsData.interviews.length > 0
                       ? interviewsData.interviews[0].status
-                      : 'N/A'}
+                      : "N/A"}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--neutral-gray-700)]">Latest Progress</label>
-                  <p className="mt-1 text-sm text-[var(--foreground)]">
-                    {interviewsData.interviews.length > 0 
+                  <label className="block text-sm font-medium text-foreground">
+                    Latest Progress
+                  </label>
+                  <p className="mt-1 text-sm text-foreground">
+                    {interviewsData.interviews.length > 0
                       ? `${Math.round(interviewsData.interviews[0].progress)}%`
-                      : 'N/A'}
+                      : "N/A"}
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-[var(--neutral-gray-500)]">Loading interviews...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading interviews...
+              </p>
             )}
           </div>
 
@@ -376,29 +484,40 @@ export default function ClaimDetailPage() {
             {claim.statusHistory && claim.statusHistory.length > 0 ? (
               <div className="space-y-3">
                 {claim.statusHistory.map((entry: any, index: number) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-[var(--background-alt)] rounded">
-                    <div className="flex-shrink-0 w-2 h-2 mt-2 bg-[var(--color-info)] rounded-full"></div>
+                  <div
+                    key={index}
+                    className="flex items-start space-x-3 p-3 bg-muted rounded"
+                  >
+                    <div className="flex-shrink-0 w-2 h-2 mt-2 bg-info rounded-full"></div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[entry.status as ClaimStatus]}`}>
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[entry.status as ClaimStatus]}`}
+                        >
                           {STATUS_LABELS[entry.status as ClaimStatus]}
                         </span>
-                        <span className="text-xs text-[var(--neutral-gray-500)]">
+                        <span className="text-xs text-muted-foreground">
                           {new Date(entry.timestamp).toLocaleString()}
                         </span>
                       </div>
                       {entry.userName && (
-                        <p className="text-xs text-[var(--neutral-gray-600)] mt-1">by {entry.userName}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          by {entry.userName}
+                        </p>
                       )}
                       {entry.reason && (
-                        <p className="text-xs text-[var(--neutral-gray-600)] mt-1">Reason: {entry.reason}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Reason: {entry.reason}
+                        </p>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[var(--neutral-gray-500)]">No status history available</p>
+              <p className="text-sm text-muted-foreground">
+                No status history available
+              </p>
             )}
           </div>
         </div>
@@ -409,16 +528,16 @@ export default function ClaimDetailPage() {
           <div className="bg-surface rounded shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <button className="w-full px-4 py-2 bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-200 text-left">
+              <button className="w-full px-4 py-2 bg-muted text-foreground rounded hover:bg-muted text-left">
                 View Documents
               </button>
-              <button className="w-full px-4 py-2 bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-200 text-left">
+              <button className="w-full px-4 py-2 bg-muted text-foreground rounded hover:bg-muted text-left">
                 View Supplements
               </button>
-              <button className="w-full px-4 py-2 bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-200 text-left">
+              <button className="w-full px-4 py-2 bg-muted text-foreground rounded hover:bg-muted text-left">
                 View Activity Timeline
               </button>
-              <button className="w-full px-4 py-2 bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-200 text-left">
+              <button className="w-full px-4 py-2 bg-muted text-foreground rounded hover:bg-muted text-left">
                 Add Note
               </button>
             </div>
@@ -429,13 +548,17 @@ export default function ClaimDetailPage() {
             <h2 className="text-lg font-semibold mb-4">Assigned Adjuster</h2>
             {claim.adjusterId ? (
               <div>
-                <p className="text-sm text-[var(--foreground)]">Adjuster ID: {claim.adjusterId}</p>
-                <button className="mt-2 text-sm text-[var(--color-info)] hover:text-blue-800">
+                <p className="text-sm text-foreground">
+                  Adjuster ID: {claim.adjusterId}
+                </p>
+                <button className="mt-2 text-sm text-info hover:text-blue-800">
                   View Adjuster Details
                 </button>
               </div>
             ) : (
-              <p className="text-sm text-[var(--neutral-gray-500)]">No adjuster assigned</p>
+              <p className="text-sm text-muted-foreground">
+                No adjuster assigned
+              </p>
             )}
           </div>
 
@@ -444,13 +567,17 @@ export default function ClaimDetailPage() {
             <h2 className="text-lg font-semibold mb-4">Property</h2>
             {claim.propertyId ? (
               <div>
-                <p className="text-sm text-[var(--foreground)]">Property ID: {claim.propertyId}</p>
-                <button className="mt-2 text-sm text-[var(--color-info)] hover:text-blue-800">
+                <p className="text-sm text-foreground">
+                  Property ID: {claim.propertyId}
+                </p>
+                <button className="mt-2 text-sm text-info hover:text-blue-800">
                   View Property Details
                 </button>
               </div>
             ) : (
-              <p className="text-sm text-[var(--neutral-gray-500)]">No property linked</p>
+              <p className="text-sm text-muted-foreground">
+                No property linked
+              </p>
             )}
           </div>
         </div>
@@ -463,13 +590,13 @@ export default function ClaimDetailPage() {
             <h3 className="text-lg font-semibold mb-4">Change Status</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)] mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   New Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                  className="w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                   aria-label="Select new status"
                 >
                   <option value="">Select status...</option>
@@ -481,13 +608,13 @@ export default function ClaimDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--neutral-gray-700)] mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Reason (optional)
                 </label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full p-2 bg-[var(--neutral-gray-100)] dark:bg-[var(--surface-alt)] border border-[var(--neutral-gray-400)] dark:border-[var(--brand-navy-light)] rounded text-[var(--foreground)] placeholder:text-[var(--neutral-gray-500)] dark:placeholder:text-[var(--neutral-gray-400)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-cyan)] focus:border-[var(--brand-cyan)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors hover:border-[var(--neutral-gray-500)] dark:hover:border-[var(--brand-cyan)]"
+                  className="w-full p-2 bg-muted dark:bg-card border border-input rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:border-primary"
                   rows={3}
                   placeholder="Enter reason for status change..."
                 />
@@ -497,17 +624,17 @@ export default function ClaimDetailPage() {
               <button
                 onClick={() => {
                   setShowStatusDialog(false);
-                  setStatus('');
-                  setReason('');
+                  setStatus("");
+                  setReason("");
                 }}
-                className="px-4 py-2 bg-[var(--neutral-gray-200)] text-[var(--neutral-gray-700)] rounded hover:bg-gray-300"
+                className="px-4 py-2 bg-muted text-foreground rounded hover:bg-accent"
               >
                 Cancel
               </button>
               <button
                 onClick={handleStatusChange}
                 disabled={!status}
-                className="px-4 py-2 bg-[var(--color-info)] text-[var(--foreground)] rounded hover:bg-[var(--color-info)] disabled:opacity-50"
+                className="px-4 py-2 bg-info text-foreground rounded hover:bg-info disabled:opacity-50"
               >
                 Change Status
               </button>

@@ -6,11 +6,11 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantStyles: Record<string, string> = {
-  default: "bg-[var(--neutral-gray-100)] text-[var(--neutral-gray-700)] border-[var(--neutral-gray-400)] dark:bg-[var(--surface-alt)] dark:text-[var(--neutral-gray-200)] dark:border-[var(--brand-navy-light)]",
-  success: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/30 dark:bg-[var(--color-success)]/10 dark:text-[var(--color-success)] dark:border-[var(--color-success)]/30",
-  warning: "bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/30 dark:bg-[var(--color-warning)]/10 dark:text-[var(--color-warning)] dark:border-[var(--color-warning)]/30",
-  error: "bg-[var(--color-error)]/10 text-[var(--color-error)] border-[var(--color-error)]/30 dark:bg-[var(--color-error)]/10 dark:text-[var(--color-error)] dark:border-[var(--color-error)]/30",
-  info: "bg-[var(--color-info)]/10 text-[var(--color-info)] border-[var(--color-info)]/30 dark:bg-[var(--color-info)]/10 dark:text-[var(--color-info)] dark:border-[var(--color-info)]/30",
+  default: "bg-muted text-foreground border",
+  success: "bg-success/10 text-success border-success/30",
+  warning: "bg-warning/10 text-warning border-warning/30",
+  error: "bg-destructive/10 text-destructive border-destructive/30",
+  info: "bg-info/10 text-info border-info/30",
 };
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
@@ -24,7 +24,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         {children}
       </span>
     );
-  }
+  },
 );
 
 Badge.displayName = "Badge";

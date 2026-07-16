@@ -9,7 +9,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col space-y-1">
         {label && (
-          <label className="text-sm font-medium text-[var(--muted-foreground)]">
+          <label className="text-sm font-medium text-muted-foreground">
             {label}
           </label>
         )}
@@ -20,7 +20,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         />
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = "Input";
